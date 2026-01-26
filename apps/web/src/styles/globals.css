@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core theme colors - CSS custom properties for dynamic theming */
+    --color-bg-0: #0d0d12;
+    --color-bg-1: #16161d;
+    --color-bg-2: #1e1e26;
+    --color-text: #eaeaf3;
+    --color-text-muted: #6b6b7b;
+    --color-text-dim: #4a4a57;
+    --color-teal: #00d4c7;
+    --color-purple: #8b5cf6;
+    --color-success: #2ee59d;
+    --color-warning: #fbbf24;
+    --color-error: #ef4444;
+    --color-surface: rgba(255, 255, 255, 0.06);
+    --color-stroke: rgba(255, 255, 255, 0.12);
+  }
+
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg-0 text-text antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Focus visible styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-teal;
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-teal/30 text-text;
+  }
+
+  /* Scrollbar styling for webkit browsers */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-stroke rounded-full hover:bg-stroke/80;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) #16161d;
+  }
+}
+
+@layer components {
+  /* Container utility */
+  .container-app {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card component base */
+  .card {
+    @apply rounded-2xl border border-stroke bg-surface p-4 shadow-card backdrop-blur-sm;
+  }
+
+  .card-elevated {
+    @apply rounded-2xl border border-stroke bg-bg-1 p-4 shadow-elevated;
+  }
+
+  /* Badge component */
+  .badge {
+    @apply inline-flex items-center gap-2 rounded-full border border-stroke bg-surface px-3 py-1.5 text-xs text-text-muted;
+  }
+
+  .badge-teal {
+    @apply border-teal/30 bg-teal/10 text-teal;
+  }
+
+  .badge-purple {
+    @apply border-purple/30 bg-purple/10 text-purple;
+  }
+
+  /* Button base styles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-stroke bg-surface px-4 py-2.5 text-sm font-semibold text-text shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 focus-visible:ring-offset-bg-0 active:translate-y-0 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply border-teal/40 bg-gradient-brand hover:shadow-glow;
+  }
+
+  .btn-ghost {
+    @apply border-transparent bg-transparent shadow-none hover:bg-surface;
+  }
+
+  /* Keyboard shortcut styling */
+  .kbd {
+    @apply inline-flex items-center rounded-lg border border-stroke/60 bg-bg-0/80 px-2 py-0.5 font-mono text-xs text-text/90;
+  }
+
+  /* Input base styles */
+  .input {
+    @apply w-full rounded-xl border border-stroke bg-bg-1 px-4 py-2.5 text-text placeholder:text-text-dim focus:border-teal/50 focus:outline-none focus:ring-2 focus:ring-teal/20;
+  }
+
+  /* Link styles */
+  .link {
+    @apply text-text-muted transition-colors hover:text-text;
+  }
+
+  .link-teal {
+    @apply text-teal hover:text-teal-300;
+  }
+}
+
+@layer utilities {
+  /* Gradient text utility */
+  .text-gradient {
+    @apply bg-gradient-to-r from-teal to-purple bg-clip-text text-transparent;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply border border-stroke/50 bg-bg-1/60 backdrop-blur-xl;
+  }
+
+  /* Glow effects */
+  .glow-teal {
+    box-shadow: 0 0 20px rgba(0, 212, 199, 0.2), 0 0 40px rgba(0, 212, 199, 0.1);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2),
+      0 0 40px rgba(139, 92, 246, 0.1);
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+}

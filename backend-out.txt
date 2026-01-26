@@ -1,0 +1,114 @@
+[sentry] Sentry DSN not configured - error tracking disabled
+prisma:info Calling https://accelerate.prisma-data.net/6.19.1/991682d82d8868f9d24bade41f97c10eaf97bb9c0050e2860a08f52eb8372518/graphql (n=0)
+[2026-01-25 21:04:22.146 -0600] [32mINFO[39m: [36m[video] MediaMTX binary found[39m
+    [35mmodule[39m: "video"
+    [35mbinaryPath[39m: "C:\Users\Oliver Productions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands Dev\livestream-copilot\apps\desktop-companion\bin\mediamtx.exe"
+[2026-01-25 21:04:22.146 -0600] [32mINFO[39m: [36m[video] MediaMTX binary found - video streaming available[39m
+    [35mmodule[39m: "video"
+    [35mconfig[39m: {
+      "rtmpPort": 1935,
+      "webrtcPort": 8889,
+      "hlsPort": 8888,
+      "apiPort": 9997,
+      "enabled": true
+    }
+[2026-01-25 21:04:22.146 -0600] [32mINFO[39m: [36m[ffmpeg] FFmpeg and FFprobe are available[39m
+    [35mmodule[39m: "ffmpeg"
+prisma:query SELECT 1
+prisma:query SELECT 1
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[db] Database connection established[39m
+    [35mmodule[39m: "db"
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent router initialized[39m
+    [35mmodule[39m: "agent-router"
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent registered[39m
+    [35mmodule[39m: "agent-router"
+    [35magentName[39m: "streamer-agent"
+    [35mworkflow[39m: "streamer"
+    [35mtriggerEvents[39m: [
+      "TRANSCRIPT_SEGMENT",
+      "MOMENT_MARKER",
+      "ARTIFACT_CLIP_CREATED"
+    ]
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent registered[39m
+    [35mmodule[39m: "agent-router"
+    [35magentName[39m: "podcast-agent"
+    [35mworkflow[39m: "podcast"
+    [35mtriggerEvents[39m: [
+      "TRANSCRIPT_SEGMENT",
+      "MOMENT_MARKER",
+      "ARTIFACT_CLIP_CREATED"
+    ]
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent registered[39m
+    [35mmodule[39m: "agent-router"
+    [35magentName[39m: "writers-room-agent"
+    [35mworkflow[39m: "writers_room"
+    [35mtriggerEvents[39m: [
+      "TRANSCRIPT_SEGMENT",
+      "MOMENT_MARKER"
+    ]
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent registered[39m
+    [35mmodule[39m: "agent-router"
+    [35magentName[39m: "debate-agent"
+    [35mworkflow[39m: "debate"
+    [35mtriggerEvents[39m: [
+      "TRANSCRIPT_SEGMENT",
+      "MOMENT_MARKER"
+    ]
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agent-router] Agent registered[39m
+    [35mmodule[39m: "agent-router"
+    [35magentName[39m: "brainstorm-agent"
+    [35mworkflow[39m: "brainstorm"
+    [35mtriggerEvents[39m: [
+      "TRANSCRIPT_SEGMENT",
+      "MOMENT_MARKER"
+    ]
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[agents] AI agent router initialized with workflow agents[39m
+    [35mmodule[39m: "agents"
+    [35mstats[39m: {
+      "enabled": true,
+      "workflowCount": 5,
+      "agentCount": 5,
+      "activeSessionCount": 0
+    }
+[2026-01-25 21:04:22.507 -0600] [32mINFO[39m: [36m[main] Initializing desktop-companion service with validated configuration[39m
+    [35mmodule[39m: "main"
+    [35mnodeEnv[39m: "development"
+    [35mhttpPort[39m: 3123
+    [35mwsPort[39m: 3124
+    [35msessionDir[39m: "./sessions"
+    [35mobsWsUrl[39m: "ws://127.0.0.1:4455"
+    [35mlogLevel[39m: "info"
+    [35mlogFormat[39m: "pretty"
+    [35msttProvider[39m: "deepgram"
+    [35mffmpegReady[39m: true
+    [35mmediamtxAvailable[39m: true
+    [35mclipOutputFormat[39m: "mp4"
+    [35mdbHealthy[39m: true
+    [35magentsEnabled[39m: true
+    [35maiProvider[39m: "anthropic"
+    [35maiModel[39m: "claude-sonnet-4-20250514"
+[2026-01-25 21:04:22.518 -0600] [32mINFO[39m: [36m[stt] STT Manager initialized[39m
+    [35mmodule[39m: "stt"
+[2026-01-25 21:04:22.516 -0600] [32mINFO[39m: [36m[api] Auth routes mounted at /api/v1/auth[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Sessions routes mounted at /api/sessions[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Clips routes mounted at /api/clips and /api/sessions/:sessionId/clips[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Outputs routes mounted at /api/outputs and /api/sessions/:sessionId/outputs[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Events routes mounted at /api/events and /api/sessions/:sessionId/events[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Billing routes mounted at /api/v1/billing[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Export routes mounted at /api/v1/export[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Branding routes mounted at /api/v1/branding[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Social media routes mounted at /api/v1/social[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.517 -0600] [32mINFO[39m: [36m[api] Video streaming routes mounted at /api/video[39m
+    [35mmodule[39m: "api"
+[2026-01-25 21:04:22.516 -0600] [32mINFO[39m: [36m[obs] Connected to OBS WebSocket[39m
+    [35mmodule[39m: "obs"
+    [35murl[39m: "ws://127.0.0.1:4455"

@@ -1,0 +1,40 @@
+{
+  "name": "livestream-copilot-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "pnpm exec expo start",
+    "android": "pnpm exec expo start --android",
+    "ios": "pnpm exec expo start --ios",
+    "web": "pnpm exec expo start --web",
+    "dev": "pnpm exec expo start --lan"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.28.4",
+    "@livestream-copilot/shared": "workspace:*",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-native-community/netinfo": "^11.4.1",
+    "@react-navigation/native": "^7.0.0",
+    "@react-navigation/native-stack": "^7.0.0",
+    "expo": "~54.0.32",
+    "expo-asset": "~12.0.2",
+    "expo-audio": "~1.1.1",
+    "expo-camera": "~17.0.10",
+    "expo-clipboard": "~8.0.8",
+    "expo-haptics": "~15.0.8",
+    "expo-linear-gradient": "~15.0.8",
+    "expo-local-authentication": "^17.0.8",
+    "expo-secure-store": "^15.0.8",
+    "expo-web-browser": "~15.0.10",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "^5.3.0",
+    "react-native-screens": "~4.16.0",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10"
+  }
+}

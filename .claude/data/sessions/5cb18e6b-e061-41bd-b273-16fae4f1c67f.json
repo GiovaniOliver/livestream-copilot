@@ -1,0 +1,11 @@
+{
+  "session_id": "5cb18e6b-e061-41bd-b273-16fae4f1c67f",
+  "prompts": [
+    "OK let's use the skill Previous Conversation to continue the work from the previous chat",
+    "ok proceed with The high priority unfinished and specs and then work on the web dashboard integration connected to the front and back in And actually go ahead Add these issues and these and all these issues to the Linear MCP tool and make sure they're organize under the product a project I don't think we have this project in our linear MCP dashboard So go ahead and make sure you make the project and then make sure you store all these issues inside that project with the linear MCP tool ",
+    " cok work on the backlog issues of this project",
+    "continue",
+    "<task-notification>\n<task-id>b4ab0e2</task-id>\n<output-file>C:\\Users\\Oliver Productions\\AppData\\Local\\Temp\\claude\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\tasks\\b4ab0e2.output</output-file>\n<status>completed</status>\n<summary>Background command \"Run tests via Node child process\" completed (exit code 0)</summary>\n</task-notification>\nRead the output file to retrieve the result: C:\\Users\\Oliver Productions\\AppData\\Local\\Temp\\claude\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\tasks\\b4ab0e2.output",
+    "continue"
+  ]
+}

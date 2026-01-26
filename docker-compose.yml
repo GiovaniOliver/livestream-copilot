@@ -1,0 +1,99 @@
+version: "3.8"
+
+services:
+  # ===========================================
+  # Backend API Service
+  # ===========================================
+  api:
+    build:
+      context: .
+      dockerfile: apps/desktop-companion/Dockerfile
+    container_name: fluxboard-api
+    ports:
+      - "3123:3123"  # HTTP API
+      - "3124:3124"  # WebSocket
+    environment:
+      - NODE_ENV=production
+      - PORT=3123
+      - WS_PORT=3124
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - OPIK_API_KEY=${OPIK_API_KEY}
+    volumes:
+      - session-data:/app/session
+      - logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3123/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - fluxboard-network
+
+  # ===========================================
+  # Web Dashboard (Next.js)
+  # ===========================================
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: fluxboard-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://api:3123
+      - NEXT_PUBLIC_WS_URL=ws://api:3124
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - fluxboard-network
+
+# ===========================================
+# Development Configuration
+# ===========================================
+  api-dev:
+    build:
+      context: .
+      dockerfile: apps/desktop-companion/Dockerfile
+      target: deps
+    container_name: fluxboard-api-dev
+    ports:
+      - "3123:3123"
+      - "3124:3124"
+    environment:
+      - NODE_ENV=development
+      - PORT=3123
+      - WS_PORT=3124
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY}
+    volumes:
+      - ./apps/desktop-companion/src:/app/apps/desktop-companion/src
+      - ./packages/shared/src:/app/packages/shared/src
+      - session-data:/app/session
+    command: ["pnpm", "dev"]
+    profiles:
+      - dev
+    networks:
+      - fluxboard-network
+
+networks:
+  fluxboard-network:
+    driver: bridge
+
+volumes:
+  session-data:
+  logs:

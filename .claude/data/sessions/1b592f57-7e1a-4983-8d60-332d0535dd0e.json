@@ -1,0 +1,13 @@
+{
+  "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+  "prompts": [
+    "OK let's continue the work from the previous check Use this skill Previous Conversation to see what we were working on and let's continue that work  ",
+    "ok yes proced with the next steps in the order listed",
+    "continue",
+    "OK let's work on some better and enhancements on the management of starting the feeds and stuff also I have OBS set up and I try to test it out but I wasn't getting any response can we start all of the apps so I can test it out myself Start the web app the desk companion in the mobile app Also let's hash out some plans to enhance the mobile version and use agents in try very very hard to do this correctly Also youth skills ",
+    " 1 is good for the mobile and 2 3 and 4 are good for desktop/web and 4 is good for the 4 also. 1 can be for that opton but also its  good for mobile record video sources feature as well",
+    "3",
+    " All these options are important for the mobile so you can Add all four of these options ",
+    "<bash-notification>\n<shell-id>b473761</shell-id>\n<output-file>C:\\Users\\Oliver Productions\\AppData\\Local\\Temp\\claude\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\tasks\\b473761.output</output-file>\n<status>failed</status>\n<summary>Background command \"Start desktop companion server\" failed with exit code 137.</summary>\nRead the output file to retrieve the output.\n</bash-notification>\n<bash-notification>\n<shell-id>ba91330</shell-id>\n<output-file>C:\\Users\\Oliver Productions\\AppData\\Local\\Temp\\claude\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\tasks\\ba91330.output</output-file>\n<status>failed</status>\n<summary>Background command \"Start Next.js web app\" failed with exit code 137.</summary>\nRead the output file to retrieve the output.\n</bash-notification>\n<bash-notification>\n<shell-id>b67d0ea</shell-id>\n<output-file>C:\\Users\\Oliver Productions\\AppData\\Local\\Temp\\claude\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\tasks\\b67d0ea.output</output-file>\n<status>failed</status>\n<summary>Background command \"Start Expo on port 8085\" failed with exit code 137.</summary>\nRead the output file to retrieve the output.\n</bash-notification>"
+  ]
+}

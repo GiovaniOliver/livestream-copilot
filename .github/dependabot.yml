@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    groups:
+      # Group all minor and patch updates
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group devDependencies
+      npm-dev:
+        dependency-type: "development"
+        patterns:
+          - "@types/*"
+          - "vitest"
+          - "@vitest/*"
+          - "typescript"
+          - "eslint*"
+          - "prettier"
+    ignore:
+      # Ignore major updates that might break things
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5

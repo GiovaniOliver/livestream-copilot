@@ -1,0 +1,72 @@
+﻿node.exe : (node:51424) ExperimentalWarning: CommonJS module C:\Users\Oliver 
+Productions\AppData\Roaming\npm\node_modules\npm\node_modules\debug\src\node.js is loading ES Module C:\Users\Oliver 
+Productions\AppData\Roaming\npm\node_modules\npm\node_modules\supports-color\index.js using require().
+At C:\Program Files\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:51424) Ex...sing require().:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Support for loading ES Module in require() is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/Oliver Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/desktop-companion[39m
+
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/auth/middleware.test.ts [2m([22m[2m30 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/services/session.service.test.ts [2m([22m[2m19 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/services/clip.service.test.ts [2m([22m[2m23 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/services/output.service.test.ts [2m([22m[2m24 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+[90mstderr[2m | src/__tests__/routes/auth.routes.test.ts[2m > [22m[2mAuth API Routes[2m > [22m[2mPOST 
+/api/v1/auth/logout[2m > [22m[2mshould return success even with invalid token (no enumeration)
+[22m[39m[auth/routes] Logout error: Error: Token not found
+    at [90mC:\Users\Oliver Productions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands 
+Dev\livestream-copilot\apps\desktop-companion\[39msrc\__tests__\routes\auth.routes.test.ts:285:55
+    at file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-copilot/node
+_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+    at file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-copilot/node
+_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+    at runWithTimeout (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestr
+eam-copilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:39:7)
+    at runTest (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-cop
+ilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1056:17)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runFiles (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1262:5)
+
+[90mstderr[2m | src/__tests__/routes/auth.routes.test.ts[2m > [22m[2mAuth API Routes[2m > [22m[2mPOST 
+/api/v1/auth/resend-verification[2m > [22m[2mshould return success even when email not found (no enumeration)
+[22m[39m[auth/routes] Resend verification error: Error: User not found
+    at [90mC:\Users\Oliver Productions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands 
+Dev\livestream-copilot\apps\desktop-companion\[39msrc\__tests__\routes\auth.routes.test.ts:382:9
+    at file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-copilot/node
+_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:146:14
+    at file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-copilot/node
+_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:533:11
+    at runWithTimeout (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestr
+eam-copilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:39:7)
+    at runTest (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-cop
+ilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1056:17)
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runSuite (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1205:15)
+    at runFiles (file:///C:/Users/Oliver%20Productions/Desktop/1.SMG-BUSINESS/0b.)SMG-Main%20Brands%20Dev/livestream-co
+pilot/node_modules/[4m.pnpm[24m/@vitest+runner@2.1.9/node_modules/[4m@vitest[24m/runner/dist/index.js:1262:5)
+
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/routes/auth.routes.test.ts [2m([22m[2m26 tests[22m[2m)[22m[90m 134[2mms[22m[39m
+ [32mΓ£ô[39m [36m|desktop-companion|[39m src/__tests__/routes/sessions.routes.test.ts [2m([22m[2m22 tests[22m[2m)[22m[90m 145[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m144 passed[39m[22m[90m (144)[39m
+[2m   Start at [22m 20:11:51
+[2m   Duration [22m 751ms[2m (transform 400ms, setup 137ms, collect 1.17s, tests 340ms, environment 1ms, prepare 732ms)[22m
+

@@ -1,0 +1,32 @@
+{
+  "name": "livestream-copilot",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --names \"API,WEB,MOBILE\" -c \"cyan,magenta,yellow\" \"pnpm dev:api\" \"pnpm dev:web\" \"pnpm dev:mobile\"",
+    "dev:api": "pnpm --filter desktop-companion dev",
+    "dev:web": "pnpm --filter @livestream-copilot/web dev",
+    "dev:mobile": "pnpm --filter livestream-copilot-mobile start",
+    "dev:api-only": "pnpm --filter desktop-companion dev",
+    "dev:web-only": "pnpm --filter @livestream-copilot/web dev",
+    "install:all": "pnpm install && pnpm db:generate",
+    "db:generate": "pnpm --filter desktop-companion db:generate",
+    "db:migrate": "pnpm --filter desktop-companion db:migrate",
+    "db:studio": "pnpm --filter desktop-companion db:studio",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit -p apps/desktop-companion/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.json",
+    "lint": "eslint apps/web/src --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/ui": "^2.1.9",
+    "concurrently": "^8.2.2",
+    "vitest": "^2.1.9"
+  }
+}

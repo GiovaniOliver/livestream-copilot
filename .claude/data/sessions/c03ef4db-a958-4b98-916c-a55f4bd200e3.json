@@ -1,0 +1,13 @@
+{
+  "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+  "prompts": [
+    "OK Let's continue the work from the previous chat Use the scale previous conversation to continue to work ",
+    "yes",
+    "ok proceed with the last two options I ll add the bunny details later",
+    "continue",
+    "ok Do you have access to the PR MCP 2 so go ahead and create the database and run the migrations ",
+    "ok try agian I just reconnected the prisma-remote mcp tool",
+    "OK I ran the prison generation Microsoft Windows [Version 10.0.26200.7462]\n(c) Microsoft Corporation. All rights reserved.\n\\desktop-companion>npx prisma generate\n(node:166904) ExperimentalWarning: CommonJS module C:\\Users\\Oliver Productions\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\debug\\src\\node.js is loading ES Module C:\\Users\\Oliver Productions\\\\desktop-companion>npx prisma generate\n(node:166904) ExperimentalWarning: CommonJS module C:\\Users\\Oliver Productions\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\debug\\src\\node.js is loading ES Module C:\\Users\\Oliver Productions\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\supports-color\\index.js using require().        \nSupport for loading ES Module in require() is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\nLoaded Prisma config from prisma.config.ts.      \n\nPrisma config detected, skipping environment variable loading.\nPrisma schema loaded from prisma\\schema.prisma   \n\n\u00e2\u0153\u201d Generated Prisma Client (6.19.1) to .\\src\\generated\\prisma in 76ms\n What's next ",
+    "OK let's make sure that all the updated UI components and pages and and and things like that and screens or connected and wired up and everything from the back end The database is connected to the front animation and if you don't have any mismatch document this this work as you do so it doesn't get up Messed up "
+  ]
+}

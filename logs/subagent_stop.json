@@ -1,0 +1,1652 @@
+[
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a938800",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a938800.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5b2d5e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a5b2d5e.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab6aaae",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ab6aaae.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a818be1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a818be1.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4105b7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a4105b7.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a165352",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a165352.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a98728d",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a98728d.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9230f8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a9230f8.jsonl"
+  },
+  {
+    "session_id": "2920d754-7949-4704-9921-7934d806e588",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2920d754-7949-4704-9921-7934d806e588.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa02dd2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aa02dd2.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aeca7a2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aeca7a2.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a189124",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a189124.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a8688e9",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a8688e9.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "afa1961",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-afa1961.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a74c33f",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a74c33f.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ae984ec",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ae984ec.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5244e7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a5244e7.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a08e33c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a08e33c.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a1e3a9c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a1e3a9c.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab62816",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ab62816.jsonl"
+  },
+  {
+    "session_id": "419e91e2-a31c-42a5-8480-badeeb53d414",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\419e91e2-a31c-42a5-8480-badeeb53d414.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a149c4f",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a149c4f.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "afcf3fe",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-afcf3fe.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "adb3fb0",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-adb3fb0.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7c0b88",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a7c0b88.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a878eb8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a878eb8.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aec90b5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aec90b5.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a89322c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a89322c.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a42e6c3",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a42e6c3.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4ffdf5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a4ffdf5.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7012d8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a7012d8.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aae129a",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aae129a.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a883eda",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a883eda.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a0b1f1b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a0b1f1b.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a147777",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a147777.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af78ab4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-af78ab4.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aff464b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aff464b.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7014ea",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a7014ea.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a17d594",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a17d594.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a038b91",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a038b91.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a89c6c2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a89c6c2.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a686486",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a686486.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa87d8e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aa87d8e.jsonl"
+  },
+  {
+    "session_id": "ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\ffb2d3e9-10d3-4ea1-ac54-864eb7d47f77.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad9f5fd",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ad9f5fd.jsonl"
+  },
+  {
+    "session_id": "b8310117-8e56-460d-8a98-e72320e2bc48",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8310117-8e56-460d-8a98-e72320e2bc48.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a8539c9",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a8539c9.jsonl"
+  },
+  {
+    "session_id": "b8310117-8e56-460d-8a98-e72320e2bc48",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8310117-8e56-460d-8a98-e72320e2bc48.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "abdfb63",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-abdfb63.jsonl"
+  },
+  {
+    "session_id": "078e4d3f-f93a-4326-b830-53faea832d9f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\078e4d3f-f93a-4326-b830-53faea832d9f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a724cdf",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a724cdf.jsonl"
+  },
+  {
+    "session_id": "078e4d3f-f93a-4326-b830-53faea832d9f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\078e4d3f-f93a-4326-b830-53faea832d9f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5920d1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a5920d1.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7c3de4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a7c3de4.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a2c04a5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a2c04a5.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "adad06b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-adad06b.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab99cf4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ab99cf4.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a910c3e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a910c3e.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a6b5de8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a6b5de8.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a2074ea",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a2074ea.jsonl"
+  },
+  {
+    "session_id": "1b592f57-7e1a-4983-8d60-332d0535dd0e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1b592f57-7e1a-4983-8d60-332d0535dd0e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a96ede7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a96ede7.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ae89a7e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ae89a7e.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa0d72a",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aa0d72a.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a49384a",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a49384a.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a114ba2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a114ba2.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a956534",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a956534.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a1fd104",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a1fd104.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a32821c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a32821c.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a61d9cf",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a61d9cf.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ae1baf8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ae1baf8.jsonl"
+  },
+  {
+    "session_id": "7a76e311-7209-4819-b499-34a018623562",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7a76e311-7209-4819-b499-34a018623562.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a2dda5a",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a2dda5a.jsonl"
+  },
+  {
+    "session_id": "1184e843-c0f7-4997-bf9b-49196c62349f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1184e843-c0f7-4997-bf9b-49196c62349f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad9604e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ad9604e.jsonl"
+  },
+  {
+    "session_id": "1184e843-c0f7-4997-bf9b-49196c62349f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\1184e843-c0f7-4997-bf9b-49196c62349f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a1fa0cb",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a1fa0cb.jsonl"
+  },
+  {
+    "session_id": "8999dfd7-4d9b-4667-88bf-71d33193eb37",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8999dfd7-4d9b-4667-88bf-71d33193eb37.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a70daa8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a70daa8.jsonl"
+  },
+  {
+    "session_id": "8999dfd7-4d9b-4667-88bf-71d33193eb37",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8999dfd7-4d9b-4667-88bf-71d33193eb37.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ac45313",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ac45313.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a07a49e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a07a49e.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "afbda04",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-afbda04.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a678aaf",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a678aaf.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a862a88",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a862a88.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5da24e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a5da24e.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ae938f5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ae938f5.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "afda527",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-afda527.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad909ba",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ad909ba.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a205f4b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a205f4b.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aaff9c8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aaff9c8.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "add072c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-add072c.jsonl"
+  },
+  {
+    "session_id": "c03ef4db-a958-4b98-916c-a55f4bd200e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\c03ef4db-a958-4b98-916c-a55f4bd200e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a78de95",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a78de95.jsonl"
+  },
+  {
+    "session_id": "52a50d02-81e3-4d6a-9c0e-6d5091b96492",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\52a50d02-81e3-4d6a-9c0e-6d5091b96492.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7a4a9d",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a7a4a9d.jsonl"
+  },
+  {
+    "session_id": "52a50d02-81e3-4d6a-9c0e-6d5091b96492",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\52a50d02-81e3-4d6a-9c0e-6d5091b96492.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab30207",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-ab30207.jsonl"
+  },
+  {
+    "session_id": "98893eed-ecbd-41e5-8fd6-19b696677a08",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\98893eed-ecbd-41e5-8fd6-19b696677a08.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa084c8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-aa084c8.jsonl"
+  },
+  {
+    "session_id": "98893eed-ecbd-41e5-8fd6-19b696677a08",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\98893eed-ecbd-41e5-8fd6-19b696677a08.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af77959",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-af77959.jsonl"
+  },
+  {
+    "session_id": "98893eed-ecbd-41e5-8fd6-19b696677a08",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\98893eed-ecbd-41e5-8fd6-19b696677a08.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a145ce5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\agent-a145ce5.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4568ac",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a4568ac.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a1cfc36",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a1cfc36.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a895abc",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a895abc.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a68995e",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a68995e.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a844b5c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a844b5c.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9fe211",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a9fe211.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4e2cee",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a4e2cee.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9bde1b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a9bde1b.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "acbbfc2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-acbbfc2.jsonl"
+  },
+  {
+    "session_id": "3985037a-d0e2-46a0-9176-55604c2cf8e3",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a055070",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\3985037a-d0e2-46a0-9176-55604c2cf8e3\\subagents\\agent-a055070.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aede755",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-aede755.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a0b7ea4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-a0b7ea4.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a8e21d0",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-a8e21d0.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a852d8d",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-a852d8d.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ac627df",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-ac627df.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa5bea4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-aa5bea4.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af17097",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-af17097.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a189856",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-a189856.jsonl"
+  },
+  {
+    "session_id": "2a52f491-0a68-4057-8743-fe6bc1e09ea5",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a1df39c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2a52f491-0a68-4057-8743-fe6bc1e09ea5\\subagents\\agent-a1df39c.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a77a61c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a77a61c.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4c908c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a4c908c.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a450fbc",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a450fbc.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab34e25",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-ab34e25.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5917e0",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a5917e0.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "adcb3e8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-adcb3e8.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af3a9d1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-af3a9d1.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a880432",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a880432.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a5b0da7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-a5b0da7.jsonl"
+  },
+  {
+    "session_id": "88b8706a-431d-4c14-96aa-9e65107cdf78",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af076e1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\88b8706a-431d-4c14-96aa-9e65107cdf78\\subagents\\agent-af076e1.jsonl"
+  },
+  {
+    "session_id": "b8f880ef-8c00-4d6b-92d0-37ab44161d5b",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8f880ef-8c00-4d6b-92d0-37ab44161d5b.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa6d596",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8f880ef-8c00-4d6b-92d0-37ab44161d5b\\subagents\\agent-aa6d596.jsonl"
+  },
+  {
+    "session_id": "b8f880ef-8c00-4d6b-92d0-37ab44161d5b",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8f880ef-8c00-4d6b-92d0-37ab44161d5b.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9037be",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\b8f880ef-8c00-4d6b-92d0-37ab44161d5b\\subagents\\agent-a9037be.jsonl"
+  },
+  {
+    "session_id": "d4741fea-9b77-4a18-a95e-2c8dacee0528",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\d4741fea-9b77-4a18-a95e-2c8dacee0528.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a6a93c5",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\d4741fea-9b77-4a18-a95e-2c8dacee0528\\subagents\\agent-a6a93c5.jsonl"
+  },
+  {
+    "session_id": "7db250c9-dde7-4ffc-8981-00ac999dca3b",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7db250c9-dde7-4ffc-8981-00ac999dca3b.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa54e89",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\7db250c9-dde7-4ffc-8981-00ac999dca3b\\subagents\\agent-aa54e89.jsonl"
+  },
+  {
+    "session_id": "57299ce3-0a87-4e86-9add-8ab4c4b91218",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab4ed66",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218\\subagents\\agent-ab4ed66.jsonl"
+  },
+  {
+    "session_id": "57299ce3-0a87-4e86-9add-8ab4c4b91218",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad5288b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218\\subagents\\agent-ad5288b.jsonl"
+  },
+  {
+    "session_id": "57299ce3-0a87-4e86-9add-8ab4c4b91218",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa1b57d",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\57299ce3-0a87-4e86-9add-8ab4c4b91218\\subagents\\agent-aa1b57d.jsonl"
+  },
+  {
+    "session_id": "fe540dbf-0e9e-46f7-981f-792be7033a49",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\fe540dbf-0e9e-46f7-981f-792be7033a49.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "adcae97",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\fe540dbf-0e9e-46f7-981f-792be7033a49\\subagents\\agent-adcae97.jsonl"
+  },
+  {
+    "session_id": "8b538d71-b235-4ec5-8b02-f6b91efccffe",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8b538d71-b235-4ec5-8b02-f6b91efccffe.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7d8b21",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8b538d71-b235-4ec5-8b02-f6b91efccffe\\subagents\\agent-a7d8b21.jsonl"
+  },
+  {
+    "session_id": "8b538d71-b235-4ec5-8b02-f6b91efccffe",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8b538d71-b235-4ec5-8b02-f6b91efccffe.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4b3978",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\8b538d71-b235-4ec5-8b02-f6b91efccffe\\subagents\\agent-a4b3978.jsonl"
+  },
+  {
+    "session_id": "adf2f389-83ce-4049-8288-7483bc393cd2",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9ac675",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2\\subagents\\agent-a9ac675.jsonl"
+  },
+  {
+    "session_id": "adf2f389-83ce-4049-8288-7483bc393cd2",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4d9122",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2\\subagents\\agent-a4d9122.jsonl"
+  },
+  {
+    "session_id": "adf2f389-83ce-4049-8288-7483bc393cd2",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a0cf588",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\adf2f389-83ce-4049-8288-7483bc393cd2\\subagents\\agent-a0cf588.jsonl"
+  },
+  {
+    "session_id": "5cb18e6b-e061-41bd-b273-16fae4f1c67f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a6688af",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f\\subagents\\agent-a6688af.jsonl"
+  },
+  {
+    "session_id": "5cb18e6b-e061-41bd-b273-16fae4f1c67f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ac53aa3",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f\\subagents\\agent-ac53aa3.jsonl"
+  },
+  {
+    "session_id": "5cb18e6b-e061-41bd-b273-16fae4f1c67f",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4e4572",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\5cb18e6b-e061-41bd-b273-16fae4f1c67f\\subagents\\agent-a4e4572.jsonl"
+  },
+  {
+    "session_id": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a8f9912",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab\\subagents\\agent-a8f9912.jsonl"
+  },
+  {
+    "session_id": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "abbfc20",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab\\subagents\\agent-abbfc20.jsonl"
+  },
+  {
+    "session_id": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a90fedd",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab\\subagents\\agent-a90fedd.jsonl"
+  },
+  {
+    "session_id": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ada94a4",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\aad4331e-a129-45c5-bfcc-5760c501d0ab\\subagents\\agent-ada94a4.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a3a787d",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a3a787d.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af80816",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-af80816.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7ae147",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a7ae147.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a3c1ba0",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a3c1ba0.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a3363f8",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a3363f8.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a600bba",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a600bba.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad29b78",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ad29b78.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a21b0c7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a21b0c7.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a853ee1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a853ee1.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a96e5a9",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a96e5a9.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab06153",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ab06153.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7f490f",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a7f490f.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a866f79",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a866f79.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a70f051",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a70f051.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a4c5327",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a4c5327.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a246e96",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a246e96.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ac16ad7",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ac16ad7.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a9540d3",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a9540d3.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a529ab1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a529ab1.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ad008d2",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ad008d2.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab5cacb",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ab5cacb.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a59c5cd",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a59c5cd.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a0d444b",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a0d444b.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7f16eb",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a7f16eb.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af6f6f3",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-af6f6f3.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "af591b6",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-af591b6.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a17d846",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a17d846.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "aa7442c",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-aa7442c.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ac5fdb1",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-ac5fdb1.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a898913",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a898913.jsonl"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "a7146b3",
+    "agent_transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6\\subagents\\agent-a7146b3.jsonl"
+  }
+]

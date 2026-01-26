@@ -1,0 +1,521 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USER & AUTHENTICATION MODELS
+// ============================================================================
+
+/// Platform-level roles for system administrators
+enum PlatformRole {
+  USER          // Regular user
+  ADMIN         // Platform moderator
+  SUPER_ADMIN   // Platform operator
+}
+
+/// Organization-level roles for team members
+enum OrgRole {
+  VIEWER  // Read-only access
+  MEMBER  // Team member, limited permissions
+  ADMIN   // Organization admin, most permissions
+  OWNER   // Organization creator, full control
+}
+
+/// User account status
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+/// Subscription tier levels
+enum SubscriptionTier {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+/// Subscription status
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+/// User account in the system
+model User {
+  id                  String              @id @default(cuid())
+  email               String              @unique
+  emailVerified       Boolean             @default(false)
+  passwordHash        String?
+  name                String?
+  avatarUrl           String?
+  platformRole        PlatformRole        @default(USER)
+  status              UserStatus          @default(PENDING_VERIFICATION)
+
+  // Relations
+  oauthConnections    OAuthConnection[]
+  socialConnections   SocialConnection[]
+  refreshTokens       RefreshToken[]
+  apiKeys             APIKey[]
+  ownedOrganizations  Organization[]      @relation("OrgOwner")
+  memberships         OrganizationMember[]
+  auditLogs           AuditLog[]
+  sessions            Session[]
+  mediaAssets         MediaAsset[]
+  exports             Export[]
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([email])
+  @@index([status])
+}
+
+/// OAuth provider connection for a user (login/authentication)
+model OAuthConnection {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider      String   // google, github, twitch
+  providerId    String   // User ID from the provider
+  accessToken   String?  // Encrypted
+  refreshToken  String?  // Encrypted
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}
+
+/// Social media platform connection for posting content
+model SocialConnection {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform        SocialPlatform
+  platformUserId  String         // User ID on the social platform
+  platformUsername String?       // Display username
+  accessToken     String         // Encrypted
+  refreshToken    String?        // Encrypted
+  tokenExpiresAt  DateTime?
+  scopes          String[]       // Granted permissions
+  accountName     String?        // Display name for the account
+  avatarUrl       String?
+  isActive        Boolean        @default(true)
+  lastUsedAt      DateTime?
+  lastError       String?        // Last error message if any
+  metadata        Json           @default("{}")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Posts made through this connection
+  posts           SocialPost[]
+
+  @@unique([userId, platform, platformUserId])
+  @@index([userId])
+  @@index([platform])
+}
+
+/// Record of content posted to social media
+model SocialPost {
+  id                String           @id @default(cuid())
+  userId            String
+  connectionId      String
+  connection        SocialConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  platform          SocialPlatform
+  platformPostId    String?          // ID of the post on the platform
+  exportId          String?          // Link to Export record
+
+  // Content
+  content           String?          // Text content
+  mediaUrls         String[]         // URLs of uploaded media
+
+  // Status
+  status            String           @default("pending") // pending, published, failed, deleted
+  publishedAt       DateTime?
+  scheduledFor      DateTime?        // For scheduled posts
+
+  // Analytics (populated later)
+  views             Int?
+  likes             Int?
+  comments          Int?
+  shares            Int?
+  analyticsUpdatedAt DateTime?
+
+  errorMessage      String?
+  platformUrl       String?          // URL to the post on the platform
+  metadata          Json             @default("{}")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([connectionId])
+  @@index([platform])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+/// Refresh token for session management
+model RefreshToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique
+  deviceInfo  String?
+  ipAddress   String?
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+/// API key for programmatic access
+model APIKey {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  keyHash        String        @unique
+  keyPrefix      String        // First 8 chars for identification
+  permissions    String[]      // e.g., ["sessions:read", "sessions:write"]
+  rateLimit      Int           @default(1000) // Requests per minute
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+
+  @@index([userId])
+  @@index([keyHash])
+}
+
+// ============================================================================
+// ORGANIZATION & TEAM MODELS
+// ============================================================================
+
+/// Organization/team for collaborative work
+model Organization {
+  id           String               @id @default(cuid())
+  name         String
+  slug         String               @unique
+  description  String?
+  avatarUrl    String?
+  ownerId      String
+  owner        User                 @relation("OrgOwner", fields: [ownerId], references: [id])
+  settings     Json                 @default("{}")
+
+  // Relations
+  members      OrganizationMember[]
+  subscription Subscription?
+  apiKeys      APIKey[]
+  sessions     Session[]
+  mediaAssets  MediaAsset[]
+  exports      Export[]
+
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@index([slug])
+  @@index([ownerId])
+}
+
+/// Organization membership linking users to organizations
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           OrgRole      @default(MEMBER)
+  invitedBy      String?
+  inviteEmail    String?
+  inviteToken    String?      @unique
+  inviteExpiresAt DateTime?
+  joinedAt       DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([inviteToken])
+}
+
+// ============================================================================
+// SUBSCRIPTION & BILLING MODELS
+// ============================================================================
+
+/// Subscription for an organization
+model Subscription {
+  id               String             @id @default(cuid())
+  organizationId   String             @unique
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tier             SubscriptionTier   @default(FREE)
+  status           SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId String?            @unique
+  stripeSubId      String?            @unique
+  stripePriceId    String?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean          @default(false)
+  usageThisMonth   Json               @default("{\"sessions\": 0, \"storageMB\": 0}")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([stripeCustomerId])
+}
+
+// ============================================================================
+// AUDIT & SECURITY MODELS
+// ============================================================================
+
+/// Audit log for security and compliance
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action        String   // e.g., "auth.login.success", "org.member.invited"
+  resourceType  String?  // e.g., "Session", "Organization"
+  resourceId    String?
+  organizationId String?
+  ipAddress     String?
+  userAgent     String?
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// MEDIA STORAGE MODELS (Bunny.net integration)
+// ============================================================================
+
+/// Media asset stored in Bunny.net CDN
+model MediaAsset {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessionId      String?
+  session        Session?      @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  type           String        // video, audio, image, thumbnail
+  filename       String
+  mimeType       String
+  sizeBytes      BigInt
+  duration       Float?        // For audio/video in seconds
+
+  // Bunny.net storage info
+  storageZone    String
+  storagePath    String        // Path within the storage zone
+  cdnUrl         String        // Full CDN URL for delivery
+
+  // Optional Bunny Stream info (for video streaming)
+  streamVideoId  String?       // Bunny Stream video ID
+  streamStatus   String?       // encoding, ready, failed
+
+  metadata       Json          @default("{}")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([sessionId])
+  @@index([type])
+}
+
+// ============================================================================
+// SESSION & WORKFLOW MODELS
+// ============================================================================
+
+/// Represents a livestream capture session
+model Session {
+  id              String        @id @default(cuid())
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  workflow        String        // content-creator, podcast, script-studio, etc.
+  captureMode     String        // audio-only, video-only, audio+video
+  title           String?
+  description     String?
+  participants    String[]
+
+  // Session state
+  status          String        @default("draft") // draft, live, processing, completed
+  startedAt       DateTime?
+  endedAt         DateTime?
+
+  // Workflow-specific settings
+  workflowConfig  Json          @default("{}")
+
+  // Relations
+  events          Event[]
+  outputs         Output[]
+  clips           Clip[]
+  mediaAssets     MediaAsset[]
+  exports         Export[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([workflow])
+  @@index([status])
+}
+
+/// Represents an event that occurred during a session
+model Event {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  ts        BigInt
+  traceId   String?
+  spanId    String?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([type])
+}
+
+/// Represents generated output content from a session
+model Output {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  category  String
+  title     String?
+  text      String
+  refs      String[]
+  meta      Json     @default("{}")
+  status    String   @default("draft")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([category])
+}
+
+/// Represents a video clip captured during a session
+model Clip {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  artifactId  String   @unique
+  path        String
+  t0          Float
+  t1          Float
+  thumbnailId String?
+  exports     Export[]
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+// ============================================================================
+// EXPORT MODELS
+// ============================================================================
+
+/// Export type enumeration
+enum ExportType {
+  POST        // Social media post text
+  CLIP        // Video clip file
+  BATCH       // Multiple items exported together
+}
+
+/// Export status enumeration
+enum ExportStatus {
+  PENDING     // Export initiated but not started
+  PROCESSING  // Export in progress
+  COMPLETED   // Export successful
+  FAILED      // Export failed
+}
+
+/// Social media platform enumeration
+enum SocialPlatform {
+  TWITTER
+  LINKEDIN
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  FACEBOOK
+  THREADS
+  BLUESKY
+}
+
+/// Export format for clips
+enum ExportFormat {
+  MP4
+  WEBM
+  GIF
+  MOV
+}
+
+/// Export record tracking all exports
+model Export {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessionId       String?
+  session         Session?       @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  clipId          String?
+  clip            Clip?          @relation(fields: [clipId], references: [id], onDelete: SetNull)
+
+  type            ExportType
+  status          ExportStatus   @default(PENDING)
+  platform        SocialPlatform?
+  format          ExportFormat?  // For clip exports
+
+  // Export content
+  content         String?        // Generated text content for posts
+  filePath        String?        // Path to exported file
+  fileSize        BigInt?        // Size in bytes
+  thumbnailPath   String?        // Path to thumbnail for clips
+
+  // Export metadata
+  metadata        Json           @default("{}")
+  errorMessage    String?
+
+  // Processing times
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([sessionId])
+  @@index([clipId])
+  @@index([type])
+  @@index([status])
+  @@index([platform])
+  @@index([createdAt])
+}

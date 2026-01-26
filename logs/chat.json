@@ -1,0 +1,569 @@
+[
+  {
+    "type": "file-history-snapshot",
+    "messageId": "5f0862ab-7cfc-432c-9cea-b069aeac9eab",
+    "snapshot": {
+      "messageId": "5f0862ab-7cfc-432c-9cea-b069aeac9eab",
+      "trackedFileBackups": {},
+      "timestamp": "2026-01-24T14:36:26.009Z"
+    },
+    "isSnapshotUpdate": false
+  },
+  {
+    "parentUuid": null,
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "SessionStart",
+      "hookName": "SessionStart:startup",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\send_event.py\" --source-app %OBS_SOURCE_APP% --event-type SessionStart --server-url %OBS_SERVER_URL% --mirror-url %MIRROR_PUSH_URL%"
+    },
+    "parentToolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "toolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "timestamp": "2026-01-24T14:34:12.933Z",
+    "uuid": "26e62da7-cc81-40ba-961b-27734244c33e"
+  },
+  {
+    "parentUuid": "26e62da7-cc81-40ba-961b-27734244c33e",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "SessionStart",
+      "hookName": "SessionStart:startup",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\session_start.py\""
+    },
+    "parentToolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "toolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "timestamp": "2026-01-24T14:34:12.983Z",
+    "uuid": "55440c52-df9d-4e4e-bbd0-3596314dfac6"
+  },
+  {
+    "parentUuid": "55440c52-df9d-4e4e-bbd0-3596314dfac6",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "SessionStart",
+      "hookName": "SessionStart:startup",
+      "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/mgrep_watch.py"
+    },
+    "parentToolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "toolUseID": "ee295d1b-c13e-40e7-80a5-ad65f230f894",
+    "timestamp": "2026-01-24T14:34:12.986Z",
+    "uuid": "24896e4b-f877-467b-a382-439cd0cc0773"
+  },
+  {
+    "parentUuid": "24896e4b-f877-467b-a382-439cd0cc0773",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "user",
+    "message": {
+      "role": "user",
+      "content": "User skill previous conversation to continue the work from the previous check "
+    },
+    "uuid": "5f0862ab-7cfc-432c-9cea-b069aeac9eab",
+    "timestamp": "2026-01-24T14:36:17.531Z",
+    "thinkingMetadata": {
+      "maxThinkingTokens": 31999
+    },
+    "todos": [],
+    "permissionMode": "bypassPermissions"
+  },
+  {
+    "parentUuid": "5f0862ab-7cfc-432c-9cea-b069aeac9eab",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "message": {
+      "model": "claude-opus-4-5-20251101",
+      "id": "msg_017AgUwv41KEEwSkfvRWskm6",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "The user wants me to use a skill to recall a previous conversation and continue the work from there. Looking at the available skills, I see \"remembering-conversations\" which is designed to \"Search previous Claude Code conversations for facts, patterns, decisions, and context using semantic or text search.\"\n\nLet me invoke this skill to find the previous conversation context.",
+          "signature": "EqEECkYICxgCKkBPBQh3HkGQLM/5O0eJcwZLwa/PO7FAKHXBhRsK931UeTGpvO7f+pXpcatz47gQ7H7EYcDIXJaFxpfAbBvYc50gEgwOc0gL3rGcDaMp06AaDFZSEnT+s6xgKKdriiIw18/sjt2uxW0AtBtEfz8LqPQCZerZDO2uFU0EeBVmTpEtU5BQCIH/irkeFwsCbeZWKogDK3EUYwiaRQLdkpuZ+qSswqBbPS50M5iDspspIfdZjDPvF6iPXvKIrj1gUxJPXI5Y/qSPCIqlW73hkiSy4qK+LQ3r5QnL8WJqMdyDT8Su71Z988E4a7xNe016Gs6wKN5DfqEP2GQgEx24ngCTdDKjHsKA7+hcuZNs/i5rs5Vljf6A4a8oAuZfp+elx1yC9XJDPXt41nXmecafqwJM9kEuUJGCMASXex+JfordkZ2Hw1ygvMB1MRZs/Flz0QUSGFLavOSN+l9u0bvXoPAIEeN73OqPdKJjdqBQR41kKRI61Esn1tH+0py1noDowGh7DLsotvOvQFLfZgGdAe2pe96dGfmJVKhlEYrIoaP4Xo4wM/fl3JUarFFNfvLMrA9brGOl8qySReL8JNrXnG3Rn1t5XxS68JrFEeFuFrpCxmqRQ1Nw/TQJpBpCrzJVeSsJcyfY1ywOntjufJ4EcDHPJIYdpMC0P/xtcpoxYLwlra2/Hq5AA1fEEBLD9PqauY6+bfCXEf5iOph/fqQYAQ=="
+        }
+      ],
+      "stop_reason": null,
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 9,
+        "cache_creation_input_tokens": 16891,
+        "cache_read_input_tokens": 22544,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 16891,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 1,
+        "service_tier": "standard"
+      }
+    },
+    "requestId": "req_011CXSNVZDfjTfo66gHemFDx",
+    "type": "assistant",
+    "uuid": "8a0aa88c-d403-43aa-8947-9ed982b65513",
+    "timestamp": "2026-01-24T14:36:30.377Z"
+  },
+  {
+    "parentUuid": "8a0aa88c-d403-43aa-8947-9ed982b65513",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "message": {
+      "model": "claude-opus-4-5-20251101",
+      "id": "msg_017AgUwv41KEEwSkfvRWskm6",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+          "name": "Skill",
+          "input": {
+            "skill": "remembering-conversations"
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "stop_reason": null,
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 9,
+        "cache_creation_input_tokens": 16891,
+        "cache_read_input_tokens": 22544,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 16891,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 1,
+        "service_tier": "standard"
+      }
+    },
+    "requestId": "req_011CXSNVZDfjTfo66gHemFDx",
+    "type": "assistant",
+    "uuid": "e4b940fc-818e-4a9e-9c90-60a047f28632",
+    "timestamp": "2026-01-24T14:36:30.866Z"
+  },
+  {
+    "parentUuid": "e4b940fc-818e-4a9e-9c90-60a047f28632",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PreToolUse",
+      "hookName": "PreToolUse:Skill",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\pre_tool_use.py\""
+    },
+    "toolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "parentToolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "uuid": "8ac5ba66-c434-4f5b-a76f-d012a8e5d745",
+    "timestamp": "2026-01-24T14:36:30.922Z"
+  },
+  {
+    "parentUuid": "8ac5ba66-c434-4f5b-a76f-d012a8e5d745",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PreToolUse",
+      "hookName": "PreToolUse:Skill",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\send_event.py\" --source-app %OBS_SOURCE_APP% --event-type PreToolUse --server-url %OBS_SERVER_URL% --mirror-url %MIRROR_PUSH_URL%"
+    },
+    "toolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "parentToolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "uuid": "92fa5866-ca62-488d-a1c8-9efc3e1a4f4e",
+    "timestamp": "2026-01-24T14:36:30.922Z"
+  },
+  {
+    "parentUuid": "e4b940fc-818e-4a9e-9c90-60a047f28632",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "user",
+    "message": {
+      "role": "user",
+      "content": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+          "content": "Launching skill: remembering-conversations"
+        }
+      ]
+    },
+    "uuid": "0865413f-935f-428e-b83e-439eefd95eb6",
+    "timestamp": "2026-01-24T14:36:39.857Z",
+    "toolUseResult": {
+      "success": true,
+      "commandName": "remembering-conversations"
+    },
+    "sourceToolAssistantUUID": "e4b940fc-818e-4a9e-9c90-60a047f28632"
+  },
+  {
+    "parentUuid": "0865413f-935f-428e-b83e-439eefd95eb6",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PostToolUse",
+      "hookName": "PostToolUse:Skill",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\post_tool_use.py\""
+    },
+    "parentToolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "toolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "timestamp": "2026-01-24T14:36:39.870Z",
+    "uuid": "9046e960-70cc-4089-8740-279ef0a79a62"
+  },
+  {
+    "parentUuid": "9046e960-70cc-4089-8740-279ef0a79a62",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PostToolUse",
+      "hookName": "PostToolUse:Skill",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\send_event.py\" --source-app %OBS_SOURCE_APP% --event-type PostToolUse --server-url %OBS_SERVER_URL% --mirror-url %MIRROR_PUSH_URL%"
+    },
+    "parentToolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "toolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH",
+    "timestamp": "2026-01-24T14:36:39.871Z",
+    "uuid": "657f2f5c-7887-46da-82bb-9961d77382f6"
+  },
+  {
+    "parentUuid": "657f2f5c-7887-46da-82bb-9961d77382f6",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "user",
+    "message": {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Base directory for this skill: C:\\Users\\Oliver Productions\\.claude\\skills\\remembering-conversations\n\n# Remembering Conversations\n\nSearch archived conversations using semantic similarity or exact text matching.\n\n**Core principle:** Search before reinventing.\n\n**Announce:** \"I'm searching previous conversations for [topic].\"\n\n**Setup:** See INDEXING.md\n\n## When to Use\n\n**Search when:**\n- Your human partner mentions \"we discussed this before\"\n- Debugging similar issues\n- Looking for architectural decisions or patterns\n- Before implementing something familiar\n\n**Don't search when:**\n- Info in current conversation\n- Question about current codebase (use Grep/Read)\n\n## In-Session Use\n\n**Always use subagents** (50-100x context savings). See skills/using-skills for workflow.\n\n**Manual/CLI use:** Direct search (below) for humans outside Claude Code sessions.\n\n## Direct Search (Manual/CLI)\n\n**Tool:** `${SUPERPOWERS_SKILLS_ROOT}/skills/collaboration/remembering-conversations/tool/search-conversations`\n\n**Modes:**\n```bash\nsearch-conversations \"query\"              # Vector similarity (default)\nsearch-conversations --text \"exact\"       # Exact string match\nsearch-conversations --both \"query\"       # Both modes\n```\n\n**Flags:**\n```bash\n--after YYYY-MM-DD    # Filter by date\n--before YYYY-MM-DD   # Filter by date\n--limit N             # Max results (default: 10)\n--help                # Full usage\n```\n\n**Examples:**\n```bash\n# Semantic search\nsearch-conversations \"React Router authentication errors\"\n\n# Find git SHA\nsearch-conversations --text \"a1b2c3d4\"\n\n# Time range\nsearch-conversations --after 2025-09-01 \"refactoring\"\n```\n\nReturns: project, date, conversation summary, matched exchange, similarity %, file path.\n\n**For details:** Run `search-conversations --help`\n"
+        }
+      ]
+    },
+    "isMeta": true,
+    "uuid": "83640fa8-7838-45a4-abb8-a57ad9a27b8d",
+    "timestamp": "2026-01-24T14:36:39.855Z",
+    "sourceToolUseID": "toolu_01JxmTZisJ4oPXKmGqJxvUhH"
+  },
+  {
+    "parentUuid": "83640fa8-7838-45a4-abb8-a57ad9a27b8d",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "message": {
+      "model": "claude-opus-4-5-20251101",
+      "id": "msg_01DmQgnsmPm85qTZY2hw7wJq",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "I'm searching previous conversations for recent work in the livestream-copilot project."
+        }
+      ],
+      "stop_reason": null,
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 1,
+        "cache_creation_input_tokens": 3842,
+        "cache_read_input_tokens": 36038,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 3842,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 1,
+        "service_tier": "standard"
+      }
+    },
+    "requestId": "req_011CXSNXDKQJyktM4eCt1A4V",
+    "type": "assistant",
+    "uuid": "b44150e7-1710-4e23-8e91-44b6c6f0ec18",
+    "timestamp": "2026-01-24T14:36:50.799Z"
+  },
+  {
+    "parentUuid": "b44150e7-1710-4e23-8e91-44b6c6f0ec18",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "message": {
+      "model": "claude-opus-4-5-20251101",
+      "id": "msg_01DmQgnsmPm85qTZY2hw7wJq",
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01HCo4YRRW7T1mPokWzCegTA",
+          "name": "Bash",
+          "input": {
+            "command": "bash \"${SUPERPOWERS_SKILLS_ROOT}/skills/collaboration/remembering-conversations/tool/search-conversations\" --limit 5 \"livestream copilot\"",
+            "description": "Search for previous conversations about livestream-copilot project",
+            "timeout": 30000
+          },
+          "caller": {
+            "type": "direct"
+          }
+        }
+      ],
+      "stop_reason": null,
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 1,
+        "cache_creation_input_tokens": 3842,
+        "cache_read_input_tokens": 36038,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 3842,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 1,
+        "service_tier": "standard"
+      }
+    },
+    "requestId": "req_011CXSNXDKQJyktM4eCt1A4V",
+    "type": "assistant",
+    "uuid": "4e526944-d6de-4c91-b8e9-5c0dce77fa6a",
+    "timestamp": "2026-01-24T14:36:52.101Z"
+  },
+  {
+    "parentUuid": "4e526944-d6de-4c91-b8e9-5c0dce77fa6a",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PreToolUse",
+      "hookName": "PreToolUse:Bash",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\pre_tool_use.py\""
+    },
+    "toolUseID": "toolu_01HCo4YRRW7T1mPokWzCegTA",
+    "parentToolUseID": "toolu_01HCo4YRRW7T1mPokWzCegTA",
+    "uuid": "2ce641eb-2d06-4e2c-b918-5ea6de7e4fd9",
+    "timestamp": "2026-01-24T14:36:52.155Z"
+  },
+  {
+    "parentUuid": "2ce641eb-2d06-4e2c-b918-5ea6de7e4fd9",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "PreToolUse",
+      "hookName": "PreToolUse:Bash",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\send_event.py\" --source-app %OBS_SOURCE_APP% --event-type PreToolUse --server-url %OBS_SERVER_URL% --mirror-url %MIRROR_PUSH_URL%"
+    },
+    "toolUseID": "toolu_01HCo4YRRW7T1mPokWzCegTA",
+    "parentToolUseID": "toolu_01HCo4YRRW7T1mPokWzCegTA",
+    "uuid": "35239a18-8dda-4185-801d-56989bf1a0aa",
+    "timestamp": "2026-01-24T14:36:52.156Z"
+  },
+  {
+    "parentUuid": "4e526944-d6de-4c91-b8e9-5c0dce77fa6a",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "user",
+    "message": {
+      "role": "user",
+      "content": [
+        {
+          "type": "tool_result",
+          "content": "Exit code 127\nbash: /skills/collaboration/remembering-conversations/tool/search-conversations: No such file or directory",
+          "is_error": true,
+          "tool_use_id": "toolu_01HCo4YRRW7T1mPokWzCegTA"
+        }
+      ]
+    },
+    "uuid": "767de208-427d-4b4f-8b66-bd89c7f561d1",
+    "timestamp": "2026-01-24T14:37:02.082Z",
+    "toolUseResult": "Error: Exit code 127\nbash: /skills/collaboration/remembering-conversations/tool/search-conversations: No such file or directory",
+    "sourceToolAssistantUUID": "4e526944-d6de-4c91-b8e9-5c0dce77fa6a"
+  },
+  {
+    "type": "queue-operation",
+    "operation": "enqueue",
+    "timestamp": "2026-01-24T14:37:03.235Z",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "content": "/rate-limit-options"
+  },
+  {
+    "parentUuid": "767de208-427d-4b4f-8b66-bd89c7f561d1",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "assistant",
+    "uuid": "0811ce5b-6b8d-4ad9-a567-a5ebe60a7573",
+    "timestamp": "2026-01-24T14:37:03.218Z",
+    "message": {
+      "id": "a7a13f0a-14c7-4f7a-a98e-caaed03c38c3",
+      "container": null,
+      "model": "<synthetic>",
+      "role": "assistant",
+      "stop_reason": "stop_sequence",
+      "stop_sequence": "",
+      "type": "message",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": null,
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        }
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "You've hit your limit \u00c2\u00b7 resets 10am (America/Chicago)"
+        }
+      ],
+      "context_management": null
+    },
+    "error": "rate_limit",
+    "isApiErrorMessage": true
+  },
+  {
+    "parentUuid": "0811ce5b-6b8d-4ad9-a567-a5ebe60a7573",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "Stop",
+      "hookName": "Stop",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\send_event.py\" --source-app %OBS_SOURCE_APP% --event-type Stop --server-url %OBS_SERVER_URL% --mirror-url %MIRROR_PUSH_URL%"
+    },
+    "parentToolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "toolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "timestamp": "2026-01-24T14:37:03.268Z",
+    "uuid": "836d4d9a-09c7-46c8-b43d-0d8fa6df1654"
+  },
+  {
+    "parentUuid": "836d4d9a-09c7-46c8-b43d-0d8fa6df1654",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "Stop",
+      "hookName": "Stop",
+      "command": "uv run \"C:\\Users\\Oliver Productions\\.claude\\hooks\\stop.py\" --chat"
+    },
+    "parentToolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "toolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "timestamp": "2026-01-24T14:37:03.269Z",
+    "uuid": "b5269ca0-4e38-49f3-b357-c298a737f02d"
+  },
+  {
+    "parentUuid": "b5269ca0-4e38-49f3-b357-c298a737f02d",
+    "isSidechain": false,
+    "userType": "external",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "sessionId": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+    "version": "2.1.19",
+    "gitBranch": "",
+    "type": "progress",
+    "data": {
+      "type": "hook_progress",
+      "hookEvent": "Stop",
+      "hookName": "Stop",
+      "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop-hook.sh"
+    },
+    "parentToolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "toolUseID": "116504e9-cc3e-4929-a551-5b894913fc78",
+    "timestamp": "2026-01-24T14:37:03.269Z",
+    "uuid": "1a96ee6a-7a13-4069-93d6-233a6791d3c7"
+  }
+]

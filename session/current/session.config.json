@@ -1,0 +1,8 @@
+{
+  "sessionId": "dev-session",
+  "workflow": "streamer",
+  "captureMode": "av",
+  "title": "Dev session",
+  "participants": [{"id":"p1","name":"Host"}],
+  "startedAt": 0
+}

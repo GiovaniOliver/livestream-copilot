@@ -1,0 +1,2 @@
+{"id":"ea5b0030-0fbc-4226-8c95-4e02eefae8d9","type":"SESSION_START","ts":1769395451866,"payload":{"sessionId":"72f8ed1c-8475-4355-91e3-e6a4ae6a91ce","workflow":"streamer","title":"Live stream"},"observability":{}}
+{"id":"adbc9115-930f-4cb5-9862-310e024954f9","type":"SESSION_END","ts":1769395622595,"payload":{"sessionId":"72f8ed1c-8475-4355-91e3-e6a4ae6a91ce","duration":170729},"observability":{}}

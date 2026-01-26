@@ -1,0 +1,10 @@
+{
+  "session_id": "aad4331e-a129-45c5-bfcc-5760c501d0ab",
+  "prompts": [
+    "User skill previous conversation to continue the work from the previous check ",
+    "continue",
+    "ok proceed with 1 and 2",
+    "ok proceed",
+    " ## Error Type\nBuild Error\n\n## Error Message\nModule not found: Can't resolve '@sentry/nextjs'\n\n## Build Output\n./Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/web/src/app/error.tsx:11:1\nModule not found: Can't resolve '@sentry/nextjs'\n   9 |\n  10 | import { useEffect } from \"react\";\n> 11 | import * as Sentry from \"@sentry/nextjs\";\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  12 |\n  13 | interface ErrorProps {\n  14 |   error: Error & { digest?: string };\n\nImport traces:\n  Client Component Browser:\n    ./Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/web/src/app/error.tsx [Client Component Browser]\n    ./Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/web/src/app/error.tsx [Server Component]\n\n  Client Component SSR:\n    ./Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/web/src/app/error.tsx [Client Component SSR]\n    ./Desktop/1.SMG-BUSINESS/0b.)SMG-Main Brands Dev/livestream-copilot/apps/web/src/app/error.tsx [Server Component]\n\nhttps://nextjs.org/docs/messages/module-not-found\n\nNext.js version: 16.1.2 (Turbopack)\n"
+  ]
+}

@@ -1,0 +1,61 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+.next
+**/.next
+out
+**/out
+
+# Development files
+.git
+.github
+.vscode
+.idea
+
+# Environment files (use docker secrets or env vars instead)
+.env
+.env.*
+!.env.sample
+!.env.example
+
+# Test files
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+coverage
+**/coverage
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Mobile app (not needed for API container)
+apps/mobile
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+
+# Session data
+session
+*.jsonl
+
+# Reports
+.reports

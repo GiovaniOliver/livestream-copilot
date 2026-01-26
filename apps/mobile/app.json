@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "FluxBoard",
+    "slug": "fluxboard",
+    "version": "0.1.0",
+    "sdkVersion": "54.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#070A10"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow FluxBoard to access your camera for video recording",
+          "microphonePermission": "Allow FluxBoard to access your microphone for audio recording",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow FluxBoard to access your microphone for audio recording"
+        }
+      ]
+    ],
+    "newArchEnabled": true
+  }
+}

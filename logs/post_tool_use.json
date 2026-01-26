@@ -1,0 +1,969 @@
+[
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*stream*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\agents\\workflows\\streamer.agent.ts"
+      ],
+      "durationMs": 1280,
+      "numFiles": 1,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_0154nLX7v7AwCyvJtRgMCWaS"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*hls*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 1227,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01GRA3M8EoZ5zQanYxWE626S"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*webrtc*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 1281,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01FhTMDm5EFxpGzBQSiZe2mN"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*ffmpeg*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 2226,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01XuTeL25FnVT1JDDTscak3G"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/video/**/*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\types.ts",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\routes.ts",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\index.ts",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\mediamtx-manager.ts"
+      ],
+      "durationMs": 585,
+      "numFiles": 4,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01DR4yvssEG2WDbsLHEga6tr"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/api/video*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 632,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01QaJwVRCbqWpnPV88K4f5tr"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "ls -la \"C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\" 2>/dev/null || dir /b \"C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\"",
+      "description": "List video directory contents"
+    },
+    "tool_response": {
+      "stdout": "total 40\ndrwxr-xr-x 1 Oliver Productions 197609     0 Jan 25 16:54 ./\ndrwxr-xr-x 1 Oliver Productions 197609     0 Jan 25 20:20 ../\n-rw-r--r-- 1 Oliver Productions 197609  1113 Jan 25 15:35 index.ts\n-rw-r--r-- 1 Oliver Productions 197609 12744 Jan 25 16:54 mediamtx-manager.ts\n-rw-r--r-- 1 Oliver Productions 197609  5231 Jan 25 15:35 routes.ts\n-rw-r--r-- 1 Oliver Productions 197609  2260 Jan 25 15:33 types.ts\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_012ZL5TdaETueD5ZuYKmGCLS"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*preview*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 4298,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01U75S86S1e2e6U8qjDFEFBC"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*Live*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\hooks\\useLiveStream.ts",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\\LiveVideoPreview.tsx"
+      ],
+      "durationMs": 865,
+      "numFiles": 2,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01BZdW71DfR53weBNQMg8i7U"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*video*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web"
+    },
+    "tool_response": {
+      "filenames": [],
+      "durationMs": 867,
+      "numFiles": 0,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_014XoWhw5zLL5pK2GJ7odi6x"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*Player*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\\VideoPlayer.tsx"
+      ],
+      "durationMs": 913,
+      "numFiles": 1,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01ExR5jjni5edbZuW1xhe6AN"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*stream*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\public\\assets\\workflows\\streamer.png",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_instrumentation_ts_a7063825._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_instrumentation_ts_a7063825._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\edge\\chunks\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_91bcb1ed._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\edge\\chunks\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_91bcb1ed._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_667c7211._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_d2ed83a8._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_11fefea4._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_5ce21de1._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\88e7d_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_667c7211._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_d2ed83a8._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_components_layout_Header_tsx_1133cd00._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_5ce21de1._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_global-error_tsx_15342b0b._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_global-error_tsx_15342b0b._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_components_layout_Header_tsx_dc2903b6._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_layout_tsx_30b6c3e8._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_5969d7e7._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_global-error_tsx_30b6c3e8._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_11fefea4._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_global-error_tsx_f2eba092._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_a0ff3932._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_682af3d4._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_537e8048._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\Desktop_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_5969d7e7._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web__next-internal_server_app_page_actions_8f861f62.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_global-error_tsx_f2eba092._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_error_tsx_682af3d4._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_app_page_tsx_537e8048._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_components_layout_Header_tsx_dc2903b6._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web__next-internal_server_app_page_actions_8f861f62.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_components_layout_Header_tsx_1133cd00._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_layout_tsx_5d3b33b5._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_page_tsx_c048d569._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_layout_tsx_5d3b33b5._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_layout_tsx_537e8048._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_page_tsx_6f59bf9b._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_page_tsx_6f59bf9b._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_page_tsx_55f97cc9._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_page_tsx_55f97cc9._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_f833d529._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_2146bc3f._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_2146bc3f._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_auth_login_page_tsx_537e8048._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_f833d529._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_agent-workflows_page_tsx_dadb2185._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_agent-workflows_page_tsx_dadb2185._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_agent-workflows_page_tsx_a80db132._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_agent-workflows_page_tsx_a80db132._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_agent-workflows_page_tsx_868d5a89._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_4fbfacfc._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_4fbfacfc._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_d977a616._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_d977a616._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_898e3874._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_898e3874._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_layout_tsx_c048d569._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_bcfd4976._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_df073d7d._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_bcfd4976._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_df073d7d._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_39044de7._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_39044de7._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_layout_tsx_c048d569._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_2e79ab13._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_2e79ab13._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_f2932650._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_f2932650._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_page_tsx_61c3e13d._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_page_tsx_2cacdeb0._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_page_tsx_2dc01720._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_page_tsx_61c3e13d._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_session_[id]_page_tsx_2dc01720._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_62e830ac._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_48bfed7e._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_62e830ac._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_48bfed7e._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_page_tsx_b734332f._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_page_tsx_b734332f._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_page_tsx_38791b67._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_page_tsx_38791b67._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\e3848_livestream-copilot_apps_web_src_app_dashboard_settings_page_tsx_66a26942._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_b5e9fc00._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_bb780ed0._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_b5e9fc00._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_bb780ed0._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__app_2da965e7._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\deb4a_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__app_d8bf5b05._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__app_d8bf5b05._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__error_2da965e7._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\deb4a_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__error_e25751dd._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\460b3_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_pages__error_e25751dd._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_98967a2f._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_a7eef73e._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_98967a2f._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\3d860_1_SMG-BUSINESS_0b_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_a7eef73e._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\846e0_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_lib_api_clips_ts_b99643a3._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\846e0_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_lib_api_clips_ts_d6588f2c._.js",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\static\\chunks\\846e0_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_lib_api_clips_ts_d6588f2c._.js.map",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.next\\dev\\server\\chunks\\ssr\\846e0_)SMG-Main Brands Dev_livestream-copilot_apps_web_src_lib_api_clips_ts_b99643a3._.js"
+      ],
+      "durationMs": 964,
+      "numFiles": 100,
+      "truncated": true
+    },
+    "tool_use_id": "toolu_01S7ADaYjQUssA8jrG1ZgdCN"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/mediamtx.yml",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\data\\mediamtx.yml",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\bin\\mediamtx.yml"
+      ],
+      "durationMs": 2435,
+      "numFiles": 2,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01L4XKhCKZkrHsV7BpdCxtJQ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Glob",
+    "tool_input": {
+      "pattern": "**/*.env*",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot"
+    },
+    "tool_response": {
+      "filenames": [
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env.example",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\.env.local",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env.sample",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\mobile\\.env",
+        "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\.env.sample"
+      ],
+      "durationMs": 1599,
+      "numFiles": 6,
+      "truncated": false
+    },
+    "tool_use_id": "toolu_01LeCd9jyDWbexAgdsoeSEfQ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\data\\mediamtx.yml"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\data\\mediamtx.yml",
+        "content": "###############################################\n# MediaMTX Configuration (auto-generated)\n###############################################\n\nlogLevel: info\nlogDestinations: [stdout]\n\n###############################################\n# RTMP server (for OBS ingest)\n###############################################\nrtmp: true\nrtmpAddress: \":1935\"\n\n###############################################\n# WebRTC server (for browser playback)\n###############################################\nwebrtc: true\nwebrtcAddress: \":8889\"\nwebrtcLocalUDPAddress: \":8889\"\nwebrtcLocalTCPAddress: \":8889\"\n\n###############################################\n# HLS server (for fallback playback)\n###############################################\nhls: true\nhlsAddress: \":8888\"\n\n###############################################\n# API server\n###############################################\napi: true\napiAddress: \":9997\"\n\n###############################################\n# Path configuration\n###############################################\npaths:\n  all:\n    # Allow any stream name",
+        "numLines": 39,
+        "startLine": 1,
+        "totalLines": 39
+      }
+    },
+    "tool_use_id": "toolu_01F2c9FwZQaaFwVcumEMr7d5"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\bin\\mediamtx.yml"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\bin\\mediamtx.yml",
+        "content": "###############################################\n# Global settings\n\n# Settings in this section are applied anywhere.\n\n###############################################\n# Global settings -> General\n\n# Verbosity of the program; available values are \"error\", \"warn\", \"info\", \"debug\".\nlogLevel: info\n# Destinations of log messages; available values are \"stdout\", \"file\" and \"syslog\".\nlogDestinations: [stdout]\n# If \"file\" is in logDestinations, this is the file which will receive the logs.\nlogFile: mediamtx.log\n\n# Timeout of read operations.\nreadTimeout: 10s\n# Timeout of write operations.\nwriteTimeout: 10s\n# Size of the queue of outgoing packets.\n# A higher value allows to increase throughput, a lower value allows to save RAM.\nwriteQueueSize: 512\n# Maximum size of outgoing UDP packets.\n# This can be decreased to avoid fragmentation on networks with a low UDP MTU.\nudpMaxPayloadSize: 1472\n\n# Command to run when a client connects to the server.\n# This is terminated with SIGINT when a client disconnects from the server.\n# The following environment variables are available:\n# * MTX_CONN_TYPE: connection type\n# * MTX_CONN_ID: connection ID\n# * RTSP_PORT: RTSP server port\nrunOnConnect:\n# Restart the command if it exits.\nrunOnConnectRestart: no\n# Command to run when a client disconnects from the server.\n# Environment variables are the same of runOnConnect.\nrunOnDisconnect:\n\n###############################################\n# Global settings -> Authentication\n\n# Authentication method. Available values are:\n# * internal: users are stored in the configuration file\n# * http: an external HTTP URL is contacted to perform authentication\n# * jwt: an external identity server provides authentication through JWTs\nauthMethod: internal\n\n# Internal authentication.\n# list of users.\nauthInternalUsers:\n  # Default unprivileged user.\n  # Username. 'any' means any user, including anonymous ones.\n- user: any\n  # Password. Not used in case of 'any' user.\n  pass:\n  # IPs or networks allowed to use this user. An empty list means any IP.\n  ips: []\n  # List of permissions.\n  permissions:\n    # Available actions are: publish, read, playback, api, metrics, pprof.\n  - action: publish\n    # Paths can be set to further restrict access to a specific path.\n    # An empty path means any path.\n    # Regular expressions can be used by using a tilde as prefix.\n    path:\n  - action: read\n    path:\n  - action: playback\n    path:\n\n  # Default administrator.\n  # This allows to use API, metrics and PPROF without authentication,\n  # if the IP is localhost.\n- user: any\n  pass:\n  ips: ['127.0.0.1', '::1']\n  permissions:\n  - action: api\n  - action: metrics\n  - action: pprof\n\n# HTTP-based authentication.\n# URL called to perform authentication. Every time a user wants\n# to authenticate, the server calls this URL with the POST method\n# and a body containing:\n# {\n#   \"user\": \"user\",\n#   \"password\": \"password\",\n#   \"ip\": \"ip\",\n#   \"action\": \"publish|read|playback|api|metrics|pprof\",\n#   \"path\": \"path\",\n#   \"protocol\": \"rtsp|rtmp|hls|webrtc|srt\",\n#   \"id\": \"id\",\n#   \"query\": \"query\"\n# }\n# If the response code is 20x, authentication is accepted, otherwise\n# it is discarded.\nauthHTTPAddress:\n# Actions to exclude from HTTP-based authentication.\n# Format is the same as the one of user permissions.\nauthHTTPExclude:\n- action: api\n- action: metrics\n- action: pprof\n\n# JWT-based authentication.\n# Users have to login through an external identity server and obtain a JWT.\n# This JWT must contain the claim \"mediamtx_permissions\" with permissions,\n# for instance:\n# {\n#  ...\n#  \"mediamtx_permissions\": [\n#     {\n#       \"action\": \"publish\",\n#       \"path\": \"somepath\"\n#     }\n#   ]\n# }\n# Users are expected to pass the JWT in the Authorization header or as a query parameter.\n# This is the JWKS URL that will be used to pull (once) the public key that allows\n# to validate JWTs.\nauthJWTJWKS:\n# name of the claim that contains permissions.\nauthJWTClaimKey: mediamtx_permissions\n\n###############################################\n# Global settings -> Control API\n\n# Enable controlling the server through the Control API.\napi: yes\n# Address of the Control API listener.\napiAddress: :9997\n# Enable TLS/HTTPS on the Control API server.\napiEncryption: no\n# Path to the server key. This is needed only when encryption is yes.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\napiServerKey: server.key\n# Path to the server certificate.\napiServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\napiAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the HTTP server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\napiTrustedProxies: []\n\n###############################################\n# Global settings -> Metrics\n\n# Enable Prometheus-compatible metrics.\nmetrics: no\n# Address of the metrics HTTP listener.\nmetricsAddress: :9998\n# Enable TLS/HTTPS on the Metrics server.\nmetricsEncryption: no\n# Path to the server key. This is needed only when encryption is yes.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nmetricsServerKey: server.key\n# Path to the server certificate.\nmetricsServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\nmetricsAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the HTTP server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\nmetricsTrustedProxies: []\n\n###############################################\n# Global settings -> PPROF\n\n# Enable pprof-compatible endpoint to monitor performances.\npprof: no\n# Address of the pprof listener.\npprofAddress: :9999\n# Enable TLS/HTTPS on the pprof server.\npprofEncryption: no\n# Path to the server key. This is needed only when encryption is yes.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\npprofServerKey: server.key\n# Path to the server certificate.\npprofServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\npprofAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the HTTP server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\npprofTrustedProxies: []\n\n###############################################\n# Global settings -> Playback server\n\n# Enable downloading recordings from the playback server.\nplayback: no\n# Address of the playback server listener.\nplaybackAddress: :9996\n# Enable TLS/HTTPS on the playback server.\nplaybackEncryption: no\n# Path to the server key. This is needed only when encryption is yes.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nplaybackServerKey: server.key\n# Path to the server certificate.\nplaybackServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\nplaybackAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the HTTP server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\nplaybackTrustedProxies: []\n\n###############################################\n# Global settings -> RTSP server\n\n# Enable publishing and reading streams with the RTSP protocol.\nrtsp: yes\n# List of enabled RTSP transport protocols.\n# UDP is the most performant, but doesn't work when there's a NAT/firewall between\n# server and clients, and doesn't support encryption.\n# UDP-multicast allows to save bandwidth when clients are all in the same LAN.\n# TCP is the most versatile, and does support encryption.\n# The handshake is always performed with TCP.\nrtspTransports: [udp, multicast, tcp]\n# Encrypt handshakes and TCP streams with TLS (RTSPS).\n# Available values are \"no\", \"strict\", \"optional\".\nrtspEncryption: \"no\"\n# Address of the TCP/RTSP listener. This is needed only when encryption is \"no\" or \"optional\".\nrtspAddress: :8554\n# Address of the TCP/TLS/RTSPS listener. This is needed only when encryption is \"strict\" or \"optional\".\nrtspsAddress: :8322\n# Address of the UDP/RTP listener. This is needed only when \"udp\" is in rtspTransports.\nrtpAddress: :8000\n# Address of the UDP/RTCP listener. This is needed only when \"udp\" is in rtspTransports.\nrtcpAddress: :8001\n# IP range of all UDP-multicast listeners. This is needed only when \"multicast\" is in rtspTransports.\nmulticastIPRange: 224.1.0.0/16\n# Port of all UDP-multicast/RTP listeners. This is needed only when \"multicast\" is in rtspTransports.\nmulticastRTPPort: 8002\n# Port of all UDP-multicast/RTCP listeners. This is needed only when \"multicast\" is in rtspTransports.\nmulticastRTCPPort: 8003\n# Path to the server key. This is needed only when encryption is \"strict\" or \"optional\".\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nrtspServerKey: server.key\n# Path to the server certificate. This is needed only when encryption is \"strict\" or \"optional\".\nrtspServerCert: server.crt\n# Authentication methods. Available are \"basic\" and \"digest\".\n# \"digest\" doesn't provide any additional security and is available for compatibility only.\nrtspAuthMethods: [basic]\n\n###############################################\n# Global settings -> RTMP server\n\n# Enable publishing and reading streams with the RTMP protocol.\nrtmp: yes\n# Address of the RTMP listener. This is needed only when encryption is \"no\" or \"optional\".\nrtmpAddress: :1935\n# Encrypt connections with TLS (RTMPS).\n# Available values are \"no\", \"strict\", \"optional\".\nrtmpEncryption: \"no\"\n# Address of the RTMPS listener. This is needed only when encryption is \"strict\" or \"optional\".\nrtmpsAddress: :1936\n# Path to the server key. This is needed only when encryption is \"strict\" or \"optional\".\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nrtmpServerKey: server.key\n# Path to the server certificate. This is needed only when encryption is \"strict\" or \"optional\".\nrtmpServerCert: server.crt\n\n###############################################\n# Global settings -> HLS server\n\n# Enable reading streams with the HLS protocol.\nhls: yes\n# Address of the HLS listener.\nhlsAddress: :8888\n# Enable TLS/HTTPS on the HLS server.\n# This is required for Low-Latency HLS.\nhlsEncryption: no\n# Path to the server key. This is needed only when encryption is yes.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nhlsServerKey: server.key\n# Path to the server certificate.\nhlsServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\n# This allows to play the HLS stream from an external website.\nhlsAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the HLS server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\nhlsTrustedProxies: []\n# By default, HLS is generated only when requested by a user.\n# This option allows to generate it always, avoiding the delay between request and generation.\nhlsAlwaysRemux: no\n# Variant of the HLS protocol to use. Available options are:\n# * mpegts - uses MPEG-TS segments, for maximum compatibility.\n# * fmp4 - uses fragmented MP4 segments, more efficient.\n# * lowLatency - uses Low-Latency HLS.\nhlsVariant: lowLatency\n# Number of HLS segments to keep on the server.\n# Segments allow to seek through the stream.\n# Their number doesn't influence latency.\nhlsSegmentCount: 7\n# Minimum duration of each segment.\n# A player usually puts 3 segments in a buffer before reproducing the stream.\n# The final segment duration is also influenced by the interval between IDR frames,\n# since the server changes the duration in order to include at least one IDR frame\n# in each segment.\nhlsSegmentDuration: 1s\n# Minimum duration of each part.\n# A player usually puts 3 parts in a buffer before reproducing the stream.\n# Parts are used in Low-Latency HLS in place of segments.\n# Part duration is influenced by the distance between video/audio samples\n# and is adjusted in order to produce segments with a similar duration.\nhlsPartDuration: 200ms\n# Maximum size of each segment.\n# This prevents RAM exhaustion.\nhlsSegmentMaxSize: 50M\n# Directory in which to save segments, instead of keeping them in the RAM.\n# This decreases performance, since reading from disk is less performant than\n# reading from RAM, but allows to save RAM.\nhlsDirectory: ''\n# The muxer will be closed when there are no\n# reader requests and this amount of time has passed.\nhlsMuxerCloseAfter: 60s\n\n###############################################\n# Global settings -> WebRTC server\n\n# Enable publishing and reading streams with the WebRTC protocol.\nwebrtc: yes\n# Address of the WebRTC HTTP listener.\nwebrtcAddress: :8889\n# Enable TLS/HTTPS on the WebRTC server.\nwebrtcEncryption: no\n# Path to the server key.\n# This can be generated with:\n# openssl genrsa -out server.key 2048\n# openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650\nwebrtcServerKey: server.key\n# Path to the server certificate.\nwebrtcServerCert: server.crt\n# Value of the Access-Control-Allow-Origin header provided in every HTTP response.\n# This allows to play the WebRTC stream from an external website.\nwebrtcAllowOrigin: '*'\n# List of IPs or CIDRs of proxies placed before the WebRTC server.\n# If the server receives a request from one of these entries, IP in logs\n# will be taken from the X-Forwarded-For header.\nwebrtcTrustedProxies: []\n# Address of a local UDP listener that will receive connections.\n# Use a blank string to disable.\nwebrtcLocalUDPAddress: :8189\n# Address of a local TCP listener that will receive connections.\n# This is disabled by default since TCP is less efficient than UDP and\n# introduces a progressive delay when network is congested.\nwebrtcLocalTCPAddress: ''\n# WebRTC clients need to know the IP of the server.\n# Gather IPs from interfaces and send them to clients.\nwebrtcIPsFromInterfaces: yes\n# List of interfaces whose IPs will be sent to clients.\n# An empty value means to use all available interfaces.\nwebrtcIPsFromInterfacesList: []\n# List of additional hosts or IPs to send to clients.\nwebrtcAdditionalHosts: []\n# ICE servers. Needed only when local listeners can't be reached by clients.\n# STUN servers allows to obtain and share the public IP of the server.\n# TURN/TURNS servers forces all traffic through them.\nwebrtcICEServers2: []\n  # - url: stun:stun.l.google.com:19302\n  # if user is \"AUTH_SECRET\", then authentication is secret based.\n  # the secret must be inserted into the password field.\n  # username: ''\n  # password: ''\n  # clientOnly: false\n# Time to wait for the WebRTC handshake to complete.\nwebrtcHandshakeTimeout: 10s\n# Maximum time to gather video tracks.\nwebrtcTrackGatherTimeout: 2s\n# The maximum time to gather STUN candidates.\nwebrtcSTUNGatherTimeout: 5s\n\n###############################################\n# Global settings -> SRT server\n\n# Enable publishing and reading streams with the SRT protocol.\nsrt: yes\n# Address of the SRT listener.\nsrtAddress: :8890\n\n###############################################\n# Default path settings\n\n# Settings in \"pathDefaults\" are applied anywhere,\n# unless they are overridden in \"paths\".\npathDefaults:\n\n  ###############################################\n  # Default path settings -> General\n\n  # Source of the stream. This can be:\n  # * publisher -> the stream is provided by a RTSP, RTMP, WebRTC or SRT client\n  # * rtsp://existing-url -> the stream is pulled from another RTSP server / camera\n  # * rtsps://existing-url -> the stream is pulled from another RTSP server / camera with RTSPS\n  # * rtmp://existing-url -> the stream is pulled from another RTMP server / camera\n  # * rtmps://existing-url -> the stream is pulled from another RTMP server / camera with RTMPS\n  # * http://existing-url/stream.m3u8 -> the stream is pulled from another HLS server / camera\n  # * https://existing-url/stream.m3u8 -> the stream is pulled from another HLS server / camera with HTTPS\n  # * udp://ip:port -> the stream is pulled with UDP, by listening on the specified IP and port\n  # * srt://existing-url -> the stream is pulled from another SRT server / camera\n  # * whep://existing-url -> the stream is pulled from another WebRTC server / camera\n  # * wheps://existing-url -> the stream is pulled from another WebRTC server / camera with HTTPS\n  # * redirect -> the stream is provided by another path or server\n  # * rpiCamera -> the stream is provided by a Raspberry Pi Camera\n  # The following variables can be used in the source string:\n  # * $MTX_QUERY: query parameters (passed by first reader)\n  # * $G1, $G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  source: publisher\n  # If the source is a URL, and the source certificate is self-signed\n  # or invalid, you can provide the fingerprint of the certificate in order to\n  # validate it anyway. It can be obtained by running:\n  # openssl s_client -connect source_ip:source_port </dev/null 2>/dev/null | sed -n '/BEGIN/,/END/p' > server.crt\n  # openssl x509 -in server.crt -noout -fingerprint -sha256 | cut -d \"=\" -f2 | tr -d ':'\n  sourceFingerprint:\n  # If the source is a URL, it will be pulled only when at least\n  # one reader is connected, saving bandwidth.\n  sourceOnDemand: no\n  # If sourceOnDemand is \"yes\", readers will be put on hold until the source is\n  # ready or until this amount of time has passed.\n  sourceOnDemandStartTimeout: 10s\n  # If sourceOnDemand is \"yes\", the source will be closed when there are no\n  # readers connected and this amount of time has passed.\n  sourceOnDemandCloseAfter: 10s\n  # Maximum number of readers. Zero means no limit.\n  maxReaders: 0\n  # SRT encryption passphrase require to read from this path\n  srtReadPassphrase:\n  # If the stream is not available, redirect readers to this path.\n  # It can be can be a relative path (i.e. /otherstream) or an absolute RTSP URL.\n  fallback:\n\n  ###############################################\n  # Default path settings -> Record\n\n  # Record streams to disk.\n  record: no\n  # Path of recording segments.\n  # Extension is added automatically.\n  # Available variables are %path (path name), %Y %m %d %H %M %S %f %s (time in strftime format)\n  recordPath: ./recordings/%path/%Y-%m-%d_%H-%M-%S-%f\n  # Format of recorded segments.\n  # Available formats are \"fmp4\" (fragmented MP4) and \"mpegts\" (MPEG-TS).\n  recordFormat: fmp4\n  # fMP4 segments are concatenation of small MP4 files (parts), each with this duration.\n  # MPEG-TS segments are concatenation of 188-bytes packets, flushed to disk with this period.\n  # When a system failure occurs, the last part gets lost.\n  # Therefore, the part duration is equal to the RPO (recovery point objective).\n  recordPartDuration: 1s\n  # Minimum duration of each segment.\n  recordSegmentDuration: 1h\n  # Delete segments after this timespan.\n  # Set to 0s to disable automatic deletion.\n  recordDeleteAfter: 1d\n\n  ###############################################\n  # Default path settings -> Publisher source (when source is \"publisher\")\n\n  # Allow another client to disconnect the current publisher and publish in its place.\n  overridePublisher: yes\n  # SRT encryption passphrase required to publish to this path\n  srtPublishPassphrase:\n\n  ###############################################\n  # Default path settings -> RTSP source (when source is a RTSP or a RTSPS URL)\n\n  # Transport protocol used to pull the stream. available values are \"automatic\", \"udp\", \"multicast\", \"tcp\".\n  rtspTransport: automatic\n  # Support sources that don't provide server ports or use random server ports. This is a security issue\n  # and must be used only when interacting with sources that require it.\n  rtspAnyPort: no\n  # Range header to send to the source, in order to start streaming from the specified offset.\n  # available values:\n  # * clock: Absolute time\n  # * npt: Normal Play Time\n  # * smpte: SMPTE timestamps relative to the start of the recording\n  rtspRangeType:\n  # Available values:\n  # * clock: UTC ISO 8601 combined date and time string, e.g. 20230812T120000Z\n  # * npt: duration such as \"300ms\", \"1.5m\" or \"2h45m\", valid time units are \"ns\", \"us\" (or \"\u00c2\u00b5s\"), \"ms\", \"s\", \"m\", \"h\"\n  # * smpte: duration such as \"300ms\", \"1.5m\" or \"2h45m\", valid time units are \"ns\", \"us\" (or \"\u00c2\u00b5s\"), \"ms\", \"s\", \"m\", \"h\"\n  rtspRangeStart:\n\n  ###############################################\n  # Default path settings -> Redirect source (when source is \"redirect\")\n\n  # RTSP URL which clients will be redirected to.\n  sourceRedirect:\n\n  ###############################################\n  # Default path settings -> Raspberry Pi Camera source (when source is \"rpiCamera\")\n\n  # ID of the camera\n  rpiCameraCamID: 0\n  # Width of frames\n  rpiCameraWidth: 1920\n  # Height of frames\n  rpiCameraHeight: 1080\n  # Flip horizontally\n  rpiCameraHFlip: false\n  # Flip vertically\n  rpiCameraVFlip: false\n  # Brightness [-1, 1]\n  rpiCameraBrightness: 0\n  # Contrast [0, 16]\n  rpiCameraContrast: 1\n  # Saturation [0, 16]\n  rpiCameraSaturation: 1\n  # Sharpness [0, 16]\n  rpiCameraSharpness: 1\n  # Exposure mode.\n  # values: normal, short, long, custom\n  rpiCameraExposure: normal\n  # Auto-white-balance mode.\n  # values: auto, incandescent, tungsten, fluorescent, indoor, daylight, cloudy, custom\n  rpiCameraAWB: auto\n  # Auto-white-balance fixed gains. This can be used in place of rpiCameraAWB.\n  # format: [red,blue]\n  rpiCameraAWBGains: [0, 0]\n  # Denoise operating mode.\n  # values: off, cdn_off, cdn_fast, cdn_hq\n  rpiCameraDenoise: \"off\"\n  # Fixed shutter speed, in microseconds.\n  rpiCameraShutter: 0\n  # Metering mode of the AEC/AGC algorithm.\n  # values: centre, spot, matrix, custom\n  rpiCameraMetering: centre\n  # Fixed gain\n  rpiCameraGain: 0\n  # EV compensation of the image [-10, 10]\n  rpiCameraEV: 0\n  # Region of interest, in format x,y,width,height (all normalized between 0 and 1)\n  rpiCameraROI:\n  # Whether to enable HDR on Raspberry Camera 3.\n  rpiCameraHDR: false\n  # Tuning file\n  rpiCameraTuningFile:\n  # Sensor mode, in format [width]:[height]:[bit-depth]:[packing]\n  # bit-depth and packing are optional.\n  rpiCameraMode:\n  # frames per second\n  rpiCameraFPS: 30\n  # Autofocus mode\n  # values: auto, manual, continuous\n  rpiCameraAfMode: continuous\n  # Autofocus range\n  # values: normal, macro, full\n  rpiCameraAfRange: normal\n  # Autofocus speed\n  # values: normal, fast\n  rpiCameraAfSpeed: normal\n  # Lens position (for manual autofocus only), will be set to focus to a specific distance\n  # calculated by the following formula: d = 1 / value\n  # Examples: 0 moves the lens to infinity.\n  #           0.5 moves the lens to focus on objects 2m away.\n  #           2 moves the lens to focus on objects 50cm away.\n  rpiCameraLensPosition: 0.0\n  # Specifies the autofocus window, in the form x,y,width,height where the coordinates\n  # are given as a proportion of the entire image.\n  rpiCameraAfWindow:\n  # Manual flicker correction period, in microseconds.\n  rpiCameraFlickerPeriod: 0\n  # Enables printing text on each frame.\n  rpiCameraTextOverlayEnable: false\n  # Text that is printed on each frame.\n  # format is the one of the strftime() function.\n  rpiCameraTextOverlay: '%Y-%m-%d %H:%M:%S - MediaMTX'\n  # Codec. Available values: auto, hardwareH264, softwareH264\n  rpiCameraCodec: auto\n  # Period between IDR frames\n  rpiCameraIDRPeriod: 60\n  # Bitrate\n  rpiCameraBitrate: 5000000\n  # H264 profile\n  rpiCameraProfile: main\n  # H264 level\n  rpiCameraLevel: '4.1'\n\n  ###############################################\n  # Default path settings -> Hooks\n\n  # Command to run when this path is initialized.\n  # This can be used to publish a stream when the server is launched.\n  # This is terminated with SIGINT when the program closes.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnInit:\n  # Restart the command if it exits.\n  runOnInitRestart: no\n\n  # Command to run when this path is requested by a reader\n  # and no one is publishing to this path yet.\n  # This can be used to publish a stream on demand.\n  # This is terminated with SIGINT when there are no readers anymore.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * MTX_QUERY: query parameters (passed by first reader)\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnDemand:\n  # Restart the command if it exits.\n  runOnDemandRestart: no\n  # Readers will be put on hold until the runOnDemand command starts publishing\n  # or until this amount of time has passed.\n  runOnDemandStartTimeout: 10s\n  # The command will be closed when there are no\n  # readers connected and this amount of time has passed.\n  runOnDemandCloseAfter: 10s\n  # Command to run when there are no readers anymore.\n  # Environment variables are the same of runOnDemand.\n  runOnUnDemand:\n\n  # Command to run when the stream is ready to be read, whenever it is\n  # published by a client or pulled from a server / camera.\n  # This is terminated with SIGINT when the stream is not ready anymore.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * MTX_QUERY: query parameters (passed by publisher)\n  # * MTX_SOURCE_TYPE: source type\n  # * MTX_SOURCE_ID: source ID\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnReady:\n  # Restart the command if it exits.\n  runOnReadyRestart: no\n  # Command to run when the stream is not available anymore.\n  # Environment variables are the same of runOnReady.\n  runOnNotReady:\n\n  # Command to run when a client starts reading.\n  # This is terminated with SIGINT when a client stops reading.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * MTX_QUERY: query parameters (passed by reader)\n  # * MTX_READER_TYPE: reader type\n  # * MTX_READER_ID: reader ID\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnRead:\n  # Restart the command if it exits.\n  runOnReadRestart: no\n  # Command to run when a client stops reading.\n  # Environment variables are the same of runOnRead.\n  runOnUnread:\n\n  # Command to run when a recording segment is created.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * MTX_SEGMENT_PATH: segment file path\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnRecordSegmentCreate:\n\n  # Command to run when a recording segment is complete.\n  # The following environment variables are available:\n  # * MTX_PATH: path name\n  # * MTX_SEGMENT_PATH: segment file path\n  # * MTX_SEGMENT_DURATION: segment duration\n  # * RTSP_PORT: RTSP server port\n  # * G1, G2, ...: regular expression groups, if path name is\n  #   a regular expression.\n  runOnRecordSegmentComplete:\n\n###############################################\n# Path settings\n\n# Settings in \"paths\" are applied to specific paths, and the map key\n# is the name of the path.\n# Any setting in \"pathDefaults\" can be overridden here.\n# It's possible to use regular expressions by using a tilde as prefix,\n# for example \"~^(test1|test2)$\" will match both \"test1\" and \"test2\",\n# for example \"~^prefix\" will match all paths that start with \"prefix\".\npaths:\n  # example:\n  # my_camera:\n  #   source: rtsp://my_camera\n\n  # Settings under path \"all_others\" are applied to all paths that\n  # do not match another entry.\n  all_others:\n",
+        "numLines": 708,
+        "startLine": 1,
+        "totalLines": 708
+      }
+    },
+    "tool_use_id": "toolu_01KLNLZCYA61Pwkasz3nU8Jd"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\mediamtx-manager.ts"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\mediamtx-manager.ts",
+        "content": "/**\n * MediaMTX Manager\n *\n * Manages the MediaMTX media server process lifecycle for live video streaming.\n * MediaMTX provides RTMP ingest (for OBS) and WebRTC/HLS playback.\n *\n * @example\n * ```typescript\n * const manager = MediaMTXManager.getInstance();\n * await manager.start();\n * const status = await manager.getStatus();\n * console.log('Stream active:', status.streamActive);\n * await manager.stop();\n * ```\n */\n\nimport { spawn, ChildProcess } from \"child_process\";\nimport fs from \"fs\";\nimport path from \"path\";\nimport { createLogger } from \"../logger/index.js\";\nimport type {\n  MediaMTXConfig,\n  VideoStreamStatus,\n  MediaMTXPathsResponse,\n  MediaMTXYamlConfig,\n} from \"./types.js\";\n\nconst videoLogger = createLogger(\"video\");\n\n/**\n * Default MediaMTX configuration\n */\nconst DEFAULT_CONFIG: MediaMTXConfig = {\n  rtmpPort: 1935,\n  webrtcPort: 8889,\n  hlsPort: 8888,\n  apiPort: 9997,\n  enabled: true,\n};\n\n/**\n * MediaMTX process manager singleton\n */\nexport class MediaMTXManager {\n  private static instance: MediaMTXManager | null = null;\n  private process: ChildProcess | null = null;\n  private config: MediaMTXConfig;\n  private binaryPath: string | null = null;\n  private configPath: string | null = null;\n  private baseDir: string;\n\n  private constructor() {\n    this.config = { ...DEFAULT_CONFIG };\n    // Determine base directory (relative to this file's location in dist or src)\n    // Decode URL-encoded characters (e.g., %20 for spaces) on Windows\n    const urlPath = new URL(import.meta.url).pathname;\n    const decodedPath = decodeURIComponent(urlPath).replace(/^\\/([A-Z]:)/, \"$1\");\n    this.baseDir = path.resolve(path.dirname(decodedPath), \"..\", \"..\");\n    this.detectBinary();\n  }\n\n  /**\n   * Get the singleton instance\n   */\n  static getInstance(): MediaMTXManager {\n    if (!MediaMTXManager.instance) {\n      MediaMTXManager.instance = new MediaMTXManager();\n    }\n    return MediaMTXManager.instance;\n  }\n\n  /**\n   * Detect the MediaMTX binary path\n   */\n  private detectBinary(): void {\n    const isWindows = process.platform === \"win32\";\n    const binaryName = isWindows ? \"mediamtx.exe\" : \"mediamtx\";\n\n    // Check multiple possible locations\n    const possiblePaths = [\n      path.join(this.baseDir, \"bin\", binaryName),\n      path.join(process.cwd(), \"bin\", binaryName),\n      path.join(process.cwd(), \"apps\", \"desktop-companion\", \"bin\", binaryName),\n    ];\n\n    for (const p of possiblePaths) {\n      if (fs.existsSync(p)) {\n        this.binaryPath = p;\n        this.config.enabled = true;\n        videoLogger.info({ binaryPath: p }, \"MediaMTX binary found\");\n        return;\n      }\n    }\n\n    this.config.enabled = false;\n    videoLogger.warn(\n      { searchedPaths: possiblePaths },\n      \"MediaMTX binary not found - video streaming disabled\"\n    );\n  }\n\n  /**\n   * Check if MediaMTX binary exists\n   */\n  isBinaryAvailable(): boolean {\n    return this.binaryPath !== null && fs.existsSync(this.binaryPath);\n  }\n\n  /**\n   * Get current configuration\n   */\n  getConfig(): MediaMTXConfig {\n    return { ...this.config };\n  }\n\n  /**\n   * Update configuration (must be called before start)\n   */\n  updateConfig(config: Partial<MediaMTXConfig>): void {\n    if (this.isRunning()) {\n      throw new Error(\"Cannot update configuration while server is running\");\n    }\n    this.config = { ...this.config, ...config };\n  }\n\n  /**\n   * Generate MediaMTX YAML configuration file\n   */\n  private generateConfigFile(): string {\n    const configDir = path.join(this.baseDir, \"data\");\n    if (!fs.existsSync(configDir)) {\n      fs.mkdirSync(configDir, { recursive: true });\n    }\n\n    const configPath = path.join(configDir, \"mediamtx.yml\");\n\n    const yamlConfig: MediaMTXYamlConfig = {\n      logLevel: \"info\",\n      logDestinations: [\"stdout\"],\n      rtmp: true,\n      rtmpAddress: `:${this.config.rtmpPort}`,\n      webrtc: true,\n      webrtcAddress: `:${this.config.webrtcPort}`,\n      webrtcLocalUDPAddress: `:${this.config.webrtcPort}`,\n      webrtcLocalTCPAddress: `:${this.config.webrtcPort}`,\n      hls: true,\n      hlsAddress: `:${this.config.hlsPort}`,\n      api: true,\n      apiAddress: `:${this.config.apiPort}`,\n      paths: {\n        all: {},\n      },\n    };\n\n    // Convert to YAML format (simple serialization)\n    const yamlContent = this.serializeToYaml(yamlConfig);\n    fs.writeFileSync(configPath, yamlContent, \"utf8\");\n\n    videoLogger.debug({ configPath, config: yamlConfig }, \"MediaMTX config file generated\");\n    return configPath;\n  }\n\n  /**\n   * Simple YAML serializer for MediaMTX config\n   */\n  private serializeToYaml(config: MediaMTXYamlConfig): string {\n    const lines: string[] = [\n      \"###############################################\",\n      \"# MediaMTX Configuration (auto-generated)\",\n      \"###############################################\",\n      \"\",\n      `logLevel: ${config.logLevel}`,\n      `logDestinations: [${config.logDestinations.join(\", \")}]`,\n      \"\",\n      \"###############################################\",\n      \"# RTMP server (for OBS ingest)\",\n      \"###############################################\",\n      `rtmp: ${config.rtmp}`,\n      `rtmpAddress: \"${config.rtmpAddress}\"`,\n      \"\",\n      \"###############################################\",\n      \"# WebRTC server (for browser playback)\",\n      \"###############################################\",\n      `webrtc: ${config.webrtc}`,\n      `webrtcAddress: \"${config.webrtcAddress}\"`,\n      `webrtcLocalUDPAddress: \"${config.webrtcLocalUDPAddress}\"`,\n      `webrtcLocalTCPAddress: \"${config.webrtcLocalTCPAddress}\"`,\n      \"\",\n      \"###############################################\",\n      \"# HLS server (for fallback playback)\",\n      \"###############################################\",\n      `hls: ${config.hls}`,\n      `hlsAddress: \"${config.hlsAddress}\"`,\n      \"\",\n      \"###############################################\",\n      \"# API server\",\n      \"###############################################\",\n      `api: ${config.api}`,\n      `apiAddress: \"${config.apiAddress}\"`,\n      \"\",\n      \"###############################################\",\n      \"# Path configuration\",\n      \"###############################################\",\n      \"paths:\",\n      \"  all:\",\n      \"    # Allow any stream name\",\n    ];\n\n    return lines.join(\"\\n\");\n  }\n\n  /**\n   * Start the MediaMTX server\n   */\n  async start(): Promise<void> {\n    if (!this.isBinaryAvailable()) {\n      throw new Error(\"MediaMTX binary not found. Video streaming is not available.\");\n    }\n\n    if (this.isRunning()) {\n      videoLogger.warn(\"MediaMTX server is already running\");\n      return;\n    }\n\n    // Use the bundled config file (with API enabled) instead of generating a custom one\n    // The bundled config is in the same directory as the binary\n    this.configPath = path.join(path.dirname(this.binaryPath!), \"mediamtx.yml\");\n\n    videoLogger.info(\n      {\n        binaryPath: this.binaryPath,\n        configPath: this.configPath,\n        config: this.config,\n      },\n      \"Starting MediaMTX server\"\n    );\n\n    return new Promise((resolve, reject) => {\n      try {\n        this.process = spawn(this.binaryPath!, [this.configPath!], {\n          stdio: [\"ignore\", \"pipe\", \"pipe\"],\n          detached: false,\n        });\n\n        // Handle stdout\n        this.process.stdout?.on(\"data\", (data: Buffer) => {\n          const message = data.toString().trim();\n          if (message) {\n            videoLogger.debug({ mediamtx: message }, \"MediaMTX stdout\");\n          }\n        });\n\n        // Handle stderr\n        this.process.stderr?.on(\"data\", (data: Buffer) => {\n          const message = data.toString().trim();\n          if (message) {\n            // MediaMTX logs to stderr by default\n            if (message.includes(\"ERR\") || message.includes(\"error\")) {\n              videoLogger.error({ mediamtx: message }, \"MediaMTX error\");\n            } else {\n              videoLogger.debug({ mediamtx: message }, \"MediaMTX stderr\");\n            }\n          }\n        });\n\n        // Handle process exit\n        this.process.on(\"exit\", (code, signal) => {\n          videoLogger.info({ code, signal }, \"MediaMTX process exited\");\n          this.process = null;\n        });\n\n        // Handle errors\n        this.process.on(\"error\", (err) => {\n          videoLogger.error({ err }, \"MediaMTX process error\");\n          this.process = null;\n          reject(err);\n        });\n\n        // Wait a bit for the server to start\n        setTimeout(() => {\n          if (this.isRunning()) {\n            videoLogger.info(\n              {\n                rtmpPort: this.config.rtmpPort,\n                webrtcPort: this.config.webrtcPort,\n                hlsPort: this.config.hlsPort,\n                apiPort: this.config.apiPort,\n              },\n              \"MediaMTX server started successfully\"\n            );\n            resolve();\n          } else {\n            reject(new Error(\"MediaMTX process failed to start\"));\n          }\n        }, 1000);\n      } catch (err) {\n        videoLogger.error({ err }, \"Failed to spawn MediaMTX process\");\n        reject(err);\n      }\n    });\n  }\n\n  /**\n   * Stop the MediaMTX server\n   */\n  async stop(): Promise<void> {\n    if (!this.isRunning()) {\n      videoLogger.debug(\"MediaMTX server is not running\");\n      return;\n    }\n\n    videoLogger.info(\"Stopping MediaMTX server\");\n\n    return new Promise((resolve) => {\n      if (!this.process) {\n        resolve();\n        return;\n      }\n\n      const timeout = setTimeout(() => {\n        // Force kill if graceful shutdown fails\n        if (this.process) {\n          videoLogger.warn(\"Force killing MediaMTX process\");\n          this.process.kill(\"SIGKILL\");\n        }\n        resolve();\n      }, 5000);\n\n      this.process.on(\"exit\", () => {\n        clearTimeout(timeout);\n        this.process = null;\n        videoLogger.info(\"MediaMTX server stopped\");\n        resolve();\n      });\n\n      // Send graceful shutdown signal\n      if (process.platform === \"win32\") {\n        // Windows doesn't support SIGTERM well\n        this.process.kill();\n      } else {\n        this.process.kill(\"SIGTERM\");\n      }\n    });\n  }\n\n  /**\n   * Check if the MediaMTX server process is running\n   */\n  isRunning(): boolean {\n    return this.process !== null && !this.process.killed;\n  }\n\n  /**\n   * Check if there's an active stream via MediaMTX API\n   */\n  async isStreamActive(): Promise<boolean> {\n    if (!this.isRunning()) {\n      return false;\n    }\n\n    try {\n      const response = await fetch(\n        `http://localhost:${this.config.apiPort}/v3/paths/list`\n      );\n\n      if (!response.ok) {\n        return false;\n      }\n\n      const data = (await response.json()) as MediaMTXPathsResponse;\n\n      // Check if any path has an active source (stream being published)\n      return data.items?.some((item) => item.ready && item.source !== null) ?? false;\n    } catch (err) {\n      videoLogger.debug({ err }, \"Failed to check stream status via API\");\n      return false;\n    }\n  }\n\n  /**\n   * Get the current video streaming status\n   */\n  async getStatus(): Promise<VideoStreamStatus> {\n    const enabled = this.isBinaryAvailable();\n    const serverRunning = this.isRunning();\n    const streamActive = serverRunning ? await this.isStreamActive() : false;\n\n    return {\n      enabled,\n      serverRunning,\n      streamActive,\n      rtmpIngestUrl: `rtmp://localhost:${this.config.rtmpPort}/live/stream`,\n      webrtcPlaybackUrl: `http://localhost:${this.config.webrtcPort}/live/stream`,\n      hlsPlaybackUrl: `http://localhost:${this.config.hlsPort}/live/stream/index.m3u8`,\n    };\n  }\n\n  /**\n   * Get active paths from MediaMTX API\n   */\n  async getActivePaths(): Promise<MediaMTXPathsResponse | null> {\n    if (!this.isRunning()) {\n      return null;\n    }\n\n    try {\n      const response = await fetch(\n        `http://localhost:${this.config.apiPort}/v3/paths/list`\n      );\n\n      if (!response.ok) {\n        return null;\n      }\n\n      return (await response.json()) as MediaMTXPathsResponse;\n    } catch (err) {\n      videoLogger.debug({ err }, \"Failed to get active paths from API\");\n      return null;\n    }\n  }\n\n  /**\n   * Cleanup resources (call on application shutdown)\n   */\n  async cleanup(): Promise<void> {\n    await this.stop();\n\n    // Remove config file if it exists\n    if (this.configPath && fs.existsSync(this.configPath)) {\n      try {\n        fs.unlinkSync(this.configPath);\n        videoLogger.debug({ configPath: this.configPath }, \"Removed MediaMTX config file\");\n      } catch (err) {\n        videoLogger.warn({ err, configPath: this.configPath }, \"Failed to remove config file\");\n      }\n    }\n  }\n}\n\n/**\n * Get the singleton MediaMTX manager instance\n */\nexport function getMediaMTXManager(): MediaMTXManager {\n  return MediaMTXManager.getInstance();\n}\n",
+        "numLines": 446,
+        "startLine": 1,
+        "totalLines": 446
+      }
+    },
+    "tool_use_id": "toolu_01Mz3VqRGWgFjAaetPrrvoox"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\index.ts"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\index.ts",
+        "content": "/**\n * Video Streaming Module\n *\n * Provides MediaMTX integration for live video streaming:\n * - RTMP ingest for OBS\n * - WebRTC playback for browsers\n * - HLS fallback playback\n *\n * @example\n * ```typescript\n * import { getMediaMTXManager, videoRouter } from './video';\n *\n * // Initialize manager\n * const manager = getMediaMTXManager();\n *\n * // Start server (optional - can also be started via API)\n * await manager.start();\n *\n * // Get status\n * const status = await manager.getStatus();\n * console.log('RTMP URL:', status.rtmpIngestUrl);\n *\n * // Mount router\n * app.use('/api/video', videoRouter);\n *\n * // Cleanup on shutdown\n * await manager.cleanup();\n * ```\n *\n * @module video\n */\n\n// Export types\nexport type {\n  MediaMTXConfig,\n  VideoStreamStatus,\n  MediaMTXPathsResponse,\n  MediaMTXPathItem,\n  MediaMTXPathSource,\n  MediaMTXTrack,\n  MediaMTXReader,\n  MediaMTXYamlConfig,\n} from \"./types.js\";\n\n// Export manager class and singleton getter\nexport { MediaMTXManager, getMediaMTXManager } from \"./mediamtx-manager.js\";\n\n// Export router\nexport { videoRouter, createVideoRouter } from \"./routes.js\";\n",
+        "numLines": 50,
+        "startLine": 1,
+        "totalLines": 50
+      }
+    },
+    "tool_use_id": "toolu_01V24M78QeAfHMQdht6CM2JW"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\hooks\\useLiveStream.ts"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\hooks\\useLiveStream.ts",
+        "content": "/**\n * Custom hook for managing live video stream status and server control\n *\n * This hook:\n * - Fetches video server status from the backend API\n * - Polls status every 5 seconds when component is mounted\n * - Provides start/stop server controls\n * - Handles error states and loading indicators\n */\n\nimport { useState, useEffect, useCallback, useRef } from \"react\";\n\n// ============================================================\n// Types\n// ============================================================\n\nexport interface VideoServerStatus {\n  /** Whether the video server is running */\n  isRunning: boolean;\n  /** Whether a stream is currently active */\n  isStreaming: boolean;\n  /** RTMP ingest URL for OBS */\n  rtmpUrl: string;\n  /** Stream key for OBS */\n  streamKey: string;\n  /** WebRTC playback URL for low-latency preview */\n  webrtcUrl: string;\n  /** HLS playback URL for fallback */\n  hlsUrl: string;\n  /** Stream statistics when active */\n  stats?: {\n    /** Current bitrate in kbps */\n    bitrate: number;\n    /** Frames per second */\n    fps: number;\n    /** Resolution (e.g., \"1920x1080\") */\n    resolution: string;\n    /** Uptime in seconds */\n    uptime: number;\n  };\n}\n\nexport interface UseLiveStreamReturn {\n  /** Current video server status */\n  status: VideoServerStatus | null;\n  /** Whether the status is currently loading */\n  isLoading: boolean;\n  /** Error message if status fetch failed */\n  error: string | null;\n  /** Refetch the status immediately */\n  refetch: () => Promise<void>;\n  /** Start the video server */\n  startServer: () => Promise<void>;\n  /** Stop the video server */\n  stopServer: () => Promise<void>;\n  /** Whether a server action is in progress */\n  isActionPending: boolean;\n}\n\n// ============================================================\n// Constants\n// ============================================================\n\nconst DEFAULT_API_BASE = \"http://localhost:3123\";\nconst POLL_INTERVAL_MS = 5000;\n\n// ============================================================\n// Hook Implementation\n// ============================================================\n\n/**\n * Hook for fetching video server status and controlling the server\n *\n * @param options - Configuration options\n * @param options.apiBase - Base URL for the video API (default: http://localhost:3123)\n * @param options.pollInterval - Interval for polling status in ms (default: 5000)\n * @param options.enabled - Whether polling is enabled (default: true)\n */\nexport function useLiveStream(options: {\n  apiBase?: string;\n  pollInterval?: number;\n  enabled?: boolean;\n} = {}): UseLiveStreamReturn {\n  const {\n    apiBase = DEFAULT_API_BASE,\n    pollInterval = POLL_INTERVAL_MS,\n    enabled = true,\n  } = options;\n\n  const [status, setStatus] = useState<VideoServerStatus | null>(null);\n  const [isLoading, setIsLoading] = useState(true);\n  const [error, setError] = useState<string | null>(null);\n  const [isActionPending, setIsActionPending] = useState(false);\n\n  const isMountedRef = useRef(true);\n  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);\n\n  /**\n   * Fetch the current video server status\n   */\n  const fetchStatus = useCallback(async () => {\n    try {\n      const response = await fetch(`${apiBase}/api/video/status`, {\n        method: \"GET\",\n        headers: {\n          \"Content-Type\": \"application/json\",\n        },\n      });\n\n      if (!response.ok) {\n        // If server is not running, return default offline status\n        if (response.status === 404 || response.status === 503) {\n          if (isMountedRef.current) {\n            setStatus({\n              isRunning: false,\n              isStreaming: false,\n              rtmpUrl: \"rtmp://localhost:1935/live\",\n              streamKey: \"stream\",\n              webrtcUrl: \"ws://localhost:8889/stream\",\n              hlsUrl: \"http://localhost:8888/stream/index.m3u8\",\n            });\n            setError(null);\n          }\n          return;\n        }\n        throw new Error(`Failed to fetch video status: ${response.statusText}`);\n      }\n\n      const data = await response.json();\n\n      if (isMountedRef.current) {\n        setStatus({\n          isRunning: data.isRunning ?? false,\n          isStreaming: data.isStreaming ?? false,\n          rtmpUrl: data.rtmpUrl ?? \"rtmp://localhost:1935/live\",\n          streamKey: data.streamKey ?? \"stream\",\n          webrtcUrl: data.webrtcUrl ?? \"ws://localhost:8889/stream\",\n          hlsUrl: data.hlsUrl ?? \"http://localhost:8888/stream/index.m3u8\",\n          stats: data.stats,\n        });\n        setError(null);\n      }\n    } catch (err) {\n      if (isMountedRef.current) {\n        // On error, set default offline status instead of showing error\n        // This handles the case when the backend is not running\n        setStatus({\n          isRunning: false,\n          isStreaming: false,\n          rtmpUrl: \"rtmp://localhost:1935/live\",\n          streamKey: \"stream\",\n          webrtcUrl: \"ws://localhost:8889/stream\",\n          hlsUrl: \"http://localhost:8888/stream/index.m3u8\",\n        });\n        setError(\n          err instanceof Error ? err.message : \"Failed to fetch video status\"\n        );\n      }\n    } finally {\n      if (isMountedRef.current) {\n        setIsLoading(false);\n      }\n    }\n  }, [apiBase]);\n\n  /**\n   * Start the video server\n   */\n  const startServer = useCallback(async () => {\n    setIsActionPending(true);\n    setError(null);\n\n    try {\n      const response = await fetch(`${apiBase}/api/video/start`, {\n        method: \"POST\",\n        headers: {\n          \"Content-Type\": \"application/json\",\n        },\n      });\n\n      if (!response.ok) {\n        const errorData = await response.json().catch(() => ({}));\n        throw new Error(\n          errorData.message ?? `Failed to start server: ${response.statusText}`\n        );\n      }\n\n      // Refresh status after starting\n      await fetchStatus();\n    } catch (err) {\n      setError(\n        err instanceof Error ? err.message : \"Failed to start video server\"\n      );\n      throw err;\n    } finally {\n      setIsActionPending(false);\n    }\n  }, [apiBase, fetchStatus]);\n\n  /**\n   * Stop the video server\n   */\n  const stopServer = useCallback(async () => {\n    setIsActionPending(true);\n    setError(null);\n\n    try {\n      const response = await fetch(`${apiBase}/api/video/stop`, {\n        method: \"POST\",\n        headers: {\n          \"Content-Type\": \"application/json\",\n        },\n      });\n\n      if (!response.ok) {\n        const errorData = await response.json().catch(() => ({}));\n        throw new Error(\n          errorData.message ?? `Failed to stop server: ${response.statusText}`\n        );\n      }\n\n      // Refresh status after stopping\n      await fetchStatus();\n    } catch (err) {\n      setError(\n        err instanceof Error ? err.message : \"Failed to stop video server\"\n      );\n      throw err;\n    } finally {\n      setIsActionPending(false);\n    }\n  }, [apiBase, fetchStatus]);\n\n  /**\n   * Set up polling for status updates\n   */\n  useEffect(() => {\n    isMountedRef.current = true;\n\n    // Initial fetch\n    if (enabled) {\n      fetchStatus();\n    }\n\n    // Set up polling\n    const startPolling = () => {\n      if (!enabled) return;\n\n      pollTimeoutRef.current = setInterval(() => {\n        if (isMountedRef.current) {\n          fetchStatus();\n        }\n      }, pollInterval);\n    };\n\n    startPolling();\n\n    // Cleanup\n    return () => {\n      isMountedRef.current = false;\n      if (pollTimeoutRef.current) {\n        clearInterval(pollTimeoutRef.current);\n        pollTimeoutRef.current = null;\n      }\n    };\n  }, [enabled, pollInterval, fetchStatus]);\n\n  return {\n    status,\n    isLoading,\n    error,\n    refetch: fetchStatus,\n    startServer,\n    stopServer,\n    isActionPending,\n  };\n}\n\nexport default useLiveStream;\n",
+        "numLines": 280,
+        "startLine": 1,
+        "totalLines": 280
+      }
+    },
+    "tool_use_id": "toolu_01WaxadfZZ3ZmTgUa1mmyi9i"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\\LiveVideoPreview.tsx"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\\LiveVideoPreview.tsx",
+        "content": "\"use client\";\n\nimport { useEffect, useRef, useState, useCallback } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\n// ============================================================\n// Types\n// ============================================================\n\ntype ConnectionState = \"connecting\" | \"connected\" | \"disconnected\" | \"error\";\ntype StreamMode = \"webrtc\" | \"hls\" | \"none\";\n\nexport interface LiveVideoPreviewProps {\n  /** WebRTC playback URL for low-latency streaming */\n  webrtcUrl?: string;\n  /** HLS playback URL for fallback streaming */\n  hlsUrl?: string;\n  /** Additional CSS classes */\n  className?: string;\n  /** Callback when connection state changes */\n  onConnectionChange?: (connected: boolean) => void;\n  /** Callback when an error occurs */\n  onError?: (error: Error) => void;\n  /** Whether the stream is expected to be active */\n  isStreamActive?: boolean;\n}\n\n// ============================================================\n// Icons\n// ============================================================\n\nfunction PlayIcon({ className }: { className?: string }) {\n  return (\n    <svg\n      className={className}\n      fill=\"none\"\n      viewBox=\"0 0 24 24\"\n      stroke=\"currentColor\"\n      strokeWidth={2}\n    >\n      <path\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        d=\"M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z\"\n      />\n    </svg>\n  );\n}\n\nfunction RefreshIcon({ className }: { className?: string }) {\n  return (\n    <svg\n      className={className}\n      fill=\"none\"\n      viewBox=\"0 0 24 24\"\n      stroke=\"currentColor\"\n      strokeWidth={2}\n    >\n      <path\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        d=\"M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99\"\n      />\n    </svg>\n  );\n}\n\nfunction WifiOffIcon({ className }: { className?: string }) {\n  return (\n    <svg\n      className={className}\n      fill=\"none\"\n      viewBox=\"0 0 24 24\"\n      stroke=\"currentColor\"\n      strokeWidth={1.5}\n    >\n      <path\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        d=\"M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z\"\n      />\n      <line\n        x1=\"3\"\n        y1=\"3\"\n        x2=\"21\"\n        y2=\"21\"\n        stroke=\"currentColor\"\n        strokeWidth=\"1.5\"\n        strokeLinecap=\"round\"\n      />\n    </svg>\n  );\n}\n\nfunction ExclamationIcon({ className }: { className?: string }) {\n  return (\n    <svg\n      className={className}\n      fill=\"none\"\n      viewBox=\"0 0 24 24\"\n      stroke=\"currentColor\"\n      strokeWidth={1.5}\n    >\n      <path\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        d=\"M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z\"\n      />\n    </svg>\n  );\n}\n\n// ============================================================\n// Live Video Preview Component\n// ============================================================\n\nexport function LiveVideoPreview({\n  webrtcUrl = \"ws://localhost:8889/stream\",\n  hlsUrl = \"http://localhost:8888/stream/index.m3u8\",\n  className,\n  onConnectionChange,\n  onError,\n  isStreamActive = false,\n}: LiveVideoPreviewProps) {\n  const videoRef = useRef<HTMLVideoElement>(null);\n  const hlsRef = useRef<Hls | null>(null);\n  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);\n  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);\n\n  const [connectionState, setConnectionState] =\n    useState<ConnectionState>(\"disconnected\");\n  const [streamMode, setStreamMode] = useState<StreamMode>(\"none\");\n  const [errorMessage, setErrorMessage] = useState<string | null>(null);\n  const [latencyMs, setLatencyMs] = useState<number | null>(null);\n  const [reconnectAttempts, setReconnectAttempts] = useState(0);\n\n  const MAX_RECONNECT_ATTEMPTS = 3;\n\n  /**\n   * Update connection state and notify parent\n   */\n  const updateConnectionState = useCallback(\n    (state: ConnectionState) => {\n      setConnectionState(state);\n      onConnectionChange?.(state === \"connected\");\n    },\n    [onConnectionChange]\n  );\n\n  /**\n   * Handle errors\n   */\n  const handleError = useCallback(\n    (error: Error, message?: string) => {\n      setErrorMessage(message ?? error.message);\n      updateConnectionState(\"error\");\n      onError?.(error);\n    },\n    [onError, updateConnectionState]\n  );\n\n  /**\n   * Clean up WebRTC connection\n   */\n  const cleanupWebRTC = useCallback(() => {\n    if (peerConnectionRef.current) {\n      peerConnectionRef.current.close();\n      peerConnectionRef.current = null;\n    }\n  }, []);\n\n  /**\n   * Clean up HLS instance\n   */\n  const cleanupHLS = useCallback(() => {\n    if (hlsRef.current) {\n      hlsRef.current.destroy();\n      hlsRef.current = null;\n    }\n  }, []);\n\n  /**\n   * Clean up all connections\n   */\n  const cleanup = useCallback(() => {\n    cleanupWebRTC();\n    cleanupHLS();\n\n    if (reconnectTimeoutRef.current) {\n      clearTimeout(reconnectTimeoutRef.current);\n      reconnectTimeoutRef.current = null;\n    }\n\n    if (videoRef.current) {\n      videoRef.current.srcObject = null;\n      videoRef.current.src = \"\";\n    }\n  }, [cleanupWebRTC, cleanupHLS]);\n\n  /**\n   * Connect via WebRTC for lowest latency\n   */\n  const connectWebRTC = useCallback(async (): Promise<boolean> => {\n    if (!videoRef.current) return false;\n\n    try {\n      updateConnectionState(\"connecting\");\n      setStreamMode(\"webrtc\");\n\n      // Create peer connection\n      const pc = new RTCPeerConnection({\n        iceServers: [{ urls: \"stun:stun.l.google.com:19302\" }],\n      });\n      peerConnectionRef.current = pc;\n\n      // Add transceiver for receiving video\n      pc.addTransceiver(\"video\", { direction: \"recvonly\" });\n      pc.addTransceiver(\"audio\", { direction: \"recvonly\" });\n\n      // Handle incoming tracks\n      pc.ontrack = (event) => {\n        if (videoRef.current && event.streams[0]) {\n          videoRef.current.srcObject = event.streams[0];\n          videoRef.current.play().catch(() => {\n            // Autoplay may be blocked\n          });\n        }\n      };\n\n      // Create offer\n      const offer = await pc.createOffer();\n      await pc.setLocalDescription(offer);\n\n      // Wait for ICE gathering to complete\n      await new Promise<void>((resolve) => {\n        if (pc.iceGatheringState === \"complete\") {\n          resolve();\n        } else {\n          const checkState = () => {\n            if (pc.iceGatheringState === \"complete\") {\n              pc.removeEventListener(\"icegatheringstatechange\", checkState);\n              resolve();\n            }\n          };\n          pc.addEventListener(\"icegatheringstatechange\", checkState);\n        }\n      });\n\n      // Send offer to WHEP endpoint\n      const response = await fetch(webrtcUrl.replace(\"ws://\", \"http://\").replace(\"wss://\", \"https://\"), {\n        method: \"POST\",\n        headers: {\n          \"Content-Type\": \"application/sdp\",\n        },\n        body: pc.localDescription?.sdp,\n      });\n\n      if (!response.ok) {\n        throw new Error(`WebRTC signaling failed: ${response.statusText}`);\n      }\n\n      const answerSdp = await response.text();\n      await pc.setRemoteDescription({\n        type: \"answer\",\n        sdp: answerSdp,\n      });\n\n      // Monitor connection state\n      pc.onconnectionstatechange = () => {\n        switch (pc.connectionState) {\n          case \"connected\":\n            updateConnectionState(\"connected\");\n            setLatencyMs(100); // WebRTC typically <500ms latency\n            setReconnectAttempts(0);\n            break;\n          case \"disconnected\":\n          case \"failed\":\n            updateConnectionState(\"disconnected\");\n            break;\n          case \"closed\":\n            updateConnectionState(\"disconnected\");\n            break;\n        }\n      };\n\n      return true;\n    } catch (error) {\n      cleanupWebRTC();\n      return false;\n    }\n  }, [webrtcUrl, updateConnectionState, cleanupWebRTC]);\n\n  /**\n   * Connect via HLS as fallback\n   */\n  const connectHLS = useCallback(async (): Promise<boolean> => {\n    if (!videoRef.current) return false;\n\n    try {\n      updateConnectionState(\"connecting\");\n      setStreamMode(\"hls\");\n\n      // Check if HLS is supported natively (Safari)\n      if (videoRef.current.canPlayType(\"application/vnd.apple.mpegurl\")) {\n        videoRef.current.src = hlsUrl;\n        videoRef.current.addEventListener(\n          \"loadedmetadata\",\n          () => {\n            updateConnectionState(\"connected\");\n            setLatencyMs(2000); // HLS typically 2-5s latency\n            setReconnectAttempts(0);\n            videoRef.current?.play().catch(() => {});\n          },\n          { once: true }\n        );\n        videoRef.current.addEventListener(\n          \"error\",\n          () => {\n            updateConnectionState(\"error\");\n            setErrorMessage(\"Failed to load HLS stream\");\n          },\n          { once: true }\n        );\n        return true;\n      }\n\n      // Use hls.js for other browsers - dynamic import to avoid SSR issues\n      try {\n        const HlsModule = await import(\"hls.js\");\n        const Hls = HlsModule.default;\n\n        if (!Hls.isSupported()) {\n          throw new Error(\"HLS is not supported in this browser\");\n        }\n\n        const hls = new Hls({\n          lowLatencyMode: true,\n          liveSyncDurationCount: 3,\n          liveMaxLatencyDurationCount: 10,\n          enableWorker: true,\n        });\n        hlsRef.current = hls;\n\n        hls.loadSource(hlsUrl);\n        hls.attachMedia(videoRef.current);\n\n        hls.on(Hls.Events.MANIFEST_PARSED, () => {\n          updateConnectionState(\"connected\");\n          setLatencyMs(2000);\n          setReconnectAttempts(0);\n          videoRef.current?.play().catch(() => {});\n        });\n\n        hls.on(Hls.Events.ERROR, (_, data) => {\n          if (data.fatal) {\n            switch (data.type) {\n              case Hls.ErrorTypes.NETWORK_ERROR:\n                // Try to recover\n                hls.startLoad();\n                break;\n              case Hls.ErrorTypes.MEDIA_ERROR:\n                hls.recoverMediaError();\n                break;\n              default:\n                handleError(\n                  new Error(\"HLS fatal error\"),\n                  \"Failed to play HLS stream\"\n                );\n                break;\n            }\n          }\n        });\n\n        return true;\n      } catch (importError) {\n        // HLS.js not available, fall back to error state\n        throw new Error(\"HLS library not available\");\n      }\n    } catch (error) {\n      cleanupHLS();\n      return false;\n    }\n  }, [hlsUrl, updateConnectionState, cleanupHLS, handleError]);\n\n  /**\n   * Attempt to connect, trying WebRTC first, then falling back to HLS\n   */\n  const connect = useCallback(async () => {\n    cleanup();\n    setErrorMessage(null);\n\n    // Only attempt connection if stream is expected to be active\n    if (!isStreamActive) {\n      updateConnectionState(\"disconnected\");\n      setStreamMode(\"none\");\n      return;\n    }\n\n    // Try WebRTC first for lowest latency\n    const webrtcSuccess = await connectWebRTC();\n    if (webrtcSuccess) {\n      return;\n    }\n\n    // Fall back to HLS\n    const hlsSuccess = await connectHLS();\n    if (hlsSuccess) {\n      return;\n    }\n\n    // Both failed\n    handleError(\n      new Error(\"Unable to connect to stream\"),\n      \"Could not establish connection to the video stream\"\n    );\n  }, [\n    cleanup,\n    isStreamActive,\n    updateConnectionState,\n    connectWebRTC,\n    connectHLS,\n    handleError,\n  ]);\n\n  /**\n   * Retry connection\n   */\n  const retry = useCallback(() => {\n    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {\n      setReconnectAttempts((prev) => prev + 1);\n      connect();\n    } else {\n      handleError(\n        new Error(\"Max reconnect attempts reached\"),\n        \"Unable to connect after multiple attempts. Please check your stream settings.\"\n      );\n    }\n  }, [reconnectAttempts, connect, handleError]);\n\n  /**\n   * Effect to handle connection when stream becomes active\n   */\n  useEffect(() => {\n    if (isStreamActive) {\n      connect();\n    } else {\n      cleanup();\n      updateConnectionState(\"disconnected\");\n      setStreamMode(\"none\");\n    }\n\n    return () => {\n      cleanup();\n    };\n  }, [isStreamActive, connect, cleanup, updateConnectionState]);\n\n  /**\n   * Render content based on connection state\n   */\n  const renderContent = () => {\n    switch (connectionState) {\n      case \"connecting\":\n        return (\n          <div className=\"absolute inset-0 flex items-center justify-center\">\n            <div className=\"text-center\">\n              <div className=\"mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface\">\n                <div className=\"h-8 w-8 animate-spin rounded-full border-2 border-teal border-t-transparent\" />\n              </div>\n              <p className=\"text-sm text-text-muted\">Connecting to stream...</p>\n              <p className=\"mt-1 text-xs text-text-dim\">\n                {streamMode === \"webrtc\"\n                  ? \"Attempting WebRTC connection\"\n                  : \"Attempting HLS connection\"}\n              </p>\n            </div>\n          </div>\n        );\n\n      case \"disconnected\":\n        return (\n          <div className=\"absolute inset-0 flex items-center justify-center\">\n            <div className=\"text-center\">\n              <div className=\"mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface\">\n                {isStreamActive ? (\n                  <WifiOffIcon className=\"h-6 w-6 text-text-muted\" />\n                ) : (\n                  <PlayIcon className=\"h-6 w-6 text-text-muted\" />\n                )}\n              </div>\n              <p className=\"text-sm text-text-muted\">\n                {isStreamActive\n                  ? \"Stream disconnected\"\n                  : \"Waiting for stream connection...\"}\n              </p>\n              <p className=\"mt-1 text-xs text-text-dim\">\n                {isStreamActive\n                  ? \"The stream connection was lost\"\n                  : \"Video preview will appear when OBS is streaming\"}\n              </p>\n              {isStreamActive && (\n                <button\n                  type=\"button\"\n                  onClick={retry}\n                  className=\"mt-4 inline-flex items-center gap-2 rounded-lg bg-surface px-4 py-2 text-sm font-medium text-teal transition-colors hover:bg-surface-hover\"\n                >\n                  <RefreshIcon className=\"h-4 w-4\" />\n                  Reconnect\n                </button>\n              )}\n            </div>\n          </div>\n        );\n\n      case \"error\":\n        return (\n          <div className=\"absolute inset-0 flex items-center justify-center\">\n            <div className=\"text-center\">\n              <div className=\"mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-error/10\">\n                <ExclamationIcon className=\"h-6 w-6 text-error\" />\n              </div>\n              <p className=\"text-sm text-error\">Connection Error</p>\n              <p className=\"mt-1 max-w-xs text-xs text-text-dim\">\n                {errorMessage ?? \"An unknown error occurred\"}\n              </p>\n              <button\n                type=\"button\"\n                onClick={retry}\n                disabled={reconnectAttempts >= MAX_RECONNECT_ATTEMPTS}\n                className=\"mt-4 inline-flex items-center gap-2 rounded-lg bg-surface px-4 py-2 text-sm font-medium text-teal transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50\"\n              >\n                <RefreshIcon className=\"h-4 w-4\" />\n                {reconnectAttempts >= MAX_RECONNECT_ATTEMPTS\n                  ? \"Max retries reached\"\n                  : \"Retry Connection\"}\n              </button>\n            </div>\n          </div>\n        );\n\n      case \"connected\":\n        return null; // Video element handles display\n    }\n  };\n\n  return (\n    <div\n      className={cn(\n        \"relative aspect-video w-full overflow-hidden rounded-xl bg-bg-2\",\n        className\n      )}\n    >\n      {/* Video Element */}\n      <video\n        ref={videoRef}\n        className={cn(\n          \"h-full w-full object-contain\",\n          connectionState !== \"connected\" && \"hidden\"\n        )}\n        autoPlay\n        playsInline\n        muted\n        controls={false}\n      />\n\n      {/* State-based Content */}\n      {renderContent()}\n\n      {/* LIVE Badge */}\n      <div className=\"absolute left-4 top-4\">\n        <div\n          className={cn(\n            \"inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium\",\n            connectionState === \"connected\"\n              ? \"border-transparent bg-red-600 text-white\"\n              : \"border-stroke bg-surface text-text-muted opacity-50\"\n          )}\n        >\n          <span className=\"relative flex h-2 w-2\">\n            {connectionState === \"connected\" && (\n              <span className=\"absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75\" />\n            )}\n            <span\n              className={cn(\n                \"relative inline-flex h-2 w-2 rounded-full\",\n                connectionState === \"connected\" ? \"bg-white\" : \"bg-text-muted\"\n              )}\n            />\n          </span>\n          {connectionState === \"connected\" ? \"LIVE\" : \"OFFLINE\"}\n        </div>\n      </div>\n\n      {/* Latency Indicator */}\n      {connectionState === \"connected\" && latencyMs !== null && (\n        <div className=\"absolute right-4 top-4\">\n          <div\n            className={cn(\n              \"inline-flex items-center gap-1.5 rounded-full border border-stroke/50 bg-bg-0/80 px-2.5 py-1 text-xs font-medium backdrop-blur-sm\",\n              streamMode === \"webrtc\" ? \"text-teal\" : \"text-warning\"\n            )}\n          >\n            <span\n              className={cn(\n                \"h-1.5 w-1.5 rounded-full\",\n                streamMode === \"webrtc\" ? \"bg-teal\" : \"bg-warning\"\n              )}\n            />\n            {streamMode === \"webrtc\" ? \"WebRTC\" : \"HLS\"} ~{latencyMs}ms\n          </div>\n        </div>\n      )}\n    </div>\n  );\n}\n\nexport default LiveVideoPreview;\n",
+        "numLines": 617,
+        "startLine": 1,
+        "totalLines": 617
+      }
+    },
+    "tool_use_id": "toolu_015LCN2HSoCqc6F8mM49aCSh"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env.sample"
+    },
+    "tool_response": {
+      "type": "text",
+      "file": {
+        "filePath": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env.sample",
+        "content": "# ============================================================================\n# FluxBoard - Livestream Copilot Environment Configuration\n# ============================================================================\n# Copy this file to .env and fill in the values for your environment.\n# Required variables are marked with [REQUIRED], optional ones with [OPTIONAL].\n# Variables with defaults will use the shown default if not specified.\n# ============================================================================\n\n# ===================\n# Server Configuration\n# ===================\n\n# Application environment [OPTIONAL]\n# Options: development, production, test\n# Default: development\nNODE_ENV=development\n\n# HTTP server port [OPTIONAL]\n# Default: 3123\nHTTP_PORT=3123\n\n# WebSocket server port [OPTIONAL]\n# Default: 3124\nWS_PORT=3124\n\n# Base URL for the application [OPTIONAL]\n# Used for OAuth callbacks, email links, etc.\nAPP_URL=http://localhost:3000\n\n# CORS allowed origins [OPTIONAL]\n# Comma-separated list of allowed origins for browser requests\nCORS_ORIGINS=http://localhost:3000,http://localhost:3002\n\n# ===================\n# OBS Configuration\n# ===================\n\n# OBS WebSocket URL [OPTIONAL]\n# Default: ws://127.0.0.1:4455\nOBS_WS_URL=ws://127.0.0.1:4455\n\n# OBS WebSocket password [OPTIONAL]\n# Leave empty if OBS authentication is disabled\nOBS_WS_PASSWORD=\n\n# Replay buffer duration in seconds [OPTIONAL]\n# This should match your OBS replay buffer configuration\n# Default: 300 (5 minutes)\nREPLAY_BUFFER_SECONDS=300\n\n# ===================\n# Database Configuration (Prisma)\n# ===================\n\n# PostgreSQL connection URL [REQUIRED for database features]\n# Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA\n#\n# For Prisma Postgres (recommended for production):\n#   Get your connection string from https://console.prisma.io\n#   DATABASE_URL=prisma+postgres://accelerate.prisma-data.net/?api_key=YOUR_API_KEY\n#\n# For local development with Docker:\n#   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/livestream_copilot?schema=public\n#\n# For production PostgreSQL:\n#   DATABASE_URL=postgresql://app_user:secure_password@db.example.com:5432/livestream_copilot?schema=public&connection_limit=5\nDATABASE_URL=\n\n# Direct database URL for Prisma migrations (when using Prisma Accelerate) [OPTIONAL]\n# This is the direct PostgreSQL connection, bypassing the proxy\n# DIRECT_URL=postgresql://user:password@host:5432/database\n\n# ===================\n# Authentication Configuration\n# ===================\n\n# JWT Secret for signing access tokens [REQUIRED for auth]\n# Generate with: openssl rand -base64 64\nJWT_SECRET=\n\n# JWT Refresh Secret for signing refresh tokens [REQUIRED for auth]\n# Generate with: openssl rand -base64 64\nJWT_REFRESH_SECRET=\n\n# Access token expiration in seconds [OPTIONAL]\n# Default: 900 (15 minutes)\nJWT_ACCESS_EXPIRY=900\n\n# Refresh token expiration in seconds [OPTIONAL]\n# Default: 604800 (7 days)\nJWT_REFRESH_EXPIRY=604800\n\n# ===================\n# OAuth Providers (Optional - enable as needed)\n# ===================\n\n# Google OAuth\n# Create credentials at: https://console.cloud.google.com/apis/credentials\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\n\n# GitHub OAuth\n# Create OAuth app at: https://github.com/settings/developers\nGITHUB_CLIENT_ID=\nGITHUB_CLIENT_SECRET=\n\n# Twitch OAuth\n# Create app at: https://dev.twitch.tv/console/apps\nTWITCH_CLIENT_ID=\nTWITCH_CLIENT_SECRET=\n\n# ===================\n# Media Storage (Bunny.net CDN)\n# ===================\n# Bunny.net provides fast, affordable CDN and storage for video/audio files.\n# Create an account at: https://bunny.net\n\n# Bunny.net Storage Zone Name [REQUIRED for media uploads]\nBUNNY_STORAGE_ZONE=\n\n# Bunny.net Storage API Key [REQUIRED for media uploads]\n# Found in Storage Zone settings\nBUNNY_STORAGE_API_KEY=\n\n# Bunny.net CDN Hostname [REQUIRED for media delivery]\n# Format: https://your-zone.b-cdn.net\nBUNNY_CDN_URL=\n\n# Bunny.net Stream Library ID [OPTIONAL - for video streaming]\n# Found in Stream settings\nBUNNY_STREAM_LIBRARY_ID=\n\n# Bunny.net Stream API Key [OPTIONAL - for video streaming]\nBUNNY_STREAM_API_KEY=\n\n# ===================\n# AI Agent Configuration\n# ===================\n\n# AI provider to use [OPTIONAL]\n# Options: anthropic, openai\n# Default: anthropic\nAI_PROVIDER=anthropic\n\n# Anthropic API key [REQUIRED for AI agents with Claude]\n# Get your key at: https://console.anthropic.com/\nANTHROPIC_API_KEY=\n\n# OpenAI API key [OPTIONAL - alternative to Claude]\n# Get your key at: https://platform.openai.com/\nOPENAI_API_KEY=\n\n# AI model identifier [OPTIONAL]\n# Default: claude-sonnet-4-20250514\nAI_MODEL=claude-sonnet-4-20250514\n\n# Max tokens for AI responses [OPTIONAL]\n# Default: 4096\nAI_MAX_TOKENS=4096\n\n# ===================\n# STT (Speech-to-Text) Configuration\n# ===================\n\n# Speech-to-text provider [OPTIONAL]\n# Options: deepgram, assemblyai, whisper\n# Default: deepgram\nSTT_PROVIDER=deepgram\n\n# Deepgram API key [OPTIONAL - Required if STT_PROVIDER=deepgram]\n# Get your key at: https://console.deepgram.com/\nDEEPGRAM_API_KEY=\n\n# AssemblyAI API key [OPTIONAL - Required if STT_PROVIDER=assemblyai]\n# Get your key at: https://www.assemblyai.com/dashboard/\n# ASSEMBLYAI_API_KEY=\n\n# Whisper model path [OPTIONAL - Required if STT_PROVIDER=whisper]\n# Path to the local Whisper model file\n# WHISPER_MODEL_PATH=\n\n# ===================\n# Payment Processing (Stripe)\n# ===================\n# For subscription management and billing\n\n# Stripe Secret Key [REQUIRED for payments]\n# Get keys at: https://dashboard.stripe.com/apikeys\nSTRIPE_SECRET_KEY=\n\n# Stripe Publishable Key [REQUIRED for frontend]\nSTRIPE_PUBLISHABLE_KEY=\n\n# Stripe Webhook Secret [REQUIRED for webhooks]\n# Found when setting up webhook endpoint\nSTRIPE_WEBHOOK_SECRET=\n\n# ===================\n# Email Service (for auth emails)\n# ===================\n\n# Email provider [OPTIONAL]\n# Options: resend, sendgrid, smtp\nEMAIL_PROVIDER=resend\n\n# Resend API Key [OPTIONAL - if using Resend]\n# Get your key at: https://resend.com/\nRESEND_API_KEY=\n\n# SendGrid API Key [OPTIONAL - if using SendGrid]\n# SENDGRID_API_KEY=\n\n# From email address for system emails\nEMAIL_FROM=noreply@fluxboard.app\n\n# ===================\n# Observability (Opik) Configuration\n# ===================\n# Opik provides tracing and observability for LLM applications.\n# Leave these empty to disable Opik integration.\n\n# Opik workspace name [OPTIONAL]\n# Your Opik workspace identifier\n# OPIK_WORKSPACE_NAME=\n\n# Opik project name [OPTIONAL]\n# The project to log traces to\n# OPIK_PROJECT_NAME=\n\n# Opik API key [OPTIONAL]\n# Not required for self-hosted Opik instances\n# OPIK_API_KEY=\n\n# Opik URL override [OPTIONAL]\n# For self-hosted Opik deployments\n# OPIK_URL_OVERRIDE=\n\n# ===================\n# Logging Configuration\n# ===================\n\n# Minimum log level [OPTIONAL]\n# Options: trace, debug, info, warn, error, fatal\n# Default: info\nLOG_LEVEL=info\n\n# Log output format [OPTIONAL]\n# Options: json, pretty\n# Default: pretty\n# Use 'json' for production environments with log aggregation\nLOG_FORMAT=pretty\n\n# ===================\n# Path Configuration\n# ===================\n\n# Directory for session data storage [OPTIONAL]\n# Default: ./sessions\nSESSION_DIR=./sessions\n\n# Path to ffmpeg binary [OPTIONAL]\n# If not specified, ffmpeg will be looked up in PATH\n# FFMPEG_PATH=\n\n# ===================\n# Redis (for sessions and caching) [OPTIONAL]\n# ===================\n\n# Redis connection URL [OPTIONAL - for session store and caching]\n# REDIS_URL=redis://localhost:6379\n",
+        "numLines": 271,
+        "startLine": 1,
+        "totalLines": 271
+      }
+    },
+    "tool_use_id": "toolu_01QspmdEhkqMgkuT8yEwDbaG"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":1935\" 2>/dev/null || echo \"Port 1935 not listening\"",
+      "description": "Check if RTMP port 1935 is listening"
+    },
+    "tool_response": {
+      "stdout": "Port 1935 not listening\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01D64nf6KHe5HJ4M9w3uDAh2"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":8889\" 2>/dev/null || echo \"Port 8889 not listening\"",
+      "description": "Check if WebRTC port 8889 is listening"
+    },
+    "tool_response": {
+      "stdout": "Port 8889 not listening\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01K9Ktfk2MVM3h6bsiFpjA1u"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":9997\" 2>/dev/null || echo \"Port 9997 not listening\"",
+      "description": "Check if MediaMTX API port 9997 is listening"
+    },
+    "tool_response": {
+      "stdout": "Port 9997 not listening\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01Y65fUZxVo9tKZ1TjWq2qaZ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"mediamtx\" 2>/dev/null || echo \"MediaMTX process not found\"",
+      "description": "Check if MediaMTX process is running"
+    },
+    "tool_response": {
+      "stdout": "MediaMTX process not found\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01SP47udnFtR9LPbmUhXJcfg"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s http://localhost:3123/api/video/status 2>/dev/null || echo \"Video API not responding\"",
+      "description": "Check video server status from backend API"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"enabled\":true,\"serverRunning\":false,\"streamActive\":false,\"rtmpIngestUrl\":\"rtmp://localhost:1935/live/stream\",\"webrtcPlaybackUrl\":\"http://localhost:8889/live/stream\",\"hlsPlaybackUrl\":\"http://localhost:8888/live/stream/index.m3u8\"}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_019cbPjZWghtTWuvCqfvzGSP"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=5\" | head -100",
+      "description": "List sessions to check if the ID exists"
+    },
+    "tool_response": {
+      "stdout": "{\"success\":true,\"data\":{\"sessions\":[{\"id\":\"cmkulxm46000j21ficuy7x92u\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"test session 1\",\"participants\":[],\"startedAt\":\"2026-01-26T03:28:04.016Z\",\"endedAt\":null,\"createdAt\":\"2026-01-26T03:28:02.358Z\",\"updatedAt\":\"2026-01-26T03:28:02.358Z\",\"isActive\":true,\"counts\":{\"events\":1,\"outputs\":0,\"clips\":0}},{\"id\":\"cmkul3i3d000g21fizaksioy1\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"Live stream test 2\",\"participants\":[],\"startedAt\":\"2026-01-26T03:04:38.901Z\",\"endedAt\":null,\"createdAt\":\"2026-01-26T03:04:37.381Z\",\"updatedAt\":\"2026-01-26T03:04:37.381Z\",\"isActive\":false,\"counts\":{\"events\":1,\"outputs\":0,\"clips\":0}},{\"id\":\"cmkukd7b4000721finwlbnl5a\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"Live stream\",\"participants\":[],\"startedAt\":\"2026-01-26T02:44:11.866Z\",\"endedAt\":\"2026-01-26T02:47:02.595Z\",\"createdAt\":\"2026-01-26T02:44:10.346Z\",\"updatedAt\":\"2026-01-26T02:47:00.926Z\",\"isActive\":false,\"counts\":{\"events\":2,\"outputs\":0,\"clips\":0}},{\"id\":\"cmktxbvvg00072lflc0otx62t\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"Weekly Talk\",\"participants\":[],\"startedAt\":\"2026-01-25T15:59:18.032Z\",\"endedAt\":\"2026-01-25T21:27:48.250Z\",\"createdAt\":\"2026-01-25T15:59:17.705Z\",\"updatedAt\":\"2026-01-25T21:27:47.145Z\",\"isActive\":false,\"counts\":{\"events\":1,\"outputs\":0,\"clips\":0}},{\"id\":\"cmkh7kdgr0000i7ucvbcqmvcm\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"Test Session\",\"participants\":[],\"startedAt\":\"2026-01-16T18:24:49.571Z\",\"endedAt\":\"2026-01-25T15:59:04.144Z\",\"createdAt\":\"2026-01-16T18:24:49.573Z\",\"updatedAt\":\"2026-01-25T15:59:03.640Z\",\"isActive\":false,\"counts\":{\"events\":0,\"outputs\":0,\"clips\":0}}],\"pagination\":{\"limit\":5,\"offset\":0,\"total\":5}}}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01KhcE16bypyfE483N144hss"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions/4ec64074-7b1e-4767-b836-24fb197313d9\"",
+      "description": "Check specific session ID"
+    },
+    "tool_response": {
+      "stdout": "{\"success\":false,\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"Session not found.\"}}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01YZpYLYAPzxELwsBuqMVeap"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST http://localhost:3123/api/video/start",
+      "description": "Start MediaMTX via backend API"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"message\":\"Server started\",\"enabled\":true,\"serverRunning\":true,\"streamActive\":false,\"rtmpIngestUrl\":\"rtmp://localhost:1935/live/stream\",\"webrtcPlaybackUrl\":\"http://localhost:8889/live/stream\",\"hlsPlaybackUrl\":\"http://localhost:8888/live/stream/index.m3u8\"}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01LHiuA4DXr9aZ4JQYJpyXAL"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "timeout 3 && netstat -ano | findstr \":1935\" 2>/dev/null || echo \"Checking...\" && sleep 2 && netstat -ano | findstr \":1935\"",
+      "description": "Check if RTMP port is now listening"
+    },
+    "tool_response": {
+      "stdout": "Checking...\n  TCP    0.0.0.0:1935           0.0.0.0:0              LISTENING       68160\r\n  TCP    [::]:1935              [::]:0                 LISTENING       68160\r\nTry 'timeout --help' for more information.\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01H2UTEdo8P7fRm7GnJ2Mugu"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"mediamtx\"",
+      "description": "Confirm MediaMTX is running"
+    },
+    "tool_response": {
+      "stdout": "mediamtx.exe                 68160 Console                    1     19,560 K\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01Lz8UweL3XRf1St18BMFAKc"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \"1935 8889 8888 9997\"",
+      "description": "Verify all MediaMTX ports are listening"
+    },
+    "tool_response": {
+      "stdout": "  TCP    0.0.0.0:1935           0.0.0.0:0              LISTENING       68160\r\n  TCP    0.0.0.0:8888           0.0.0.0:0              LISTENING       68160\r\n  TCP    0.0.0.0:8889           0.0.0.0:0              LISTENING       68160\r\n  TCP    0.0.0.0:9997           0.0.0.0:0              LISTENING       68160\r\n  TCP    [::]:1935              [::]:0                 LISTENING       68160\r\n  TCP    [::]:8888              [::]:0                 LISTENING       68160\r\n  TCP    [::]:8889              [::]:0                 LISTENING       68160\r\n  TCP    [::]:9997              [::]:0                 LISTENING       68160\r\n  TCP    [::1]:64070            [::1]:9997             TIME_WAIT       0\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01LGEuScKhFSC4kcC2RxqwYM"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=10\" | python -c \"import sys,json; d=json.load(sys.stdin); sessions=d['data']['sessions']; [print(f\\\"{s['id'][:20]}... | {s['title'][:25]:25} | {'ACTIVE' if s['isActive'] else 'ended'}\\\") for s in sessions]\"",
+      "description": "List sessions and their active status"
+    },
+    "tool_response": {
+      "stdout": "",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_015Pk39em82EbYi8Wm3AXteQ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=10\"",
+      "description": "List all sessions"
+    },
+    "tool_response": {
+      "stdout": "{\"success\":true,\"data\":{\"sessions\":[{\"id\":\"cmkh7kdgr0000i7ucvbcqmvcm\",\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"Test Session\",\"participants\":[],\"startedAt\":\"2026-01-16T18:24:49.571Z\",\"endedAt\":\"2026-01-25T15:59:04.144Z\",\"createdAt\":\"2026-01-16T18:24:49.573Z\",\"updatedAt\":\"2026-01-25T15:59:03.640Z\",\"isActive\":false,\"counts\":{\"events\":0,\"outputs\":0,\"clips\":0}}],\"pagination\":{\"limit\":10,\"offset\":0,\"total\":1}}}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01QPxbyrVsVmASA5haZoaehM"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/session/status\"",
+      "description": "Check current session status"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"active\":true,\"session\":{\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"test session 1\",\"participants\":[],\"sessionId\":\"4ec64074-7b1e-4767-b836-24fb197313d9\"},\"t0\":1769398084016,\"elapsed\":1078206}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01Fa8L4Au1JRksQPpg89ZY2N"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Grep",
+    "tool_input": {
+      "pattern": "409|conflict|already.*active|session.*running",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src",
+      "output_mode": "content",
+      "-i": true
+    },
+    "tool_response": {
+      "mode": "content",
+      "numFiles": 0,
+      "filenames": [],
+      "content": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\api\\sessions.ts:34: * if a session is truly \"live\" (both endedAt === null AND currently running).\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\api\\sessions.ts:47: * Check if a session is truly active (currently running in memory).\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\api\\sessions.ts:376:    // For sessions with endedAt === null but not currently running,\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\config\\env.ts:218:    .default(4096)\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\index.ts:593:          return res.status(409).json({ ok: false, error: \"Session already active\" });\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\auth\\service.ts:144:      409\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\agents\\workflows\\writersroom.agent.ts:26:    type: \"plot_point\" | \"character_moment\" | \"scene_transition\" | \"conflict\" | \"resolution\";\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\agents\\workflows\\writersroom.agent.ts:222:- Conflicts introduced or resolved\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\agents\\workflows\\writersroom.agent.ts:231:      \"type\": \"plot_point\" | \"character_moment\" | \"scene_transition\" | \"conflict\" | \"resolution\",\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\__tests__\\routes\\auth.routes.test.ts:123:        new AuthError(\"Email already in use\", 409, \"EMAIL_EXISTS\")\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\__tests__\\routes\\auth.routes.test.ts:132:        .expect(409);\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\APIKey.ts:1311: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\AuditLog.ts:1053: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Clip.ts:1175: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Event.ts:1029: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Export.ts:2036: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\MediaAsset.ts:1739: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Organization.ts:1776: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\OrganizationMember.ts:1258: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\OAuthConnection.ts:1035: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Output.ts:1056: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\RefreshToken.ts:991: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Session.ts:2106: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\Subscription.ts:1089: * Because we want to prevent naming conflicts as mentioned in\nC:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\generated\\prisma\\models\\User.ts:2139: * Because we want to prevent naming conflicts as mentioned in",
+      "numLines": 25
+    },
+    "tool_use_id": "toolu_01CADxctUhpkVeacfb8QNBz9"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"node\"",
+      "description": "Check for Node processes"
+    },
+    "tool_response": {
+      "stdout": "node.exe                     36680 Console                    1      1,692 K\r\nnode.exe                     62256 Console                    1     13,428 K\r\nnode.exe                     36928 Console                    1      1,596 K\r\nnode.exe                     30948 Console                    1      2,780 K\r\nnode.exe                     11440 Console                    1     42,068 K\r\nnode.exe                     64680 Console                    1      1,692 K\r\nnode.exe                     11192 Console                    1      1,668 K\r\nnode.exe                     18984 Console                    1    470,208 K\r\nnode.exe                     50356 Console                    1    413,404 K\r\nnode.exe                     10876 Console                    1     16,092 K\r\nnode.exe                     38940 Console                    1      1,724 K\r\nnode.exe                     52984 Console                    1      8,360 K\r\nnode.exe                     63068 Console                    1      1,784 K\r\nnode.exe                     34636 Console                    1      1,664 K\r\nnode.exe                     61304 Console                    1      1,768 K\r\nnode.exe                     68092 Console                    1      1,756 K\r\nnode.exe                     69248 Console                    1      1,760 K\r\nnode.exe                     66996 Console                    1      1,772 K\r\nnode.exe                     49648 Console                    1      2,224 K\r\nnode.exe                     25252 Console                    1      1,744 K\r\nnode.exe                     41060 Console                    1      1,800 K\r\nnode.exe                     56380 Console                    1      1,844 K\r\nnode.exe                     37112 Console                    1    375,732 K\r\nnode.exe                     16104 Console                    1  4,284,280 K\r\nnode.exe                     67836 Console                    1      1,644 K\r\nnode.exe                     22460 Console                    1      1,628 K\r\nnode.exe                     63776 Console                    1      1,696 K\r\nnode.exe                     67216 Console                    1      1,648 K\r\nnode.exe                     67116 Console                    1      1,628 K\r\nnode.exe                     59204 Console                    1      1,636 K\r\nnode.exe                     51128 Console                    1      1,620 K\r\nnode.exe                     23528 Console                    1      1,624 K\r\nnode.exe                     39684 Console                    1      1,644 K\r\nnode.exe                     32392 Console                    1      1,668 K\r\nnode.exe                     34300 Console                    1      1,708 K\r\nnode.exe                     47252 Console                    1      1,748 K\r\nnode.exe                     63648 Console                    1    159,532 K\r\nnode.exe                      6952 Console                    1     12,456 K\r\nnode.exe                     34204 Console                    1      2,016 K\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01QQjQ6J4LbF5Supn1PbzPgZ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":3123\"",
+      "description": "Check if port 3123 is listening"
+    },
+    "tool_response": {
+      "stdout": "  TCP    [::1]:3123             [::1]:49183            TIME_WAIT       0\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01LnLz82nLgNHwVUxG6VTMXy"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "powershell -Command \"Start-Process -FilePath 'node' -ArgumentList '--import', 'tsx', 'src/index.ts' -WorkingDirectory 'C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion' -WindowStyle Hidden\"",
+      "timeout": 15000,
+      "description": "Restart backend using PowerShell"
+    },
+    "tool_response": {
+      "stdout": "",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false,
+      "backgroundTaskId": "bd8548c"
+    },
+    "tool_use_id": "toolu_01QYyKe1CQUA5Yxisia7pZsa"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "sleep 3 && curl -s http://localhost:3123/health",
+      "timeout": 10000,
+      "description": "Wait and check if backend is running"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"service\":\"desktop-companion\",\"version\":\"1.0.0\",\"uptime\":11.7020095,\"timestamp\":\"2026-01-26T03:49:28.602Z\",\"components\":{\"database\":true,\"obs\":true,\"stt\":false,\"ai\":true,\"ffmpeg\":true,\"agents\":true,\"video\":{\"enabled\":true,\"serverRunning\":false,\"streamActive\":false}},\"session\":{\"active\":false}}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_01CXzaTTZXaKFqD15ETCkWUL"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST http://localhost:3123/api/video/start",
+      "description": "Start MediaMTX video server"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"message\":\"Server started\",\"enabled\":true,\"serverRunning\":true,\"streamActive\":false,\"rtmpIngestUrl\":\"rtmp://localhost:1935/live/stream\",\"webrtcPlaybackUrl\":\"http://localhost:8889/live/stream\",\"hlsPlaybackUrl\":\"http://localhost:8888/live/stream/index.m3u8\"}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_015rfSNrUArPhn7GEkv5m19a"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s http://localhost:3123/session/status",
+      "description": "Check session status"
+    },
+    "tool_response": {
+      "stdout": "{\"ok\":true,\"active\":true,\"session\":{\"workflow\":\"streamer\",\"captureMode\":\"av\",\"title\":\"test session live\",\"participants\":[],\"sessionId\":\"98d55cd6-f709-4f77-bb96-56f1fa37b0fa\"},\"t0\":1769399387554,\"elapsed\":24818}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_019gkkqNK1Zrt7PSffks4M2p"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PostToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions/98d55cd6-f709-4f77-bb96-56f1fa37b0fa\"",
+      "description": "Check if new session exists in database"
+    },
+    "tool_response": {
+      "stdout": "{\"success\":false,\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"Session not found.\"}}\r",
+      "stderr": "",
+      "interrupted": false,
+      "isImage": false
+    },
+    "tool_use_id": "toolu_016PBVkZqjSHWgbKVaxq8y7d"
+  }
+]

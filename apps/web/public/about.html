@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About — FluxBoard</title>
+  <link rel="icon" href="./assets/favicon.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="nav">
+      <div class="brand">
+        <a href="./index.html"><img src="./assets/logo-wordmark.png" alt="FluxBoard" /></a>
+        <span class="badge">About</span>
+      </div>
+      <nav class="links">
+        <a href="./index.html#features">Features</a>
+        <a href="./index.html#workflows">Workflows</a>
+        <a href="./index.html#observability">Observability</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section">
+        <h2>What FluxBoard is</h2>
+        <p>
+          FluxBoard is a hackathon prototype for a workflow-first agentic system that turns live sessions into structured, shareable assets.
+          Users pick a session workflow (Streamer, Podcast, Writers Room, Brainstorm, Debate) and a capture mode (Audio, Video, or Audio+Video).
+          The system then generates real-time outputs—posts, clips, chapters, claims, evidence cards, beats—rendered on dashboards that match the activity.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Architecture (high level)</h2>
+        <div class="feature-grid" style="margin-top:14px">
+          <div class="card feature">
+            <h3>Capture layer</h3>
+            <p>OBS companion service for replay-buffer clips and screenshots; mobile app for session control and review.</p>
+          </div>
+          <div class="card feature">
+            <h3>Event stream</h3>
+            <p>A single event schema (moments, artifacts, outputs) that every workflow dashboard can render.</p>
+          </div>
+          <div class="card feature">
+            <h3>Agents</h3>
+            <p>Role-based agents generate workflow outputs (social drafts, script inserts, claim maps, packaging).</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Observability with Comet Opik</h2>
+        <p>
+          FluxBoard is designed to be traceable end-to-end. In the scaffold repo, the desktop companion includes an Opik instrumentation module that can log
+          traces and spans for clip capture and output generation.
+        </p>
+        <div class="card" style="margin-top:14px">
+          <div class="badge">Environment</div>
+          <p class="small" style="margin:10px 0 0">
+            Set <span class="kbd">OPIK_API_KEY</span>, <span class="kbd">OPIK_WORKSPACE_NAME</span>, and <span class="kbd">OPIK_PROJECT_NAME</span>.
+            For Opik Cloud, set <span class="kbd">OPIK_URL_OVERRIDE</span> to the hosted API endpoint.
+          </p>
+        </div>
+      </section>
+
+      <hr class="sep" />
+      <section class="section">
+        <h2>Brand</h2>
+        <p>
+          Theme: dark base with a purple→teal→mint gradient. Logo mark is a comet trail—nodding to “Comet” observability—and a “flow” motif for real-time agent outputs.
+        </p>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:16px">
+          <div class="card" style="padding:12px"><img src="./assets/logo-mark.png" alt="Logo mark" style="width:180px; height:auto; border-radius:16px" /></div>
+          <div class="card" style="padding:12px"><img src="./assets/logo-wordmark.png" alt="Logo wordmark" style="width:520px; max-width:80vw; height:auto; border-radius:16px" /></div>
+        </div>
+      </section>
+
+      <hr class="sep" />
+      <footer class="footer">
+        <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap">
+          <div><a href="./index.html">Back to home</a></div>
+          <div>Hackathon prototype — iterate fast, trace everything.</div>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

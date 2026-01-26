@@ -1,0 +1,2 @@
+{"id":"472e3d6b-6e2a-4cd2-844f-4527405062cb","type":"SESSION_START","ts":1768604740236,"payload":{"sessionId":"c17e422a-7853-4158-a770-8abf2ab04e0d","workflow":"streamer","title":"Full Lifecycle Test"},"observability":{}}
+{"id":"2d4edd01-4277-44ed-bbd6-6708c74097be","type":"SESSION_END","ts":1768604763146,"payload":{"sessionId":"c17e422a-7853-4158-a770-8abf2ab04e0d","duration":22910},"observability":{}}

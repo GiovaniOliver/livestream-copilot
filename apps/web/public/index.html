@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FluxBoard — Live workflows for streams, pods, debates, and writers rooms</title>
+  <link rel="icon" href="./assets/favicon.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="nav">
+      <div class="brand">
+        <img src="./assets/logo-wordmark.png" alt="FluxBoard" />
+        <span class="badge">Hackathon build • OBS + Mobile • Agentic dashboards</span>
+      </div>
+      <nav class="links">
+        <a href="#features">Features</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#observability">Observability</a>
+        <a href="./about.html">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <div class="badge">Capture mode: <b>Audio</b> / <b>Video</b> / <b>Audio+Video</b></div>
+            <h1>Turn live sessions into publishable assets—while they happen.</h1>
+            <p class="lead">
+              FluxBoard is a workflow-first copilot for streamers, podcast teams, writers rooms, brainstorms, and debates.
+              Pick a workflow, capture from OBS or mobile, and review agent outputs on dashboards that match the moment.
+            </p>
+            <div class="cta-row">
+              <a class="btn primary" href="#workflows">Explore workflows</a>
+              <a class="btn" href="#observability">See Comet Opik tracing</a>
+              <a class="btn" href="https://github.com/">Get the repo</a>
+            </div>
+            <p class="small" style="margin-top:12px">Tip: use <span class="kbd">gesture</span> or <span class="kbd">voice</span> markers to start/end clips, then export the best cuts.</p>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 8px">What you get in real time</h2>
+            <div class="feature-grid">
+              <div class="feature">
+                <h3>Clip queue</h3>
+                <p>Start/end clip intent markers, replay-buffer saves, and titles/hooks ready for Shorts/Reels.</p>
+              </div>
+              <div class="feature">
+                <h3>Post drafts</h3>
+                <p>Platform-ready captions and threads generated from the last segment of the session.</p>
+              </div>
+              <div class="feature">
+                <h3>Attribution</h3>
+                <p>Idea ledger and quote bank with timestamps and speaker tags (when available).</p>
+              </div>
+              <div class="feature">
+                <h3>Debate cards</h3>
+                <p>Claims map, verification queue, and evidence-card drafts for structured debates.</p>
+              </div>
+              <div class="feature">
+                <h3>Podcast packaging</h3>
+                <p>Chapters, promos, show notes, and a highlight list for post-production.</p>
+              </div>
+              <div class="feature">
+                <h3>Operator controls</h3>
+                <p>Approve, edit, copy, and share outputs instantly—no waiting for post-processing.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <h2>Workflow-first features</h2>
+        <p>
+          Instead of a generic “transcript viewer,” FluxBoard gives each session type its own visual dashboard—Producer Desk, Script Studio, Mind Map, or Claims & Evidence Board.
+          Under the hood, every workflow uses the same event model so agents can generate outputs consistently.
+        </p>
+        <hr class="sep" />
+        <div class="feature-grid">
+          <div class="card feature">
+            <div class="badge">Capture</div>
+            <h3>OBS or Mobile</h3>
+            <p>Use OBS for replay-buffer clips and source screenshots, or run a mobile-only session when you’re away from your desktop.</p>
+          </div>
+          <div class="card feature">
+            <div class="badge">Modes</div>
+            <h3>Audio / Video / A+V</h3>
+            <p>Pick what you want to capture for each session. Audio-only is fast and transcript-first; video enables clips and thumbnails.</p>
+          </div>
+          <div class="card feature">
+            <div class="badge">Actions</div>
+            <h3>Copy, approve, share</h3>
+            <p>Every output card is built for speed: copy to clipboard, quick edits, and a queue for what to publish next.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflows" class="section">
+        <h2>Workflows</h2>
+        <p>Select a workflow at session start to activate the right agents and the right dashboard.</p>
+
+        <div class="workflow-grid">
+          <div class="card workflow">
+            <img src="./assets/workflows/streamer.png" alt="Streamer" />
+            <div>
+              <h3>Live Streamer</h3>
+              <p>Producer Desk: clip queue, post drafts by platform, and a moment rail for fast publishing.</p>
+            </div>
+          </div>
+          <div class="card workflow">
+            <img src="./assets/workflows/podcast.png" alt="Podcast" />
+            <div>
+              <h3>Podcast</h3>
+              <p>Podcast Console: chapters, quote bank, promos, and a highlights list with timestamps.</p>
+            </div>
+          </div>
+          <div class="card workflow">
+            <img src="./assets/workflows/writers_room.png" alt="Writers Room" />
+            <div>
+              <h3>Writers Room</h3>
+              <p>Script Studio: screenplay-style view, beat board, and attribution ledger for ideas and decisions.</p>
+            </div>
+          </div>
+          <div class="card workflow">
+            <img src="./assets/workflows/brainstorm.png" alt="Brainstorm" />
+            <div>
+              <h3>Brainstorm</h3>
+              <p>Mind Map Room: clusters, sticky nodes, and an action funnel to convert ideas into tasks.</p>
+            </div>
+          </div>
+          <div class="card workflow">
+            <img src="./assets/workflows/debate.png" alt="Debate" />
+            <div>
+              <h3>Debate</h3>
+              <p>Claims & Evidence Board: claims graph, verification queue, and evidence cards (with sourcing).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="observability" class="section">
+        <h2>Agent observability (Comet Opik)</h2>
+        <p>
+          FluxBoard is instrumented for trace-level visibility so you can debug agent behavior and measure improvements.
+          Opik supports agent observability via its TypeScript SDK, OpenTelemetry, and REST APIs.
+        </p>
+        <div class="feature-grid" style="margin-top:14px">
+          <div class="card feature">
+            <h3>Trace every step</h3>
+            <p>Log traces/spans for session start, clip capture, output generation, and validation.</p>
+          </div>
+          <div class="card feature">
+            <h3>Annotate and iterate</h3>
+            <p>Use the trace history to find bottlenecks, prompt regressions, and tool failures—fast.</p>
+          </div>
+          <div class="card feature">
+            <h3>Hackathon-friendly</h3>
+            <p>Turn observability on with env vars. Keep it off for a local-only demo.</p>
+          </div>
+        </div>
+        <p class="small" style="margin-top:12px">
+          Configure <span class="kbd">OPIK_API_KEY</span>, <span class="kbd">OPIK_WORKSPACE_NAME</span>, and optional <span class="kbd">OPIK_URL_OVERRIDE</span> to log traces to Opik.
+        </p>
+      </section>
+
+      <hr class="sep" />
+      <footer class="footer">
+        <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap">
+          <div>© FluxBoard — hackathon prototype.</div>
+          <div>Built for fast live workflows: streams • podcasts • writers rooms • brainstorms • debates.</div>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

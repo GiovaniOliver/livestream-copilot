@@ -1,0 +1,418 @@
+[
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "dir /b \"C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\"",
+      "description": "List video components in web app"
+    },
+    "tool_use_id": "toolu_01EoBzyMMUmD9JupWCpzXd7Q"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\data\\mediamtx.yml"
+    },
+    "tool_use_id": "toolu_01F2c9FwZQaaFwVcumEMr7d5"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\index.ts"
+    },
+    "tool_use_id": "toolu_01V24M78QeAfHMQdht6CM2JW"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src\\video\\mediamtx-manager.ts"
+    },
+    "tool_use_id": "toolu_01Mz3VqRGWgFjAaetPrrvoox"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\web\\src\\components\\video\\LiveVideoPreview.tsx"
+    },
+    "tool_use_id": "toolu_015LCN2HSoCqc6F8mM49aCSh"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Read",
+    "tool_input": {
+      "file_path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\.env.sample"
+    },
+    "tool_use_id": "toolu_01QspmdEhkqMgkuT8yEwDbaG"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":1935\" 2>/dev/null || echo \"Port 1935 not listening\"",
+      "description": "Check if RTMP port 1935 is listening"
+    },
+    "tool_use_id": "toolu_01D64nf6KHe5HJ4M9w3uDAh2"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":8889\" 2>/dev/null || echo \"Port 8889 not listening\"",
+      "description": "Check if WebRTC port 8889 is listening"
+    },
+    "tool_use_id": "toolu_01K9Ktfk2MVM3h6bsiFpjA1u"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":9997\" 2>/dev/null || echo \"Port 9997 not listening\"",
+      "description": "Check if MediaMTX API port 9997 is listening"
+    },
+    "tool_use_id": "toolu_01Y65fUZxVo9tKZ1TjWq2qaZ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"mediamtx\" 2>/dev/null || echo \"MediaMTX process not found\"",
+      "description": "Check if MediaMTX process is running"
+    },
+    "tool_use_id": "toolu_01SP47udnFtR9LPbmUhXJcfg"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s http://localhost:3123/api/video/status 2>/dev/null || echo \"Video API not responding\"",
+      "description": "Check video server status from backend API"
+    },
+    "tool_use_id": "toolu_019cbPjZWghtTWuvCqfvzGSP"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=5\" | head -100",
+      "description": "List sessions to check if the ID exists"
+    },
+    "tool_use_id": "toolu_01KhcE16bypyfE483N144hss"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions/4ec64074-7b1e-4767-b836-24fb197313d9\"",
+      "description": "Check specific session ID"
+    },
+    "tool_use_id": "toolu_01YZpYLYAPzxELwsBuqMVeap"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST http://localhost:3123/api/video/start",
+      "description": "Start MediaMTX via backend API"
+    },
+    "tool_use_id": "toolu_01LHiuA4DXr9aZ4JQYJpyXAL"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "timeout 3 && netstat -ano | findstr \":1935\" 2>/dev/null || echo \"Checking...\" && sleep 2 && netstat -ano | findstr \":1935\"",
+      "description": "Check if RTMP port is now listening"
+    },
+    "tool_use_id": "toolu_01H2UTEdo8P7fRm7GnJ2Mugu"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"mediamtx\"",
+      "description": "Confirm MediaMTX is running"
+    },
+    "tool_use_id": "toolu_01Lz8UweL3XRf1St18BMFAKc"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \"1935 8889 8888 9997\"",
+      "description": "Verify all MediaMTX ports are listening"
+    },
+    "tool_use_id": "toolu_01LGEuScKhFSC4kcC2RxqwYM"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=10\" | python -c \"import sys,json; d=json.load(sys.stdin); sessions=d['data']['sessions']; [print(f\\\"{s['id'][:20]}... | {s['title'][:25]:25} | {'ACTIVE' if s['isActive'] else 'ended'}\\\") for s in sessions]\"",
+      "description": "List sessions and their active status"
+    },
+    "tool_use_id": "toolu_015Pk39em82EbYi8Wm3AXteQ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions?limit=10\"",
+      "description": "List all sessions"
+    },
+    "tool_use_id": "toolu_01QPxbyrVsVmASA5haZoaehM"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/session/status\"",
+      "description": "Check current session status"
+    },
+    "tool_use_id": "toolu_01Fa8L4Au1JRksQPpg89ZY2N"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Grep",
+    "tool_input": {
+      "pattern": "409|conflict|already.*active|session.*running",
+      "path": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\\src",
+      "output_mode": "content",
+      "-i": true
+    },
+    "tool_use_id": "toolu_01CADxctUhpkVeacfb8QNBz9"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST http://localhost:3123/session/stop",
+      "description": "Stop the orphaned session"
+    },
+    "tool_use_id": "toolu_013KAPGWjk5TomHLTjXhGvqq"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST \"http://localhost:3123/session/stop\" -H \"Content-Type: application/json\" --max-time 10",
+      "description": "Stop the session with headers"
+    },
+    "tool_use_id": "toolu_01UeeanyngDFATMmP98NkNXi"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s http://localhost:3123/health",
+      "description": "Check if backend is running"
+    },
+    "tool_use_id": "toolu_01S26WdncAr6yEhPLYnf98gg"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "tasklist | findstr -i \"node\"",
+      "description": "Check for Node processes"
+    },
+    "tool_use_id": "toolu_01QQjQ6J4LbF5Supn1PbzPgZ"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "netstat -ano | findstr \":3123\"",
+      "description": "Check if port 3123 is listening"
+    },
+    "tool_use_id": "toolu_01LnLz82nLgNHwVUxG6VTMXy"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "cd \"C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion\" && Start-Process -FilePath \"node\" -ArgumentList \"--import\", \"tsx\", \"src/index.ts\" -NoNewWindow -RedirectStandardOutput \"..\\..\\backend-out.txt\" -RedirectStandardError \"..\\..\\backend-err.txt\"",
+      "timeout": 10000,
+      "description": "Restart the backend server"
+    },
+    "tool_use_id": "toolu_01LFhgwq6M5Jaswx55LQEsA8"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "powershell -Command \"Start-Process -FilePath 'node' -ArgumentList '--import', 'tsx', 'src/index.ts' -WorkingDirectory 'C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot\\apps\\desktop-companion' -WindowStyle Hidden\"",
+      "timeout": 15000,
+      "description": "Restart backend using PowerShell"
+    },
+    "tool_use_id": "toolu_01QYyKe1CQUA5Yxisia7pZsa"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "sleep 3 && curl -s http://localhost:3123/health",
+      "timeout": 10000,
+      "description": "Wait and check if backend is running"
+    },
+    "tool_use_id": "toolu_01CXzaTTZXaKFqD15ETCkWUL"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s -X POST http://localhost:3123/api/video/start",
+      "description": "Start MediaMTX video server"
+    },
+    "tool_use_id": "toolu_015rfSNrUArPhn7GEkv5m19a"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s http://localhost:3123/session/status",
+      "description": "Check session status"
+    },
+    "tool_use_id": "toolu_019gkkqNK1Zrt7PSffks4M2p"
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "PreToolUse",
+    "tool_name": "Bash",
+    "tool_input": {
+      "command": "curl -s \"http://localhost:3123/api/sessions/98d55cd6-f709-4f77-bb96-56f1fa37b0fa\"",
+      "description": "Check if new session exists in database"
+    },
+    "tool_use_id": "toolu_016PBVkZqjSHWgbKVaxq8y7d"
+  }
+]

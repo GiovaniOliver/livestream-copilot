@@ -1,0 +1,32 @@
+# Docker Compose for local PostgreSQL development
+#
+# Usage:
+#   docker compose up -d        # Start PostgreSQL in background
+#   docker compose down         # Stop and remove containers
+#   docker compose down -v      # Stop and remove containers + volumes (deletes data)
+#
+# After starting, run migrations:
+#   pnpm db:migrate
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: livestream-copilot-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: livestream_copilot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d livestream_copilot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    name: livestream-copilot-postgres-data

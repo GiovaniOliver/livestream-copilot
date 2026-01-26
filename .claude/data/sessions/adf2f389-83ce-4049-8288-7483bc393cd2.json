@@ -1,0 +1,9 @@
+{
+  "session_id": "adf2f389-83ce-4049-8288-7483bc393cd2",
+  "prompts": [
+    "/update-docs ",
+    " ok proceed with the recommendations ",
+    "commit these changes",
+    "/refactor-clean"
+  ]
+}

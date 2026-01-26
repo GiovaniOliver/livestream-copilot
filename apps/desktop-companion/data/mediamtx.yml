@@ -1,0 +1,39 @@
+###############################################
+# MediaMTX Configuration (auto-generated)
+###############################################
+
+logLevel: info
+logDestinations: [stdout]
+
+###############################################
+# RTMP server (for OBS ingest)
+###############################################
+rtmp: true
+rtmpAddress: ":1935"
+
+###############################################
+# WebRTC server (for browser playback)
+###############################################
+webrtc: true
+webrtcAddress: ":8889"
+webrtcLocalUDPAddress: ":8889"
+webrtcLocalTCPAddress: ":8889"
+
+###############################################
+# HLS server (for fallback playback)
+###############################################
+hls: true
+hlsAddress: ":8888"
+
+###############################################
+# API server
+###############################################
+api: true
+apiAddress: ":9997"
+
+###############################################
+# Path configuration
+###############################################
+paths:
+  all:
+    # Allow any stream name

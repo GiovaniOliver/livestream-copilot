@@ -1,0 +1,2 @@
+{"id":"febcaa08-e8e6-4722-be88-b88b8abb5a10","type":"SESSION_START","ts":1768861413693,"payload":{"sessionId":"28bba429-c847-4797-9fc7-62a4ecf16a68","workflow":"streamer","title":"test"},"observability":{}}
+{"id":"ca71b309-385e-4f2a-a4ae-4808f13988a0","type":"SESSION_END","ts":1768861508200,"payload":{"sessionId":"28bba429-c847-4797-9fc7-62a4ecf16a68","duration":94507},"observability":{}}
