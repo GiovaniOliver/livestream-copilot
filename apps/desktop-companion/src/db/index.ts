@@ -22,6 +22,9 @@ export {
   EventService,
   OutputService,
   ClipService,
+  TriggerConfigService,
+  ReferenceImageService,
+  ClipQueueService,
 } from "./services/index.js";
 
 // Re-export service types
@@ -39,4 +42,20 @@ export type {
   UpdateClipInput,
   ClipFilters,
   ClipWithDuration,
+  TriggerConfig,
+  AudioTrigger,
+  VisualTrigger,
+  CreateTriggerConfigInput,
+  UpdateTriggerConfigInput,
+  ReferenceImage,
+  CreateReferenceImageInput,
+  UpdateReferenceImageInput,
+  ReferenceImageFilters,
+  ClipQueueItem,
+  ClipQueueItemWithDuration,
+  ClipQueueStatus,
+  TriggerType,
+  CreateClipQueueItemInput,
+  UpdateClipQueueItemInput,
+  ClipQueueFilters,
 } from "./services/index.js";

@@ -14,6 +14,7 @@ import {
 
 // Storage key for API configuration
 const API_CONFIG_KEY = "fluxboard_api_config";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3123";
 
 // Types
 interface APIConfig {
@@ -21,6 +22,24 @@ interface APIConfig {
   endpointUrl: string;
   rateLimitPerMinute: number;
   rateLimitPerDay: number;
+}
+
+interface AgentStats {
+  enabled: boolean;
+  workflowCount: number;
+  agentCount: number;
+  activeSessionCount: number;
+  opik: {
+    configured: boolean;
+    workspaceName: string | null;
+    projectName: string | null;
+    dashboardUrl: string | null;
+  };
+  config: {
+    aiProvider: string;
+    aiModel: string;
+    maxTokens: number;
+  };
 }
 
 interface AgentActivity {
@@ -41,20 +60,12 @@ const DEFAULT_API_CONFIG: APIConfig = {
   rateLimitPerDay: 10000,
 };
 
-// Placeholder metrics
-const PLACEHOLDER_METRICS = {
-  totalApiCalls: 1247,
-  avgResponseTime: 342,
-  tokenUsage: 45892,
-  errorRate: 0.8,
-};
-
-// Placeholder activity log
+// Placeholder activity log (will be replaced with real data later)
 const PLACEHOLDER_ACTIVITIES: AgentActivity[] = [
   {
     id: "1",
     timestamp: new Date(Date.now() - 2 * 60 * 1000),
-    agentType: "Content Creator",
+    agentType: "Streamer",
     actionType: "Clip Detection",
     status: "success",
     duration: 234,
@@ -72,7 +83,7 @@ const PLACEHOLDER_ACTIVITIES: AgentActivity[] = [
   {
     id: "3",
     timestamp: new Date(Date.now() - 8 * 60 * 1000),
-    agentType: "Script Studio",
+    agentType: "Writers Room",
     actionType: "Content Analysis",
     status: "pending",
     duration: 0,
@@ -81,7 +92,7 @@ const PLACEHOLDER_ACTIVITIES: AgentActivity[] = [
   {
     id: "4",
     timestamp: new Date(Date.now() - 12 * 60 * 1000),
-    agentType: "Mind Map",
+    agentType: "Brainstorm",
     actionType: "Idea Extraction",
     status: "error",
     duration: 45,
@@ -90,20 +101,11 @@ const PLACEHOLDER_ACTIVITIES: AgentActivity[] = [
   {
     id: "5",
     timestamp: new Date(Date.now() - 18 * 60 * 1000),
-    agentType: "Debate Room",
+    agentType: "Debate",
     actionType: "Argument Generation",
     status: "success",
     duration: 890,
     tokenCount: 1536,
-  },
-  {
-    id: "6",
-    timestamp: new Date(Date.now() - 25 * 60 * 1000),
-    agentType: "Writers Corner",
-    actionType: "Script Enhancement",
-    status: "success",
-    duration: 678,
-    tokenCount: 1024,
   },
 ];
 
@@ -275,7 +277,35 @@ export default function AgentObservabilityPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string>("");
 
-  // Load API configuration from localStorage on mount
+  // Agent Stats State
+  const [agentStats, setAgentStats] = useState<AgentStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  // Fetch agent stats from backend
+  const fetchAgentStats = useCallback(async () => {
+    try {
+      setStatsLoading(true);
+      setStatsError(null);
+      const response = await fetch(`${BACKEND_URL}/api/agents/stats`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch agent stats: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (data.success) {
+        setAgentStats(data.data);
+      } else {
+        throw new Error("Failed to fetch agent stats");
+      }
+    } catch (err) {
+      setStatsError(err instanceof Error ? err.message : "Unknown error");
+      console.error("Failed to fetch agent stats:", err);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  // Load API configuration from localStorage and fetch stats on mount
   useEffect(() => {
     const stored = localStorage.getItem(API_CONFIG_KEY);
     if (stored) {
@@ -285,7 +315,8 @@ export default function AgentObservabilityPage() {
         console.error("Failed to parse API config from localStorage");
       }
     }
-  }, []);
+    fetchAgentStats();
+  }, [fetchAgentStats]);
 
   // Save API configuration
   const saveApiConfig = useCallback(async () => {
@@ -333,67 +364,97 @@ export default function AgentObservabilityPage() {
           </p>
         </div>
 
+        {/* Opik Dashboard Link */}
+        {agentStats?.opik.configured && agentStats.opik.dashboardUrl && (
+          <div className="mb-8">
+            <Card variant="elevated" className="border-teal/30 bg-teal/5">
+              <CardContent className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal/20 text-teal">
+                    <SignalIcon />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-text">Opik Observability Dashboard</h3>
+                    <p className="text-sm text-text-muted">
+                      View detailed traces, metrics, and agent performance in Comet Opik
+                    </p>
+                    <p className="mt-1 text-xs text-text-dim">
+                      Workspace: {agentStats.opik.workspaceName} | Project: {agentStats.opik.projectName}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="primary"
+                  onClick={() => window.open(agentStats.opik.dashboardUrl!, "_blank")}
+                >
+                  Open Opik Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Overview Metrics Section */}
         <div className="mb-8">
           <h2 className="mb-4 text-lg font-semibold text-text">
-            Overview (Last 24 Hours)
+            Agent System Status
           </h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {/* Total API Calls */}
+            {/* Agent Status */}
+            <Card variant="elevated">
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${agentStats?.enabled ? 'bg-success/20 text-success' : 'bg-error/20 text-error'}`}>
+                  <SignalIcon />
+                </div>
+                <div>
+                  <p className="text-sm text-text-muted">Agent System</p>
+                  <p className="text-2xl font-bold text-text">
+                    {statsLoading ? "..." : agentStats?.enabled ? "Enabled" : "Disabled"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Registered Agents */}
+            <Card variant="elevated">
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple/20 text-purple">
+                  <CpuChipIcon />
+                </div>
+                <div>
+                  <p className="text-sm text-text-muted">Registered Agents</p>
+                  <p className="text-2xl font-bold text-text">
+                    {statsLoading ? "..." : agentStats?.agentCount ?? 0}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Workflows */}
             <Card variant="elevated">
               <CardContent className="flex items-center gap-4 p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal/20 text-teal">
                   <ChartBarIcon />
                 </div>
                 <div>
-                  <p className="text-sm text-text-muted">Total API Calls</p>
+                  <p className="text-sm text-text-muted">Workflows</p>
                   <p className="text-2xl font-bold text-text">
-                    {PLACEHOLDER_METRICS.totalApiCalls.toLocaleString()}
+                    {statsLoading ? "..." : agentStats?.workflowCount ?? 0}
                   </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Average Response Time */}
-            <Card variant="elevated">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple/20 text-purple">
-                  <ClockIcon />
-                </div>
-                <div>
-                  <p className="text-sm text-text-muted">Avg Response Time</p>
-                  <p className="text-2xl font-bold text-text">
-                    {PLACEHOLDER_METRICS.avgResponseTime}ms
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Token Usage */}
+            {/* Active Sessions */}
             <Card variant="elevated">
               <CardContent className="flex items-center gap-4 p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal/20 text-teal">
-                  <CpuChipIcon />
+                  <ClockIcon />
                 </div>
                 <div>
-                  <p className="text-sm text-text-muted">Token Usage</p>
+                  <p className="text-sm text-text-muted">Active Sessions</p>
                   <p className="text-2xl font-bold text-text">
-                    {PLACEHOLDER_METRICS.tokenUsage.toLocaleString()}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Error Rate */}
-            <Card variant="elevated">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-error/20 text-error">
-                  <ExclamationTriangleIcon />
-                </div>
-                <div>
-                  <p className="text-sm text-text-muted">Error Rate</p>
-                  <p className="text-2xl font-bold text-text">
-                    {PLACEHOLDER_METRICS.errorRate}%
+                    {statsLoading ? "..." : agentStats?.activeSessionCount ?? 0}
                   </p>
                 </div>
               </CardContent>
@@ -470,7 +531,7 @@ export default function AgentObservabilityPage() {
           </div>
 
           {/* Real-time Monitoring Section - Takes 1 column */}
-          <div>
+          <div className="space-y-6">
             <Card variant="elevated">
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -478,8 +539,8 @@ export default function AgentObservabilityPage() {
                     <SignalIcon />
                   </div>
                   <div>
-                    <CardTitle>Real-time Monitoring</CardTitle>
-                    <CardDescription>System status overview</CardDescription>
+                    <CardTitle>System Status</CardTitle>
+                    <CardDescription>Agent configuration</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -488,35 +549,89 @@ export default function AgentObservabilityPage() {
                 <div className="flex items-center justify-between rounded-xl border border-stroke bg-bg-1 p-3">
                   <div className="flex items-center gap-3">
                     <span className="relative flex h-3 w-3">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-                      <span className="relative inline-flex h-3 w-3 rounded-full bg-success" />
+                      <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${agentStats?.enabled ? 'bg-success' : 'bg-error'} opacity-75`} />
+                      <span className={`relative inline-flex h-3 w-3 rounded-full ${agentStats?.enabled ? 'bg-success' : 'bg-error'}`} />
                     </span>
                     <span className="text-sm font-medium text-text">
-                      Connection Status
+                      Agent Router
                     </span>
                   </div>
-                  <Badge variant="success">Connected</Badge>
+                  <Badge variant={agentStats?.enabled ? "success" : "error"}>
+                    {agentStats?.enabled ? "Active" : "Inactive"}
+                  </Badge>
                 </div>
 
-                {/* Active Agents */}
+                {/* AI Provider */}
                 <div className="flex items-center justify-between rounded-xl border border-stroke bg-bg-1 p-3">
                   <span className="text-sm font-medium text-text">
-                    Active Agents
+                    AI Provider
                   </span>
-                  <span className="text-lg font-bold text-teal">3</span>
+                  <span className="text-sm font-mono text-teal">
+                    {agentStats?.config.aiProvider || "-"}
+                  </span>
                 </div>
 
-                {/* Queue Depth */}
+                {/* AI Model */}
                 <div className="flex items-center justify-between rounded-xl border border-stroke bg-bg-1 p-3">
                   <span className="text-sm font-medium text-text">
-                    Queue Depth
+                    AI Model
                   </span>
-                  <span className="text-lg font-bold text-text">12</span>
+                  <span className="text-xs font-mono text-text-muted truncate max-w-[150px]" title={agentStats?.config.aiModel}>
+                    {agentStats?.config.aiModel || "-"}
+                  </span>
                 </div>
 
-                {/* Placeholder message */}
-                <div className="rounded-xl border border-stroke-subtle bg-surface p-3 text-center text-xs text-text-dim">
-                  Real-time updates coming in a future release
+                {/* Opik Status */}
+                <div className="flex items-center justify-between rounded-xl border border-stroke bg-bg-1 p-3">
+                  <span className="text-sm font-medium text-text">
+                    Opik Tracing
+                  </span>
+                  <Badge variant={agentStats?.opik.configured ? "success" : "warning"}>
+                    {agentStats?.opik.configured ? "Enabled" : "Not Configured"}
+                  </Badge>
+                </div>
+
+                {/* Refresh Button */}
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={fetchAgentStats}
+                  disabled={statsLoading}
+                >
+                  {statsLoading ? "Loading..." : "Refresh Stats"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Agent File Locations Card */}
+            <Card variant="elevated">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple/20 text-purple">
+                    <CpuChipIcon />
+                  </div>
+                  <div>
+                    <CardTitle>Agent Locations</CardTitle>
+                    <CardDescription>Code file references</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs font-mono">
+                <div className="rounded bg-bg-1 p-2">
+                  <span className="text-text-muted">Base:</span>{" "}
+                  <span className="text-text">src/agents/base.ts</span>
+                </div>
+                <div className="rounded bg-bg-1 p-2">
+                  <span className="text-text-muted">Router:</span>{" "}
+                  <span className="text-text">src/agents/router.ts</span>
+                </div>
+                <div className="rounded bg-bg-1 p-2">
+                  <span className="text-text-muted">Opik:</span>{" "}
+                  <span className="text-text">src/observability/opik.ts</span>
+                </div>
+                <div className="rounded bg-bg-1 p-2">
+                  <span className="text-text-muted">Workflows:</span>{" "}
+                  <span className="text-text">src/agents/workflows/</span>
                 </div>
               </CardContent>
             </Card>

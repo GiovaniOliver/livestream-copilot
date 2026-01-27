@@ -11,6 +11,8 @@ export const EventTypeSchema = z.enum([
   "ARTIFACT_FRAME_CREATED",
   "OUTPUT_CREATED",
   "OUTPUT_VALIDATED",
+  "AUTO_TRIGGER_DETECTED",
+  "CLIP_QUEUE_UPDATED",
 ]);
 
 export const TranscriptSegmentPayloadSchema = z.object({
@@ -78,6 +80,37 @@ export const OutputValidatedPayloadSchema = z.object({
   issues: z.array(z.string()).default([]),
 });
 
+export const TriggerTypeSchema = z.enum(["audio", "visual", "manual"]);
+
+export const AutoTriggerDetectedPayloadSchema = z.object({
+  triggerType: TriggerTypeSchema,
+  triggerSource: z.string(), // The matched phrase or image label
+  confidence: z.number().min(0).max(1).optional(),
+  t: z.number(), // Timestamp when trigger was detected
+  queueItemId: z.string().optional(), // ID of created ClipQueueItem
+});
+
+export const ClipQueueStatusSchema = z.enum([
+  "pending",
+  "recording",
+  "processing",
+  "completed",
+  "failed",
+]);
+
+export const ClipQueueUpdatedPayloadSchema = z.object({
+  queueItemId: z.string(),
+  status: ClipQueueStatusSchema,
+  triggerType: TriggerTypeSchema,
+  triggerSource: z.string().optional(),
+  t0: z.number(),
+  t1: z.number().optional(),
+  clipId: z.string().optional(), // Set when clip is created
+  thumbnailPath: z.string().optional(),
+  title: z.string().optional(),
+  errorMessage: z.string().optional(),
+});
+
 export const SessionStartPayloadSchema = z.object({
   sessionId: z.string(),
   workflow: z.string(),
@@ -102,6 +135,8 @@ export const EventPayloadSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("ARTIFACT_FRAME_CREATED"), payload: ArtifactFramePayloadSchema }),
   z.object({ type: z.literal("OUTPUT_CREATED"), payload: OutputPayloadSchema }),
   z.object({ type: z.literal("OUTPUT_VALIDATED"), payload: OutputValidatedPayloadSchema }),
+  z.object({ type: z.literal("AUTO_TRIGGER_DETECTED"), payload: AutoTriggerDetectedPayloadSchema }),
+  z.object({ type: z.literal("CLIP_QUEUE_UPDATED"), payload: ClipQueueUpdatedPayloadSchema }),
 ]);
 
 export const ObservabilitySchema = z.object({

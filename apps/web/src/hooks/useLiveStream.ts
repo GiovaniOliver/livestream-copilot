@@ -114,10 +114,10 @@ export function useLiveStream(options: {
             setStatus({
               isRunning: false,
               isStreaming: false,
-              rtmpUrl: "rtmp://localhost:1935/live",
+              rtmpUrl: "rtmp://localhost:1935/live/stream",
               streamKey: "stream",
-              webrtcUrl: "ws://localhost:8889/stream",
-              hlsUrl: "http://localhost:8888/stream/index.m3u8",
+              webrtcUrl: "http://localhost:8889/live/stream",
+              hlsUrl: "http://localhost:8888/live/stream/index.m3u8",
             });
             setError(null);
           }
@@ -129,13 +129,16 @@ export function useLiveStream(options: {
       const data = await response.json();
 
       if (isMountedRef.current) {
+        // Map backend field names to frontend interface
+        // Backend uses: serverRunning, streamActive, webrtcPlaybackUrl, hlsPlaybackUrl, rtmpIngestUrl
+        // Frontend expects: isRunning, isStreaming, webrtcUrl, hlsUrl, rtmpUrl
         setStatus({
-          isRunning: data.isRunning ?? false,
-          isStreaming: data.isStreaming ?? false,
-          rtmpUrl: data.rtmpUrl ?? "rtmp://localhost:1935/live",
+          isRunning: data.serverRunning ?? data.isRunning ?? false,
+          isStreaming: data.streamActive ?? data.isStreaming ?? false,
+          rtmpUrl: data.rtmpIngestUrl ?? data.rtmpUrl ?? "rtmp://localhost:1935/live/stream",
           streamKey: data.streamKey ?? "stream",
-          webrtcUrl: data.webrtcUrl ?? "ws://localhost:8889/stream",
-          hlsUrl: data.hlsUrl ?? "http://localhost:8888/stream/index.m3u8",
+          webrtcUrl: data.webrtcPlaybackUrl ?? data.webrtcUrl ?? "http://localhost:8889/live/stream",
+          hlsUrl: data.hlsPlaybackUrl ?? data.hlsUrl ?? "http://localhost:8888/live/stream/index.m3u8",
           stats: data.stats,
         });
         setError(null);
@@ -147,10 +150,10 @@ export function useLiveStream(options: {
         setStatus({
           isRunning: false,
           isStreaming: false,
-          rtmpUrl: "rtmp://localhost:1935/live",
+          rtmpUrl: "rtmp://localhost:1935/live/stream",
           streamKey: "stream",
-          webrtcUrl: "ws://localhost:8889/stream",
-          hlsUrl: "http://localhost:8888/stream/index.m3u8",
+          webrtcUrl: "http://localhost:8889/live/stream",
+          hlsUrl: "http://localhost:8888/live/stream/index.m3u8",
         });
         setError(
           err instanceof Error ? err.message : "Failed to fetch video status"

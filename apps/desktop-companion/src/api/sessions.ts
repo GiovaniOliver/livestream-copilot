@@ -34,6 +34,7 @@ import { authenticateToken, type AuthenticatedRequest } from "../auth/middleware
  * if a session is truly "live" (both endedAt === null AND currently running).
  */
 let getActiveSessionDbId: (() => string | null) | null = null;
+let clearActiveSession: (() => void) | null = null;
 
 /**
  * Set the active session getter function.
@@ -41,6 +42,14 @@ let getActiveSessionDbId: (() => string | null) | null = null;
  */
 export function setActiveSessionGetter(getter: () => string | null): void {
   getActiveSessionDbId = getter;
+}
+
+/**
+ * Set the active session clearer function.
+ * Called by the main server to allow the API to end the in-memory session.
+ */
+export function setActiveSessionClearer(clearer: () => void): void {
+  clearActiveSession = clearer;
 }
 
 /**
@@ -328,6 +337,13 @@ async function endSessionByIdHandler(req: Request, res: Response): Promise<void>
     const durationMs = existing.startedAt
       ? endedAt.getTime() - existing.startedAt.getTime()
       : 0;
+
+    // IMPORTANT: Clear in-memory session if it matches the one we just ended
+    if (clearActiveSession && getActiveSessionDbId) {
+      if (getActiveSessionDbId() === id) {
+        clearActiveSession();
+      }
+    }
 
     sendSuccess(res, {
       session: {

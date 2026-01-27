@@ -17,6 +17,7 @@ import {
   updateSession as apiUpdateSession,
   deleteSession as apiDeleteSession,
   getSessionOutputs as apiGetSessionOutputs,
+  forceStopSession as apiForceStopSession,
   type SessionListItem,
   type StartSessionConfig,
   type StartSessionResponse,
@@ -24,6 +25,7 @@ import {
 } from "@/lib/api/sessions";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { ApiError } from "@/lib/api/client";
 import { type Session, formatDuration } from "@/lib/stores/sessions";
 import { WORKFLOW_TYPES, CAPTURE_MODES, type WorkflowType, type CaptureMode } from "@/lib/constants";
 
@@ -42,6 +44,7 @@ export interface UseSessionsReturn {
   deleteSession: (id: string) => Promise<void>;
   getSessionOutputs: (id: string) => Promise<SessionOutput[]>;
   refreshSessions: () => Promise<void>;
+  forceStop: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -96,7 +99,9 @@ function mapApiSessionToSession(apiSession: SessionListItem): Session {
     name: apiSession.title || "Untitled Session",
     workflow: mapApiWorkflow(apiSession.workflow),
     captureMode: mapApiCaptureMode(apiSession.captureMode),
-    status: apiSession.isActive ? "live" : "ended",
+    // "active" means session is in progress, but not necessarily streaming
+    // The actual "live" streaming status comes from useLiveStream hook
+    status: apiSession.isActive ? "active" : "ended",
     startedAt: apiSession.startedAt,
     endedAt: apiSession.endedAt || undefined,
     duration: formatDuration(durationMs),
@@ -181,10 +186,42 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
       await loadSessions();
 
       return response;
-    } catch (err) {
+    } catch (err: any) {
+      const isConflict = (err instanceof ApiError && err.status === 409) || err.status === 409;
+
+      if (isConflict) {
+        // Special handling for 409 Conflict
+        const body = err.body || {};
+        const msg = body.error || "A session is already active. You must stop it before starting a new one.";
+        setError(msg);
+        throw new Error(msg);
+      }
+
       const errorMsg = err instanceof Error ? err.message : "Failed to create session";
       setError(errorMsg);
       throw new Error(errorMsg);
+    }
+  }, [loadSessions, accessToken]);
+
+  /**
+   * Force-stop the current session (clear in-memory state)
+   * Calls API /session/force-stop
+   */
+  const forceStop = useCallback(async (): Promise<void> => {
+    try {
+      setError(null);
+      setIsLoading(true);
+
+      await apiForceStopSession(accessToken || undefined);
+
+      // Refresh sessions list from API
+      await loadSessions();
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to force-stop session";
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   }, [loadSessions, accessToken]);
 
@@ -281,7 +318,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
   useEffect(() => {
     if (autoConnect) {
       const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3124";
-      connect(wsUrl);
+      connect();
 
       return () => {
         disconnect();
@@ -324,6 +361,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
     deleteSession,
     getSessionOutputs,
     refreshSessions: loadSessions,
+    forceStop,
     clearError,
   };
 }

@@ -79,6 +79,8 @@ model User {
   sessions            Session[]
   mediaAssets         MediaAsset[]
   exports             Export[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
 
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
@@ -307,6 +309,40 @@ model AuditLog {
   @@index([createdAt])
 }
 
+/// Email verification token for confirming user email addresses
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String   // The email address being verified
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
+}
+
+/// Password reset token for secure password recovery
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String   // The email address associated with the reset request
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([email])
+  @@index([expiresAt])
+}
+
 // ============================================================================
 // MEDIA STORAGE MODELS (Bunny.net integration)
 // ============================================================================
@@ -378,6 +414,7 @@ model Session {
   clips           Clip[]
   mediaAssets     MediaAsset[]
   exports         Export[]
+  clipQueueItems  ClipQueueItem[]
 
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -518,4 +555,75 @@ model Export {
   @@index([status])
   @@index([platform])
   @@index([createdAt])
+}
+
+// ============================================================================
+// AUTO-TRIGGER & CLIP QUEUE MODELS
+// ============================================================================
+
+/// Trigger type enumeration for clip queue items
+enum TriggerType {
+  AUDIO     // Triggered by audio phrase detection
+  VISUAL    // Triggered by visual cue detection
+  MANUAL    // Manually triggered by producer
+}
+
+/// Clip queue item status enumeration
+enum ClipQueueStatus {
+  PENDING     // Waiting to start recording
+  RECORDING   // Currently recording
+  PROCESSING  // Being processed by FFmpeg
+  COMPLETED   // Successfully created
+  FAILED      // Processing failed
+}
+
+/// Configuration for auto-triggers per workflow
+model TriggerConfig {
+  id              String   @id @default(cuid())
+  workflow        String   @unique
+  audioTriggers   Json     @default("[]")  // [{phrase: string, enabled: boolean, caseSensitive: boolean}]
+  audioEnabled    Boolean  @default(false)
+  visualTriggers  Json     @default("[]")  // [{label: string, imageId: string, threshold: number}]
+  visualEnabled   Boolean  @default(false)
+  frameSampleRate Int      @default(5)     // seconds between frame samples for visual detection
+  autoClipEnabled Boolean  @default(false)
+  autoClipDuration Int     @default(60)    // clip duration in seconds (15, 20, 30, 60, 90, 120)
+  triggerCooldown Int      @default(30)    // seconds between triggers to prevent spam
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Reference image for visual trigger detection
+model ReferenceImage {
+  id          String   @id @default(cuid())
+  workflow    String
+  label       String   // User-friendly label like "thumbs up", "peace sign"
+  imagePath   String   // Path to stored image file
+  threshold   Float    @default(0.8)  // Confidence threshold (0-1)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([workflow])
+}
+
+/// Item in the clip processing queue
+model ClipQueueItem {
+  id                String          @id @default(cuid())
+  sessionId         String
+  session           Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  clipId            String?         // ID of created Clip when completed
+  status            ClipQueueStatus @default(PENDING)
+  triggerType       TriggerType
+  triggerSource     String?         // The matched phrase or image label that triggered this
+  triggerConfidence Float?          // Confidence score for visual triggers
+  t0                Float           // Start timestamp (session-relative seconds)
+  t1                Float?          // End timestamp (null while recording)
+  thumbnailPath     String?         // Path to generated thumbnail
+  title             String?         // User-editable title
+  errorMessage      String?         // Error details if failed
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([sessionId])
+  @@index([status])
 }

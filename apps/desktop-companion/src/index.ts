@@ -87,15 +87,18 @@ import {
   BrainstormAgent,
 } from "./agents/index.js";
 import { authRouter, oauthRouter } from "./auth/index.js";
-import { sessionsRouter, setActiveSessionGetter } from "./api/sessions.js";
+import { sessionsRouter, setActiveSessionGetter, setActiveSessionClearer } from "./api/sessions.js";
 import { clipsRouter, sessionClipsRouter } from "./api/clips.js";
 import { outputsRouter, sessionOutputsRouter } from "./api/outputs.js";
 import { eventsRouter, sessionEventsRouter } from "./api/events.js";
+// Note: triggersRouter requires multer - will be loaded dynamically if available
+import { clipQueueRouter, sessionClipQueueRouter } from "./api/clip-queue.js";
 import { billingRouter } from "./billing/index.js";
 import { exportRouter } from "./export/index.js";
 import { brandingRouter } from "./export/branding-routes.js";
 import { socialRouter } from "./social/index.js";
 import { videoRouter, getMediaMTXManager } from "./video/index.js";
+import { getVisualTriggerService } from "./triggers/visual-trigger.service.js";
 
 // Use validated config values
 const OBS_WS_URL = config.OBS_WS_URL;
@@ -134,10 +137,14 @@ function getActiveSessionDbId(): string | null {
   return session?.dbId ?? null;
 }
 
-// Register the active session getter with the sessions API
+// Register the active session getter and clearer with the sessions API
 // This allows the API to distinguish between truly active sessions
 // and orphaned sessions with endedAt: null from previous crashes/restarts
 setActiveSessionGetter(getActiveSessionDbId);
+setActiveSessionClearer(() => {
+  apiLogger.info("Active session memory cleared via API request");
+  session = null;
+});
 
 // Database logger
 const dbLogger = logger.child({ module: "db" });
@@ -470,18 +477,30 @@ async function main() {
   app.use((req, res, next) => {
     const origin = req.headers.origin;
 
-    if (origin && corsOrigins.has(origin)) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-      res.setHeader("Vary", "Origin");
-      res.setHeader("Access-Control-Allow-Credentials", "true");
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      );
-      res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-      );
+    // Enable logging for CORS debugging if needed
+    // apiLogger.debug({ origin, method: req.method, url: req.url }, "Incoming request CORS check");
+
+    if (origin) {
+      const isAllowed = corsOrigins.has(origin) ||
+        config.NODE_ENV === "development" ||
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1");
+
+      if (isAllowed) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Vary", "Origin");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        res.setHeader(
+          "Access-Control-Allow-Headers",
+          "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-api-key"
+        );
+        res.setHeader(
+          "Access-Control-Allow-Methods",
+          "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        );
+      } else {
+        apiLogger.warn({ origin }, "CORS Origin not allowed");
+      }
     }
 
     if (req.method === "OPTIONS") {
@@ -530,6 +549,25 @@ async function main() {
   apiLogger.info("Events routes mounted at /api/events and /api/sessions/:sessionId/events");
 
   // =============================================================================
+  // Triggers Routes (Auto-marker configuration)
+  // =============================================================================
+  // Triggers router requires multer - load dynamically if available
+  try {
+    const { triggersRouter } = await import("./api/triggers.js");
+    app.use("/api/workflows/:workflow/triggers", triggersRouter);
+    apiLogger.info("Triggers routes mounted at /api/workflows/:workflow/triggers");
+  } catch (err) {
+    apiLogger.warn("Triggers routes not available (multer may not be installed)")
+  }
+
+  // =============================================================================
+  // Clip Queue Routes
+  // =============================================================================
+  app.use("/api/clip-queue", clipQueueRouter);
+  app.use("/api/sessions/:sessionId/clip-queue", sessionClipQueueRouter);
+  apiLogger.info("Clip queue routes mounted at /api/clip-queue and /api/sessions/:sessionId/clip-queue");
+
+  // =============================================================================
   // Billing Routes (API v1)
   // =============================================================================
   // Raw body parsing for Stripe webhooks
@@ -561,11 +599,132 @@ async function main() {
   app.use("/api/video", videoRouter);
   apiLogger.info("Video streaming routes mounted at /api/video");
 
-  const wss = new WebSocketServer({ port: WS_PORT });
-  wss.on("connection", (ws) => {
-    logger.debug("New WebSocket client connected");
-    ws.send(JSON.stringify({ type: "hello", ok: true }));
+  // =============================================================================
+  // Agent Observability Routes
+  // =============================================================================
+  app.get("/api/agents/stats", (_req, res) => {
+    const stats = agentRouter.getStats();
+    const opikConfigured = !!(config.OPIK_WORKSPACE_NAME && config.OPIK_PROJECT_NAME);
+
+    res.json({
+      success: true,
+      data: {
+        ...stats,
+        opik: {
+          configured: opikConfigured,
+          workspaceName: config.OPIK_WORKSPACE_NAME || null,
+          projectName: config.OPIK_PROJECT_NAME || null,
+          dashboardUrl: opikConfigured
+            ? `https://www.comet.com/opik/${config.OPIK_WORKSPACE_NAME}/redirect/projects?query=${encodeURIComponent(config.OPIK_PROJECT_NAME || '')}`
+            : null,
+        },
+        config: {
+          aiProvider: config.AI_PROVIDER,
+          aiModel: config.AI_MODEL,
+          maxTokens: config.AI_MAX_TOKENS,
+        },
+      },
+    });
   });
+  apiLogger.info("Agent observability routes mounted at /api/agents");
+
+  // OBS Status endpoint
+  app.get("/api/obs/status", async (_req, res) => {
+    const connected = obs.identified;
+    let replayBufferActive = false;
+
+    if (connected) {
+      try {
+        const status = await obs.call("GetReplayBufferStatus");
+        replayBufferActive = status.outputActive;
+      } catch {
+        // Replay buffer might not be available
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        connected,
+        wsUrl: OBS_WS_URL,
+        hasPassword: !!OBS_WS_PASSWORD,
+        replayBufferActive,
+        help: !connected ? {
+          message: "OBS WebSocket is not connected. Make sure:",
+          steps: [
+            "1. OBS Studio is running",
+            "2. WebSocket Server is enabled in OBS (Tools > WebSocket Server Settings)",
+            "3. Check the port matches OBS_WS_URL (default: ws://127.0.0.1:4455)",
+            "4. If authentication is enabled in OBS, set OBS_WS_PASSWORD in your .env file",
+          ],
+        } : null,
+      },
+    });
+  });
+
+  // Reconnect OBS endpoint
+  app.post("/api/obs/reconnect", async (_req, res) => {
+    try {
+      if (obs.identified) {
+        await obs.disconnect();
+      }
+      await obs.connect(OBS_WS_URL, OBS_WS_PASSWORD || undefined);
+      obsLogger.info({ url: OBS_WS_URL }, "Reconnected to OBS WebSocket");
+      res.json({ success: true, message: "Reconnected to OBS" });
+    } catch (err) {
+      obsLogger.error({ err, url: OBS_WS_URL }, "Failed to reconnect to OBS");
+      res.status(500).json({
+        success: false,
+        error: err instanceof Error ? err.message : "Failed to connect to OBS",
+        help: {
+          message: "Connection failed. Verify:",
+          steps: [
+            "1. OBS is running with WebSocket Server enabled",
+            `2. WebSocket URL is correct: ${OBS_WS_URL}`,
+            "3. Password matches if authentication is enabled",
+          ],
+        },
+      });
+    }
+  });
+  apiLogger.info("OBS status routes mounted at /api/obs");
+
+  let wss: WebSocketServer;
+  try {
+    wss = new WebSocketServer({ port: WS_PORT });
+    wss.on("connection", (ws) => {
+      logger.debug("New WebSocket client connected");
+      ws.send(JSON.stringify({ type: "hello", ok: true }));
+
+      // Handle incoming messages (e.g., MediaPipe detections from browser)
+      ws.on("message", (data) => {
+        try {
+          const message = JSON.parse(data.toString());
+
+          // Handle MediaPipe gesture detections from frontend
+          if (message.type === "MEDIAPIPE_DETECTION" && message.sessionId) {
+            const visualTriggerService = getVisualTriggerService(wss);
+            const detections = message.payload?.detections || [];
+
+            if (detections.length > 0) {
+              logger.debug(
+                { sessionId: message.sessionId, detections },
+                "Received MediaPipe detections from browser"
+              );
+              visualTriggerService.handleMediaPipeDetections(detections);
+            }
+          }
+        } catch (err) {
+          // Ignore parse errors for non-JSON messages
+        }
+      });
+    });
+  } catch (err: any) {
+    logger.error({ err, port: WS_PORT }, "Failed to start WebSocket server");
+    // If WebSocket fails, we can't really function as a real-time service
+    // but we can at least log the error clearly.
+    throw err;
+  }
 
   // Initialize STT Manager with WebSocket server
   const sttManager = getSTTManager();
@@ -583,93 +742,115 @@ async function main() {
   // Session Management Routes
   // =============================================================================
   app.post("/session/start", async (req, res) => {
-    const traceId = setOpikTraceId();
-
-    await withOpikTrace(
-      { name: "session.start", metadata: { endpoint: "/session/start" } },
-      async () => {
-      try {
-        if (session) {
-          return res.status(409).json({ ok: false, error: "Session already active" });
-        }
-
-        const validated = SessionConfigSchema.parse(req.body);
-        const sessionId = validated.sessionId || uuidv4();
-        const t0 = nowMs();
-
-        const sessionDir = path.join(SESSION_DIR, sessionId);
-        ensureDir(sessionDir);
-
-        // Persist session to database
-        const dbSession = await SessionService.createSession({
-          workflow: validated.workflow,
-          captureMode: validated.captureMode,
-          title: validated.title,
-          participants: validated.participants.map((p) => p.name),
-          startedAt: new Date(t0),
+    try {
+      if (session) {
+        return res.status(409).json({
+          ok: false,
+          error: "Session already active",
+          session: session.config,
+          startedAt: session.t0UnixMs
         });
-
-        session = {
-          config: { ...validated, sessionId },
-          dbId: dbSession.id,
-          t0UnixMs: t0,
-        };
-
-        await ensureReplayBuffer();
-
-        // Emit SESSION_START event
-        const startEvent: EventEnvelope = {
-          id: uuidv4(),
-          type: "SESSION_START",
-          ts: t0,
-          payload: { sessionId, workflow: validated.workflow, title: validated.title },
-          observability: { traceId },
-        };
-        emitEvent(wss, startEvent);
-
-        apiLogger.info({ sessionId, workflow: validated.workflow }, "Session started");
-        return res.json({ sessionId, startedAt: t0 });
-      } catch (err: any) {
-        apiLogger.error({ err }, "Failed to start session");
-        return res.status(400).json({ ok: false, error: err.message });
       }
-    });
+
+      const validated = SessionConfigSchema.parse(req.body);
+      const t0 = nowMs();
+
+      // Persist session to database FIRST to get the canonical ID
+      const dbSession = await SessionService.createSession({
+        workflow: validated.workflow,
+        captureMode: validated.captureMode,
+        title: validated.title,
+        participants: validated.participants.map((p) => p.name),
+        startedAt: new Date(t0),
+      });
+
+      // Use the database-generated ID as the canonical session ID
+      const sessionId = dbSession.id;
+
+      const sessionDir = path.join(SESSION_DIR, sessionId);
+      ensureDir(sessionDir);
+
+      session = {
+        config: { ...validated, sessionId },
+        dbId: dbSession.id,
+        t0UnixMs: t0,
+      };
+
+      await ensureReplayBuffer();
+
+      // Emit SESSION_START event
+      const startEvent: any = {
+        id: uuidv4(),
+        type: "SESSION_START",
+        ts: t0,
+        payload: { sessionId, workflow: validated.workflow, title: validated.title },
+      };
+      emitEvent(wss, startEvent);
+
+      apiLogger.info({ sessionId, workflow: validated.workflow }, "Session started");
+      return res.json({ sessionId, startedAt: t0 });
+    } catch (err: any) {
+      apiLogger.error({ err }, "Failed to start session");
+      return res.status(400).json({ ok: false, error: err.message });
+    }
   });
 
   app.post("/session/stop", async (req, res) => {
-    const traceId = setOpikTraceId();
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
 
-    await withOpikTrace(
-      { name: "session.stop", metadata: { endpoint: "/session/stop" } },
-      async () => {
-      if (!session) {
-        return res.status(404).json({ ok: false, error: "No active session" });
-      }
+    const t1 = nowMs();
+    const duration = t1 - session.t0UnixMs;
 
-      const t1 = nowMs();
-      const duration = t1 - session.t0UnixMs;
-
-      // Update session in database
-      await SessionService.updateSession(session.dbId, {
-        endedAt: new Date(t1),
-        status: "completed",
-      });
-
-      // Emit SESSION_END event
-      const endEvent: EventEnvelope = {
-        id: uuidv4(),
-        type: "SESSION_END",
-        ts: t1,
-        payload: { sessionId: session.config.sessionId, duration },
-        observability: { traceId },
-      };
-      emitEvent(wss, endEvent);
-
-      apiLogger.info({ sessionId: session.config.sessionId, duration }, "Session stopped");
-
-      session = null;
-      return res.json({ ok: true, t1, duration });
+    // Update session in database
+    await SessionService.updateSession(session.dbId, {
+      endedAt: new Date(t1),
+      status: "completed",
     });
+
+    // Emit SESSION_END event
+    const endEvent: any = {
+      id: uuidv4(),
+      type: "SESSION_END",
+      ts: t1,
+      payload: { sessionId: session.config.sessionId, duration },
+    };
+    emitEvent(wss, endEvent);
+
+    apiLogger.info({ sessionId: session.config.sessionId, duration }, "Session stopped");
+
+    session = null;
+    return res.json({ ok: true, t1, duration });
+  });
+
+  app.get("/session/force-stop", async (req, res) => {
+    session = null;
+    return res.json({ ok: true, message: "Session cleared via GET" });
+  });
+
+  app.post("/session/force-stop", async (req, res) => {
+    const t1 = nowMs();
+
+    if (session) {
+      /*
+      try {
+        await SessionService.updateSession(session.dbId, {
+          endedAt: new Date(t1),
+          status: "completed",
+        });
+      } catch (err) {
+        apiLogger.error({ err }, "Failed to update session in DB during force-stop");
+      }
+      */
+
+      apiLogger.info({ sessionId: session.config.sessionId }, "Session force-stopped (memory only)");
+      session = null;
+    } else {
+      apiLogger.info("Force-stop called but no active session in memory");
+    }
+
+    return res.json({ ok: true, message: "Session state cleared", t1 });
   });
 
   app.get("/session/status", (req, res) => {
@@ -679,9 +860,16 @@ async function main() {
     return res.json({
       ok: true,
       active: true,
+      sessionId: session.config.sessionId,
+      workflow: session.config.workflow,
+      captureMode: session.config.captureMode,
+      title: session.config.title,
+      participants: session.config.participants,
+      startedAt: session.t0UnixMs,
+      elapsed: nowMs() - session.t0UnixMs,
+      // Keep legacy fields for backward compatibility
       session: session.config,
       t0: session.t0UnixMs,
-      elapsed: nowMs() - session.t0UnixMs,
     });
   });
 
@@ -689,57 +877,68 @@ async function main() {
   // OBS Integration Routes
   // =============================================================================
   app.post("/clip", async (req, res) => {
-    const traceId = setOpikTraceId();
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
 
-    await withOpikTrace(
-      { name: "clip.create", metadata: { endpoint: "/clip" } },
-      async () => {
-      if (!session) {
-        return res.status(404).json({ ok: false, error: "No active session" });
-      }
+    try {
+      const now = nowMs();
+      const clipStart = session.clipStartT || now - REPLAY_BUFFER_SECONDS * 1000;
+      session.clipStartT = now;
 
-      try {
-        const now = nowMs();
-        const clipStart = session.clipStartT || now - REPLAY_BUFFER_SECONDS * 1000;
-        session.clipStartT = now;
+      // Save replay buffer
+      const replayBufferPath = await saveReplayBuffer();
 
-        // Save replay buffer
-        const replayBufferPath = await saveReplayBuffer();
+      // Generate artifact ID
+      const artifactId = uuidv4();
 
-        // Generate artifact ID
-        const artifactId = uuidv4();
+      // Calculate clip timestamps
+      const t0 = Math.max(0, (clipStart - session.t0UnixMs) / 1000);
+      const t1 = (now - session.t0UnixMs) / 1000;
 
-        // Calculate clip timestamps
-        const t0 = Math.max(0, (clipStart - session.t0UnixMs) / 1000);
-        const t1 = (now - session.t0UnixMs) / 1000;
+      // Emit artifact event (before trimming)
+      const artifactEvent: any = {
+        id: uuidv4(),
+        type: "ARTIFACT_CLIP_CREATED",
+        ts: now,
+        payload: {
+          artifactId,
+          type: "clip",
+          path: replayBufferPath || "(pending)",
+          t0,
+          t1,
+          duration: t1 - t0,
+        },
+      };
+      emitEvent(wss, artifactEvent);
 
-        // Emit artifact event (before trimming)
-        const artifactEvent: EventEnvelope = {
-          id: uuidv4(),
-          type: "ARTIFACT_CLIP_CREATED",
-          ts: now,
-          payload: {
-            artifactId,
-            type: "clip",
-            path: replayBufferPath || "(pending)",
-            t0,
-            t1,
-            duration: t1 - t0,
-          },
-          observability: { traceId },
-        };
-        emitEvent(wss, artifactEvent);
-
-        // Attempt FFmpeg trim if available and we have a valid replay buffer path
-        let trimResult: TrimClipResult | null = null;
-        if (
-          ffmpegReady &&
-          replayBufferPath &&
-          replayBufferPath !== "(obs-managed)" &&
-          fs.existsSync(replayBufferPath)
-        ) {
+      // Attempt FFmpeg trim if available and we have a valid replay buffer path
+      let trimResult: TrimClipResult | null = null;
+      if (
+        ffmpegReady &&
+        replayBufferPath &&
+        replayBufferPath !== "(obs-managed)" &&
+        fs.existsSync(replayBufferPath)
+      ) {
+        trimResult = await attemptClipTrim(
+          replayBufferPath,
+          t0,
+          t1,
+          sessionPath(),
+          artifactId,
+          session.t0UnixMs,
+          now
+        );
+      } else if (ffmpegReady && OBS_REPLAY_OUTPUT_DIR) {
+        // Fallback: try to find the latest replay buffer file
+        const latestReplayBuffer = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
+        if (latestReplayBuffer) {
+          ffmpegLogger.info(
+            { path: latestReplayBuffer },
+            "Using latest replay buffer file from directory scan"
+          );
           trimResult = await attemptClipTrim(
-            replayBufferPath,
+            latestReplayBuffer,
             t0,
             t1,
             sessionPath(),
@@ -747,136 +946,110 @@ async function main() {
             session.t0UnixMs,
             now
           );
-        } else if (ffmpegReady && OBS_REPLAY_OUTPUT_DIR) {
-          // Fallback: try to find the latest replay buffer file
-          const latestReplayBuffer = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
-          if (latestReplayBuffer) {
-            ffmpegLogger.info(
-              { path: latestReplayBuffer },
-              "Using latest replay buffer file from directory scan"
-            );
-            trimResult = await attemptClipTrim(
-              latestReplayBuffer,
-              t0,
-              t1,
-              sessionPath(),
-              artifactId,
-              session.t0UnixMs,
-              now
-            );
-          }
         }
+      }
 
-        // Persist clip to database
-        const dbClip = await ClipService.createClip({
-          sessionId: session.dbId,
-          artifactId,
-          path: trimResult?.clipPath || replayBufferPath || "(pending)",
-          t0,
-          t1,
-          thumbnailId: undefined, // TODO: implement thumbnail ID tracking
-        });
+      // Persist clip to database
+      const dbClip = await ClipService.createClip({
+        sessionId: session.dbId,
+        artifactId,
+        path: trimResult?.clipPath || replayBufferPath || "(pending)",
+        t0,
+        t1,
+        thumbnailId: undefined, // TODO: implement thumbnail ID tracking
+      });
 
-        // If trimming succeeded, emit an update event with the trimmed clip path
-        if (trimResult) {
-          const updateEvent: EventEnvelope = {
-            id: uuidv4(),
-            type: "ARTIFACT_CLIP_CREATED",
-            ts: nowMs(),
-            payload: {
-              artifactId,
-              type: "clip",
-              path: trimResult.clipPath,
-              thumbnailPath: trimResult.thumbnailPath,
-              t0,
-              t1,
-              duration: trimResult.duration,
-              format: trimResult.format,
-              videoCodec: trimResult.videoCodec,
-              audioCodec: trimResult.audioCodec,
-            },
-            observability: { traceId },
-          };
-          emitEvent(wss, updateEvent);
-        }
-
-        apiLogger.info(
-          {
+      // If trimming succeeded, emit an update event with the trimmed clip path
+      if (trimResult) {
+        const updateEvent: any = {
+          id: uuidv4(),
+          type: "ARTIFACT_CLIP_CREATED",
+          ts: nowMs(),
+          payload: {
             artifactId,
+            type: "clip",
+            path: trimResult.clipPath,
+            thumbnailPath: trimResult.thumbnailPath,
             t0,
             t1,
-            duration: t1 - t0,
-            trimmed: !!trimResult,
-            clipPath: trimResult?.clipPath,
+            duration: trimResult.duration,
+            format: trimResult.metadata?.format,
+            videoCodec: trimResult.metadata?.codec,
+            audioCodec: trimResult.metadata?.codec,
           },
-          "Clip created"
-        );
+        };
+        emitEvent(wss, updateEvent);
+      }
 
-        return res.json({
-          ok: true,
+      apiLogger.info(
+        {
           artifactId,
-          replayBufferPath,
-          clipPath: trimResult?.clipPath,
-          thumbnailPath: trimResult?.thumbnailPath,
           t0,
           t1,
-          duration: trimResult?.duration || t1 - t0,
-        });
-      } catch (err: any) {
-        apiLogger.error({ err }, "Failed to create clip");
-        return res.status(500).json({ ok: false, error: err.message });
-      }
-    });
+          duration: t1 - t0,
+          trimmed: !!trimResult,
+          clipPath: trimResult?.clipPath,
+        },
+        "Clip created"
+      );
+
+      return res.json({
+        ok: true,
+        artifactId,
+        replayBufferPath,
+        clipPath: trimResult?.clipPath,
+        thumbnailPath: trimResult?.thumbnailPath,
+        t0,
+        t1,
+        duration: trimResult?.duration || t1 - t0,
+      });
+    } catch (err: any) {
+      apiLogger.error({ err }, "Failed to create clip");
+      return res.status(500).json({ ok: false, error: err.message });
+    }
   });
 
   app.post("/screenshot", async (req, res) => {
-    const traceId = setOpikTraceId();
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
 
-    await withOpikTrace(
-      { name: "screenshot.create", metadata: { endpoint: "/screenshot" } },
-      async () => {
-      if (!session) {
-        return res.status(404).json({ ok: false, error: "No active session" });
+    try {
+      const { sourceName } = req.body;
+      if (!sourceName) {
+        return res.status(400).json({ ok: false, error: "sourceName required" });
       }
 
-      try {
-        const { sourceName } = req.body;
-        if (!sourceName) {
-          return res.status(400).json({ ok: false, error: "sourceName required" });
-        }
+      const now = nowMs();
+      const artifactId = uuidv4();
+      const fileName = `screenshot-${artifactId}.png`;
+      const outputPath = sessionPath(fileName);
 
-        const now = nowMs();
-        const artifactId = uuidv4();
-        const fileName = `screenshot-${artifactId}.png`;
-        const outputPath = sessionPath(fileName);
+      const success = await takeScreenshot(sourceName, outputPath);
 
-        const success = await takeScreenshot(sourceName, outputPath);
+      if (success) {
+        const artifactEvent: any = {
+          id: uuidv4(),
+          type: "ARTIFACT_FRAME_CREATED",
+          ts: now,
+          payload: {
+            artifactId,
+            type: "frame",
+            path: outputPath,
+            sourceName,
+          },
+        };
+        emitEvent(wss, artifactEvent);
 
-        if (success) {
-          const artifactEvent: EventEnvelope = {
-            id: uuidv4(),
-            type: "ARTIFACT_FRAME_CREATED",
-            ts: now,
-            payload: {
-              artifactId,
-              type: "frame",
-              path: outputPath,
-              sourceName,
-            },
-            observability: { traceId },
-          };
-          emitEvent(wss, artifactEvent);
-
-          apiLogger.info({ artifactId, sourceName, outputPath }, "Screenshot captured");
-          return res.json({ ok: true, artifactId, path: outputPath });
-        } else {
-          return res.status(500).json({ ok: false, error: "Screenshot failed" });
-        }
-      } catch (err: any) {
-        apiLogger.error({ err }, "Failed to capture screenshot");
-        return res.status(500).json({ ok: false, error: err.message });
+        apiLogger.info({ artifactId, sourceName, outputPath }, "Screenshot captured");
+        return res.json({ ok: true, artifactId, path: outputPath });
+      } else {
+        return res.status(500).json({ ok: false, error: "Screenshot failed" });
       }
-    });
+    } catch (err: any) {
+      apiLogger.error({ err }, "Failed to capture screenshot");
+      return res.status(500).json({ ok: false, error: err.message });
+    }
   });
 
   // =============================================================================
@@ -888,18 +1061,19 @@ async function main() {
         return res.status(404).json({ ok: false, error: "No active session" });
       }
 
-      const config: STTStartConfig = {
+      const sttConfig: STTStartConfig = {
         sessionId: session.config.sessionId,
-        language: req.body.language || "en",
-        diarization: req.body.diarization !== false,
-        interimResults: req.body.interimResults !== false,
+        sessionStartedAt: session.t0UnixMs,
+        language: req.body.language || "en-US",
+        enableDiarization: req.body.diarization !== false,
+        enableInterimResults: req.body.interimResults !== false,
         keywords: req.body.keywords,
       };
 
-      await sttManager.start(config);
+      await sttManager.start(sttConfig);
 
-      sttLogger.info({ sessionId: config.sessionId }, "STT started");
-      return res.json({ ok: true, sessionId: config.sessionId });
+      sttLogger.info({ sessionId: sttConfig.sessionId }, "STT started");
+      return res.json({ ok: true, sessionId: sttConfig.sessionId });
     } catch (err: any) {
       sttLogger.error({ err }, "Failed to start STT");
       return res.status(500).json({ ok: false, error: err.message });
@@ -1000,11 +1174,11 @@ async function main() {
       },
       session: session
         ? {
-            active: true,
-            sessionId: session.config.sessionId,
-            workflow: session.config.workflow,
-            elapsed: nowMs() - session.t0UnixMs,
-          }
+          active: true,
+          sessionId: session.config.sessionId,
+          workflow: session.config.workflow,
+          elapsed: nowMs() - session.t0UnixMs,
+        }
         : { active: false },
     });
   };
@@ -1036,7 +1210,7 @@ async function main() {
         status: "completed",
       });
 
-      const endEvent: EventEnvelope = {
+      const endEvent: any = {
         id: uuidv4(),
         type: "SESSION_END",
         ts: t1,

@@ -59,6 +59,13 @@ export type {
   OutputStatus,
 } from "./outputs";
 
+// Posts API (Producer Desk)
+export * as posts from "./posts";
+export type {
+  PostInfo,
+  PostStatus,
+} from "./posts";
+
 // Moments API
 export * as moments from "./moments";
 export type {

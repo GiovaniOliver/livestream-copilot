@@ -268,6 +268,38 @@ export async function endSession(
 }
 
 /**
+ * Force-stop the active session in memory
+ * @param accessToken - Optional access token for authentication
+ */
+export async function forceStopSession(
+  accessToken?: string
+): Promise<{ ok: boolean; message: string }> {
+  return apiClient.post<{ ok: boolean; message: string }>(
+    "/session/force-stop",
+    {},
+    withAuth(accessToken)
+  );
+}
+
+/**
+ * Response shape from GET /session/status endpoint
+ */
+interface SessionStatusResponse {
+  ok: boolean;
+  active: boolean;
+  sessionId?: string;
+  workflow?: SessionConfig["workflow"];
+  captureMode?: SessionConfig["captureMode"];
+  title?: string;
+  participants?: Array<{ id: string; name: string }>;
+  startedAt?: number;
+  elapsed?: number;
+  // Legacy fields (for backward compatibility)
+  session?: SessionConfig;
+  t0?: number;
+}
+
+/**
  * Get the currently active session, if any
  * @param accessToken - Optional access token for authentication
  */
@@ -275,27 +307,36 @@ export async function getActiveSession(
   accessToken?: string
 ): Promise<SessionDetails | null> {
   try {
-    const response = await apiClient.get<{
-      ok: boolean;
-      sessionId?: string;
-      workflow?: string;
-      status?: string;
-    }>("/session/status", withAuth(accessToken));
+    const response = await apiClient.get<SessionStatusResponse>(
+      "/session/status",
+      withAuth(accessToken)
+    );
 
-    if (!response.ok || !response.sessionId) {
+    if (!response.ok || !response.active || !response.sessionId) {
       return null;
     }
 
-    // Map backend response to SessionDetails format
+    // Use the new top-level fields from the backend response
+    // Fall back to legacy nested fields if needed
+    const workflow = response.workflow || response.session?.workflow || "streamer";
+    const captureMode = response.captureMode || response.session?.captureMode || "av";
+    const title = response.title || response.session?.title || "Active Session";
+    const startedAt = response.startedAt || response.t0 || Date.now();
+    const participants = response.participants || response.session?.participants || [];
+
     return {
       sessionId: response.sessionId,
-      workflow: response.workflow as any || "streamer",
-      captureMode: "av" as any, // Backend doesn't return this
-      title: "Active Session",
-      startedAt: Date.now(), // Backend doesn't return this
+      workflow: workflow as SessionConfig["workflow"],
+      captureMode: captureMode as SessionConfig["captureMode"],
+      title,
+      startedAt,
       clipCount: 0,
       outputCount: 0,
-      participants: [],
+      participants: participants.map((p, index) =>
+        typeof p === "string"
+          ? { id: `participant-${index}`, name: p }
+          : p
+      ),
     };
   } catch (error) {
     // Network error or server down

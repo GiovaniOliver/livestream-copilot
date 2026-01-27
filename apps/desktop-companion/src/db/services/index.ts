@@ -44,3 +44,34 @@ export type {
   ExportWithRelations,
   ExportStats,
 } from "./export.service.js";
+
+// Trigger config service - auto-trigger configurations
+export * as TriggerConfigService from "./trigger-config.service.js";
+export type {
+  TriggerConfig,
+  AudioTrigger,
+  VisualTrigger,
+  CreateTriggerConfigInput,
+  UpdateTriggerConfigInput,
+} from "./trigger-config.service.js";
+
+// Reference image service - visual trigger reference images
+export * as ReferenceImageService from "./reference-image.service.js";
+export type {
+  ReferenceImage,
+  CreateReferenceImageInput,
+  UpdateReferenceImageInput,
+  ReferenceImageFilters,
+} from "./reference-image.service.js";
+
+// Clip queue service - clip processing queue
+export * as ClipQueueService from "./clip-queue.service.js";
+export type {
+  ClipQueueItem,
+  ClipQueueItemWithDuration,
+  ClipQueueStatus,
+  TriggerType,
+  CreateClipQueueItemInput,
+  UpdateClipQueueItemInput,
+  ClipQueueFilters,
+} from "./clip-queue.service.js";

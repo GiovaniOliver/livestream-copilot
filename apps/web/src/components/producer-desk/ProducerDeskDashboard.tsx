@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useMoments } from "@/hooks/useMoments";
+import { usePosts } from "@/hooks/usePosts";
 import { ClipBin, type ClipData } from "./ClipBin";
 import { PostQueue, type SocialPost, type Platform } from "./PostQueue";
 import { MomentRail, type Moment, type MomentType } from "./MomentRail";
@@ -67,8 +68,22 @@ export function ProducerDeskDashboard({
     createMoment,
   } = useMoments(sessionId);
 
+  // Post operations hook
+  const {
+    approvePost,
+    publishPost,
+    schedulePost,
+    deletePost,
+    operationState,
+    error: postError,
+    clearError: clearPostError,
+  } = usePosts();
+
   const [previewClip, setPreviewClip] = useState<Clip | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Track optimistically updated posts
+  const [optimisticUpdates, setOptimisticUpdates] = useState<Map<string, Partial<SocialPost>>>(new Map());
 
   // Connect to WebSocket on mount
   useEffect(() => {
@@ -107,7 +122,7 @@ export function ProducerDeskDashboard({
     });
   }, [clips]);
 
-  // Transform outputs to SocialPost format
+  // Transform outputs to SocialPost format with optimistic updates
   const postList: SocialPost[] = useMemo(() => {
     return outputs
       .filter((e) => {
@@ -117,8 +132,9 @@ export function ProducerDeskDashboard({
       .map((e) => {
         const payload = e.payload as any;
         const text = payload.text || payload.content || "";
+        const optimisticUpdate = optimisticUpdates.get(e.id);
 
-        return {
+        const basePost: SocialPost = {
           id: e.id,
           text,
           timestamp: formatTimestamp(e.ts),
@@ -127,8 +143,20 @@ export function ProducerDeskDashboard({
           scheduledFor: payload.scheduledFor ? new Date(payload.scheduledFor) : undefined,
           metadata: payload.metadata || {},
         };
+
+        // Apply optimistic update if present
+        if (optimisticUpdate) {
+          return { ...basePost, ...optimisticUpdate };
+        }
+
+        return basePost;
+      })
+      // Filter out deleted posts (optimistically removed)
+      .filter((post) => {
+        const update = optimisticUpdates.get(post.id);
+        return !update || update.status !== "deleted" as any;
       });
-  }, [outputs]);
+  }, [outputs, optimisticUpdates]);
 
   // Combine API moments with WebSocket moments, deduplicating by ID
   const momentList: Moment[] = useMemo(() => {
@@ -216,36 +244,103 @@ export function ProducerDeskDashboard({
     }
   }, [previewClip, clipList, handlePreviewClip]);
 
+  // Helper to apply optimistic update
+  const applyOptimisticUpdate = useCallback((postId: string, update: Partial<SocialPost>) => {
+    setOptimisticUpdates((prev) => {
+      const next = new Map(prev);
+      next.set(postId, { ...prev.get(postId), ...update });
+      return next;
+    });
+  }, []);
+
+  // Helper to clear optimistic update
+  const clearOptimisticUpdate = useCallback((postId: string) => {
+    setOptimisticUpdates((prev) => {
+      const next = new Map(prev);
+      next.delete(postId);
+      return next;
+    });
+  }, []);
+
   // Post handlers
   const handleEditPost = useCallback((post: SocialPost) => {
-    console.log("Edit post:", post.id);
     // TODO: Open post editor modal
   }, []);
 
-  const handleApprovePost = useCallback((postId: string) => {
-    console.log("Approve post:", postId);
-    // TODO: Call API to approve post
-  }, []);
+  const handleApprovePost = useCallback(
+    async (postId: string) => {
+      // Optimistic update
+      applyOptimisticUpdate(postId, { status: "approved" });
 
-  const handlePublishPost = useCallback((postId: string) => {
-    console.log("Publish post:", postId);
-    // TODO: Call API to publish post
-  }, []);
+      const success = await approvePost(postId, () => {
+        // On success, clear optimistic update (real data will come through WebSocket)
+        clearOptimisticUpdate(postId);
+      });
+
+      if (!success) {
+        // Revert optimistic update on failure
+        clearOptimisticUpdate(postId);
+      }
+    },
+    [approvePost, applyOptimisticUpdate, clearOptimisticUpdate]
+  );
+
+  const handlePublishPost = useCallback(
+    async (postId: string) => {
+      // Optimistic update
+      applyOptimisticUpdate(postId, { status: "published" });
+
+      const success = await publishPost(postId, () => {
+        // On success, clear optimistic update (real data will come through WebSocket)
+        clearOptimisticUpdate(postId);
+      });
+
+      if (!success) {
+        // Revert optimistic update on failure
+        clearOptimisticUpdate(postId);
+      }
+    },
+    [publishPost, applyOptimisticUpdate, clearOptimisticUpdate]
+  );
 
   const handleCopyPost = useCallback((text: string) => {
-    console.log("Copied:", text);
     // Toast notification could be added here
   }, []);
 
-  const handleSchedulePost = useCallback((postId: string, date: Date) => {
-    console.log("Schedule post:", postId, date);
-    // TODO: Call API to schedule post
-  }, []);
+  const handleSchedulePost = useCallback(
+    async (postId: string, date: Date) => {
+      // Optimistic update
+      applyOptimisticUpdate(postId, { status: "scheduled", scheduledFor: date });
 
-  const handleDeletePost = useCallback((postId: string) => {
-    console.log("Delete post:", postId);
-    // TODO: Call API to delete post
-  }, []);
+      const success = await schedulePost(postId, date, () => {
+        // On success, clear optimistic update (real data will come through WebSocket)
+        clearOptimisticUpdate(postId);
+      });
+
+      if (!success) {
+        // Revert optimistic update on failure
+        clearOptimisticUpdate(postId);
+      }
+    },
+    [schedulePost, applyOptimisticUpdate, clearOptimisticUpdate]
+  );
+
+  const handleDeletePost = useCallback(
+    async (postId: string) => {
+      // Optimistic update - mark as deleted
+      applyOptimisticUpdate(postId, { status: "deleted" as any });
+
+      const success = await deletePost(postId, () => {
+        // On success, keep the optimistic update (post is gone)
+      });
+
+      if (!success) {
+        // Revert optimistic update on failure
+        clearOptimisticUpdate(postId);
+      }
+    },
+    [deletePost, applyOptimisticUpdate, clearOptimisticUpdate]
+  );
 
   // Moment handlers
   const handleMomentClick = useCallback((moment: Moment) => {

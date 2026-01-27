@@ -8,7 +8,7 @@
 import type { WebSocketServer } from "ws";
 import { config } from "../config/index.js";
 import { DeepgramSTTProvider, createDeepgramProvider } from "./deepgram.js";
-import type { STTProvider, STTProviderFactory, DeepgramConfig } from "./types.js";
+import type { STTProvider, STTProviderFactory, DeepgramConfig, STTStartConfig } from "./types.js";
 
 // Re-export types
 export * from "./types.js";
@@ -140,7 +140,7 @@ export class STTManager {
   private provider: STTProvider | null = null;
   private wss: WebSocketServer | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   /**
    * Get the singleton instance
@@ -194,16 +194,45 @@ export class STTManager {
   }
 
   /**
+   * Start STT with the given config
+   */
+  async start(config: STTStartConfig): Promise<void> {
+    if (!this.provider) {
+      this.createProvider();
+    }
+    await this.provider!.start(config);
+  }
+
+  /**
+   * Stop STT
+   */
+  async stop(): Promise<void> {
+    if (this.provider) {
+      await this.provider.stop();
+    }
+  }
+
+  /**
+   * Send audio data to the active provider
+   */
+  sendAudio(audioData: Buffer): void {
+    if (this.provider && this.provider.isReady()) {
+      this.provider.sendAudio(audioData);
+    }
+  }
+
+  /**
    * Get provider status
    */
-  getStatus(): { active: boolean; provider: string | null; status: string | null } {
+  getStatus(): { active: boolean; provider: string | null; status: string | null; sessionId?: string | null } {
     if (!this.provider) {
       return { active: false, provider: null, status: null };
     }
     return {
-      active: true,
+      active: this.provider.status !== "stopped" && this.provider.status !== "idle",
       provider: this.provider.name,
       status: this.provider.status,
+      sessionId: (this.provider as any).sessionId, // Some providers might have sessionId
     };
   }
 }
