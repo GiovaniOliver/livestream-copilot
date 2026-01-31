@@ -3,6 +3,7 @@
  */
 
 import type { EventEnvelope } from "@livestream-copilot/shared";
+import { logger } from "@/lib/logger";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3124";
 const isDev = process.env.NODE_ENV === "development";
@@ -88,18 +89,18 @@ export class WebSocketManager {
    */
   connect(): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
-      if (isDev) console.log("[WS] Already connected");
+      logger.debug("[WS] Already connected");
       return;
     }
 
     this.setState("connecting");
-    if (isDev) console.log(`[WS] Connecting to ${WS_URL}`);
+    logger.debug(`[WS] Connecting to ${WS_URL}`);
 
     try {
       this.ws = new WebSocket(WS_URL);
       this.setupEventListeners();
     } catch (error) {
-      if (isDev) console.error("[WS] Connection error:", error);
+      logger.error("[WS] Connection error:", error);
       this.handleDisconnect();
     }
   }
@@ -117,7 +118,7 @@ export class WebSocketManager {
     }
 
     this.setState("disconnected");
-    if (isDev) console.log("[WS] Disconnected");
+    logger.debug("[WS] Disconnected");
   }
 
   /**
@@ -125,14 +126,14 @@ export class WebSocketManager {
    */
   send(type: string, payload?: unknown): void {
     if (this.ws?.readyState !== WebSocket.OPEN) {
-      if (isDev) console.warn("[WS] Cannot send, not connected");
+      logger.warn("[WS] Cannot send, not connected");
       return;
     }
 
     const message = JSON.stringify({ type, payload, ts: Date.now() });
     this.ws.send(message);
 
-    if (isDev) console.log("[WS] Sent:", { type, payload });
+    logger.debug("[WS] Sent:", { type, payload });
   }
 
   /**
@@ -177,7 +178,7 @@ export class WebSocketManager {
     if (!this.ws) return;
 
     this.ws.onopen = () => {
-      if (isDev) console.log("[WS] Connected");
+      logger.debug("[WS] Connected");
       this.setState("connected");
       this.reconnectAttempts = 0;
       this.currentReconnectDelay = this.config.reconnectDelay;
@@ -186,20 +187,20 @@ export class WebSocketManager {
     };
 
     this.ws.onclose = (event) => {
-      if (isDev) console.log("[WS] Closed:", event.code, event.reason);
+      logger.debug("[WS] Closed:", event.code, event.reason);
       this.emit("disconnected", { code: event.code, reason: event.reason });
       this.handleDisconnect();
     };
 
     this.ws.onerror = (error) => {
-      if (isDev) console.error("[WS] Error:", error);
+      logger.error("[WS] Error:", error);
       this.emit("error", { error: "WebSocket error" });
     };
 
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (isDev) console.log("[WS] Received:", data);
+        logger.debug("[WS] Received:", data);
 
         // Handle pong (heartbeat response)
         if (data.type === "pong") return;
@@ -213,7 +214,7 @@ export class WebSocketManager {
         // Emit generic "event" for all events
         this.emit("event", data);
       } catch (error) {
-        if (isDev) console.error("[WS] Failed to parse message:", error);
+        logger.error("[WS] Failed to parse message:", error);
       }
     };
   }
@@ -230,7 +231,7 @@ export class WebSocketManager {
     }
 
     if (this.reconnectAttempts >= this.config.maxReconnectAttempts) {
-      if (isDev) console.log("[WS] Max reconnect attempts reached");
+      logger.debug("[WS] Max reconnect attempts reached");
       this.setState("disconnected");
       return;
     }
@@ -238,11 +239,9 @@ export class WebSocketManager {
     this.setState("reconnecting");
     this.reconnectAttempts++;
 
-    if (isDev) {
-      console.log(
-        `[WS] Reconnecting in ${this.currentReconnectDelay}ms (attempt ${this.reconnectAttempts})`
-      );
-    }
+    logger.debug(
+      `[WS] Reconnecting in ${this.currentReconnectDelay}ms (attempt ${this.reconnectAttempts})`
+    );
 
     this.reconnectTimeout = setTimeout(() => {
       this.connect();
@@ -297,7 +296,7 @@ export class WebSocketManager {
         try {
           handler(data);
         } catch (error) {
-          if (isDev) console.error(`[WS] Handler error for ${type}:`, error);
+          logger.error(`[WS] Handler error for ${type}:`, error);
         }
       });
     }

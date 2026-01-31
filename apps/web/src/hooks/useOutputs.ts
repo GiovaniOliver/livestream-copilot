@@ -183,7 +183,7 @@ export function useOutputs(
 
         setPagination(result.pagination);
       } catch (err) {
-        console.error("Failed to load outputs:", err);
+        logger.error("Failed to load outputs:", err);
         setError(err instanceof Error ? err.message : "Failed to load outputs");
         // Keep existing data on error
       } finally {
@@ -398,10 +398,11 @@ export function useOutput(outputId: string): {
 
       // Import getOutput lazily to avoid circular deps
       const { getOutput } = await import("@/lib/api/outputs");
+import { logger } from "@/lib/logger";
       const apiOutput = await getOutput(outputId, accessToken || undefined);
       setOutput(transformOutput(apiOutput));
     } catch (err) {
-      console.error("Failed to load output:", err);
+      logger.error("Failed to load output:", err);
       setError(err instanceof Error ? err.message : "Failed to load output");
       setOutput(null);
     } finally {

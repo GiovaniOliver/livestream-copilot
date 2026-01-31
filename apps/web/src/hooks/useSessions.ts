@@ -28,6 +28,7 @@ import { useAuth } from "@/lib/contexts/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import { type Session, formatDuration } from "@/lib/stores/sessions";
 import { WORKFLOW_TYPES, CAPTURE_MODES, type WorkflowType, type CaptureMode } from "@/lib/constants";
+import { logger } from "@/lib/logger";
 
 export interface UseSessionsReturn {
   sessions: Session[];
@@ -162,7 +163,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
       const active = mappedSessions.find((s) => s.status === "live") || null;
       setActiveSession(active);
     } catch (err) {
-      console.error("Failed to load sessions:", err);
+      logger.error("Failed to load sessions:", err);
       setError(err instanceof Error ? err.message : "Failed to load sessions");
       // Keep existing data on error
     } finally {
@@ -403,7 +404,7 @@ export function useSession(id: string): UseSessionReturn {
       const apiSession = await getSessionById(id, accessToken || undefined);
       setSession(mapApiSessionToSession(apiSession));
     } catch (err) {
-      console.error("Failed to load session:", err);
+      logger.error("Failed to load session:", err);
       setError(err instanceof Error ? err.message : "Failed to load session");
       setSession(null);
     } finally {

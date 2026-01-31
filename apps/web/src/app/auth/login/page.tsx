@@ -8,6 +8,7 @@ import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { logger } from "@/lib/logger";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function LoginPage() {
       await login(formData, rememberMe);
     } catch (error) {
       // Error is handled by AuthContext
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
     }
   };
 

@@ -3,10 +3,13 @@
  *
  * Provides API methods for managing social posts (approve, publish, schedule, delete)
  * Posts are a specialized view of outputs with category "SOCIAL_POST"
+ * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
+import { z } from "zod";
 import { apiClient, type RequestOptions } from "./client";
-import type { OutputInfo, OutputStatus } from "./outputs";
+import { apiResponseSchema, outputInfoSchema, type OutputStatus } from "./schemas";
+import type { OutputInfo } from "./outputs";
 
 /**
  * Post status types
@@ -14,36 +17,42 @@ import type { OutputInfo, OutputStatus } from "./outputs";
 export type PostStatus = "draft" | "approved" | "published" | "scheduled";
 
 /**
+ * Post information schema
+ */
+const postInfoSchema = outputInfoSchema.extend({
+  status: z.enum(["draft", "approved", "published", "scheduled"]),
+  scheduledFor: z.string().datetime().optional(),
+});
+
+/**
+ * Post mutation response schema
+ */
+const postMutationResponseSchema = apiResponseSchema(
+  z.object({
+    post: postInfoSchema.optional(),
+    output: outputInfoSchema.optional(),
+    message: z.string().optional(),
+  })
+);
+
+/**
+ * Schedule post response schema
+ */
+const schedulePostResponseSchema = apiResponseSchema(
+  z.object({
+    post: postInfoSchema.optional(),
+    output: outputInfoSchema.optional(),
+    scheduledFor: z.string().datetime(),
+    message: z.string().optional(),
+  })
+);
+
+/**
  * Post information from the API
  */
 export interface PostInfo extends OutputInfo {
   status: PostStatus;
   scheduledFor?: string;
-}
-
-/**
- * Response from post mutation operations
- */
-interface PostMutationResponse {
-  success: boolean;
-  data: {
-    post?: PostInfo;
-    output?: OutputInfo;
-    message?: string;
-  };
-}
-
-/**
- * Response from schedule operation
- */
-interface SchedulePostResponse {
-  success: boolean;
-  data: {
-    post?: PostInfo;
-    output?: OutputInfo;
-    scheduledFor: string;
-    message?: string;
-  };
 }
 
 /**
@@ -67,8 +76,9 @@ function withAuth(accessToken?: string, options: RequestOptions = {}): RequestOp
  * @param token - Optional auth token
  */
 export async function approvePost(postId: string, token?: string): Promise<PostInfo> {
-  const response = await apiClient.post<PostMutationResponse>(
+  const response = await apiClient.post(
     `/api/posts/${encodeURIComponent(postId)}/approve`,
+    postMutationResponseSchema,
     {},
     withAuth(token)
   );
@@ -87,8 +97,9 @@ export async function approvePost(postId: string, token?: string): Promise<PostI
  * @param token - Optional auth token
  */
 export async function publishPost(postId: string, token?: string): Promise<PostInfo> {
-  const response = await apiClient.post<PostMutationResponse>(
+  const response = await apiClient.post(
     `/api/posts/${encodeURIComponent(postId)}/publish`,
+    postMutationResponseSchema,
     {},
     withAuth(token)
   );
@@ -112,8 +123,9 @@ export async function schedulePost(
   scheduledFor: Date,
   token?: string
 ): Promise<PostInfo> {
-  const response = await apiClient.post<SchedulePostResponse>(
+  const response = await apiClient.post(
     `/api/posts/${encodeURIComponent(postId)}/schedule`,
+    schedulePostResponseSchema,
     { scheduledFor: scheduledFor.toISOString() },
     withAuth(token)
   );
@@ -135,8 +147,9 @@ export async function schedulePost(
  * @param token - Optional auth token
  */
 export async function deletePost(postId: string, token?: string): Promise<void> {
-  await apiClient.delete<PostMutationResponse>(
+  await apiClient.delete(
     `/api/posts/${encodeURIComponent(postId)}`,
+    postMutationResponseSchema,
     withAuth(token)
   );
 }
@@ -157,8 +170,9 @@ export async function updatePost(
   },
   token?: string
 ): Promise<PostInfo> {
-  const response = await apiClient.patch<PostMutationResponse>(
+  const response = await apiClient.patch(
     `/api/posts/${encodeURIComponent(postId)}`,
+    postMutationResponseSchema,
     updates,
     withAuth(token)
   );

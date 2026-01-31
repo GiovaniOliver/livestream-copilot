@@ -250,7 +250,7 @@ export default function SettingsPage() {
       try {
         setOBSSettings(JSON.parse(storedOBS));
       } catch {
-        console.error("Failed to parse OBS settings from localStorage");
+        logger.error("Failed to parse OBS settings from localStorage");
       }
     }
 
@@ -258,7 +258,7 @@ export default function SettingsPage() {
       try {
         setGeneralSettings(JSON.parse(storedGeneral));
       } catch {
-        console.error("Failed to parse general settings from localStorage");
+        logger.error("Failed to parse general settings from localStorage");
       }
     }
   }, []);
@@ -947,4 +947,5 @@ export default function SettingsPage() {
       </div>
     </>
   );
+import { logger } from "@/lib/logger";
 }

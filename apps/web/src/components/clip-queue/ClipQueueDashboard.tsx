@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Badge, Button, Card } from "@/components/ui";
 import { ClipQueueItemCard, type ClipQueueItem } from "./ClipQueueItemCard";
+import { logger } from "@/lib/logger";
 
 interface ClipQueueDashboardProps {
   sessionId: string;
@@ -39,9 +40,9 @@ export function ClipQueueDashboard({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const apiBase = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3001";
-  // WebSocket runs on a separate port (default: 3002 for dev, configured via NEXT_PUBLIC_DESKTOP_WS_URL)
-  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3002";
+  const apiBase = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  // WebSocket runs on a separate port (default: 3124 for dev, configured via NEXT_PUBLIC_DESKTOP_WS_URL)
+  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3124";
 
   // Fetch queue items
   const fetchItems = useCallback(async () => {
@@ -70,7 +71,7 @@ export function ClipQueueDashboard({
     const ws = new WebSocket(wsBase);
 
     ws.onopen = () => {
-      console.log("[clip-queue] WebSocket connected");
+      logger.debug("[clip-queue] WebSocket connected");
     };
 
     ws.onmessage = (event) => {
@@ -129,11 +130,11 @@ export function ClipQueueDashboard({
     };
 
     ws.onerror = () => {
-      console.error("[clip-queue] WebSocket error");
+      logger.error("[clip-queue] WebSocket error");
     };
 
     ws.onclose = () => {
-      console.log("[clip-queue] WebSocket closed");
+      logger.debug("[clip-queue] WebSocket closed");
     };
 
     return () => {

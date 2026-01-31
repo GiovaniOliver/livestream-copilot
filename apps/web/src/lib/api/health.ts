@@ -1,13 +1,17 @@
 /**
  * Health check API methods for FluxBoard
+ * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
 import { apiClient } from "./client";
-
-/**
- * Overall health status
- */
-export type HealthStatus = "healthy" | "degraded" | "unhealthy";
+import {
+  healthResponseSchema,
+  agentsStatusResponseSchema,
+  ffmpegStatusResponseSchema,
+  systemResourcesResponseSchema,
+  pingResponseSchema,
+  type HealthStatus,
+} from "./schemas";
 
 /**
  * Component health information
@@ -94,21 +98,21 @@ export interface FFmpegStatusResponse {
  * Get overall health status
  */
 export async function getHealth(): Promise<HealthResponse> {
-  return apiClient.get<HealthResponse>("/api/health");
+  return apiClient.get("/api/health", healthResponseSchema);
 }
 
 /**
  * Get agents status
  */
 export async function getAgentsStatus(): Promise<AgentsStatusResponse> {
-  return apiClient.get<AgentsStatusResponse>("/api/health/agents");
+  return apiClient.get("/api/health/agents", agentsStatusResponseSchema);
 }
 
 /**
  * Get FFmpeg status
  */
 export async function getFFmpegStatus(): Promise<FFmpegStatusResponse> {
-  return apiClient.get<FFmpegStatusResponse>("/api/health/ffmpeg");
+  return apiClient.get("/api/health/ffmpeg", ffmpegStatusResponseSchema);
 }
 
 /**
@@ -116,7 +120,7 @@ export async function getFFmpegStatus(): Promise<FFmpegStatusResponse> {
  */
 export async function ping(): Promise<boolean> {
   try {
-    await apiClient.get<{ ok: boolean }>("/api/health/ping");
+    await apiClient.get("/api/health/ping", pingResponseSchema);
     return true;
   } catch {
     return false;
@@ -131,7 +135,7 @@ export async function getSystemResources(): Promise<{
   memory: { used: number; total: number; percent: number };
   disk: { used: number; total: number; percent: number };
 }> {
-  return apiClient.get("/api/health/resources");
+  return apiClient.get("/api/health/resources", systemResourcesResponseSchema);
 }
 
 /**

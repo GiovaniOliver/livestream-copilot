@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Icons
@@ -155,7 +156,7 @@ export function DownloadButton({
         setProgress(0);
       }, 2000);
     } catch (error) {
-      console.error("Download failed:", error);
+      logger.error("Download failed:", error);
       setIsDownloading(false);
       setProgress(0);
       // TODO: Show error toast

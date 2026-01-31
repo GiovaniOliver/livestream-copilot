@@ -20,6 +20,7 @@ import {
   type ExportJobStatus,
 } from "@/lib/api/export";
 import { ApiError } from "@/lib/api/client";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // useExport Hook
@@ -201,7 +202,7 @@ export function useExport(options: UseExportOptions = {}) {
                 fileSize = downloadInfo.fileSize;
               } catch (downloadError) {
                 // Use a placeholder if download URL fetch fails
-                console.error("Failed to get download URL:", downloadError);
+                logger.error("Failed to get download URL:", downloadError);
                 downloadUrl = `/api/v1/export/${exportId}/download`;
               }
             }
@@ -255,7 +256,7 @@ export function useExport(options: UseExportOptions = {}) {
             : new Error("Unknown error occurred while checking export status");
 
         // Don't stop polling on transient errors, just log them
-        console.error("Export status poll error:", apiError);
+        logger.error("Export status poll error:", apiError);
 
         // If we've had too many consecutive errors, give up
         if (pollAttemptsRef.current > 5) {

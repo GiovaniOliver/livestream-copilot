@@ -3,10 +3,27 @@
  *
  * All API calls support optional authentication via accessToken parameter.
  * When provided, the Authorization header will be included in requests.
+ *
+ * Enhanced with comprehensive Zod schema validation for runtime type safety.
  */
 
 import { apiClient, type RequestOptions } from "./client";
 import type { SessionConfig } from "@livestream-copilot/shared";
+import {
+  getSessionsResponseSchema,
+  getSessionByIdResponseSchema,
+  startSessionResponseSchema,
+  endSessionResponseSchema,
+  forceStopSessionResponseSchema,
+  sessionStatusResponseSchema,
+  getSessionOutputsResponseSchema,
+  updateSessionResponseSchema,
+  apiResponseSchema,
+  sessionListItemSchema,
+  sessionOutputSchema,
+  type SessionListItem,
+  type PaginationInfo,
+} from "./schemas";
 
 /**
  * Create request options with optional auth header
@@ -20,55 +37,6 @@ function withAuth(accessToken?: string, options: RequestOptions = {}): RequestOp
       ...options.headers,
       Authorization: `Bearer ${accessToken}`,
     },
-  };
-}
-
-/**
- * Session list item returned from the API
- */
-export interface SessionListItem {
-  id: string;
-  workflow: SessionConfig["workflow"];
-  captureMode: SessionConfig["captureMode"];
-  title: string | null;
-  participants: string[];
-  startedAt: string; // ISO date
-  endedAt: string | null;
-  isActive: boolean;
-  counts: {
-    events: number;
-    outputs: number;
-    clips: number;
-  };
-}
-
-/**
- * Pagination info from API responses
- */
-export interface PaginationInfo {
-  limit: number;
-  offset: number;
-  total: number;
-}
-
-/**
- * Response from GET /api/sessions
- */
-export interface GetSessionsResponse {
-  success: boolean;
-  data: {
-    sessions: SessionListItem[];
-    pagination: PaginationInfo;
-  };
-}
-
-/**
- * Response from GET /api/sessions/:id
- */
-export interface GetSessionByIdResponse {
-  success: boolean;
-  data: {
-    session: SessionListItem;
   };
 }
 
@@ -123,6 +91,19 @@ export interface EndSessionResponse {
 }
 
 /**
+ * Session output item
+ */
+export interface SessionOutput {
+  id: string;
+  sessionId: string;
+  type: string;
+  label: string | null;
+  content: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+/**
  * Get all sessions from the backend API
  * @param limit - Maximum number of sessions to return (default: 50)
  * @param offset - Number of sessions to skip (default: 0)
@@ -133,8 +114,9 @@ export async function getSessions(
   offset = 0,
   accessToken?: string
 ): Promise<{ sessions: SessionListItem[]; pagination: PaginationInfo }> {
-  const response = await apiClient.get<GetSessionsResponse>(
+  const response = await apiClient.get(
     "/api/sessions",
+    getSessionsResponseSchema,
     withAuth(accessToken, { params: { limit, offset } })
   );
 
@@ -154,8 +136,9 @@ export async function getSessionById(
   id: string,
   accessToken?: string
 ): Promise<SessionListItem> {
-  const response = await apiClient.get<GetSessionByIdResponse>(
+  const response = await apiClient.get(
     `/api/sessions/${encodeURIComponent(id)}`,
+    getSessionByIdResponseSchema,
     withAuth(accessToken)
   );
 
@@ -222,8 +205,9 @@ export async function startSession(
     participants: config.participants || [],
   };
 
-  return apiClient.post<StartSessionResponse>(
+  return apiClient.post(
     "/session/start",
+    startSessionResponseSchema,
     backendConfig,
     withAuth(accessToken)
   );
@@ -239,15 +223,9 @@ export async function endSession(
   id: string,
   accessToken?: string
 ): Promise<EndSessionResponse> {
-  const response = await apiClient.post<{
-    success: boolean;
-    data: {
-      session: SessionListItem;
-      duration?: number;
-      message?: string;
-    };
-  }>(
+  const response = await apiClient.post(
     `/api/sessions/${encodeURIComponent(id)}/end`,
+    endSessionResponseSchema,
     {},
     withAuth(accessToken)
   );
@@ -274,29 +252,12 @@ export async function endSession(
 export async function forceStopSession(
   accessToken?: string
 ): Promise<{ ok: boolean; message: string }> {
-  return apiClient.post<{ ok: boolean; message: string }>(
+  return apiClient.post(
     "/session/force-stop",
+    forceStopSessionResponseSchema,
     {},
     withAuth(accessToken)
   );
-}
-
-/**
- * Response shape from GET /session/status endpoint
- */
-interface SessionStatusResponse {
-  ok: boolean;
-  active: boolean;
-  sessionId?: string;
-  workflow?: SessionConfig["workflow"];
-  captureMode?: SessionConfig["captureMode"];
-  title?: string;
-  participants?: Array<{ id: string; name: string }>;
-  startedAt?: number;
-  elapsed?: number;
-  // Legacy fields (for backward compatibility)
-  session?: SessionConfig;
-  t0?: number;
 }
 
 /**
@@ -307,8 +268,9 @@ export async function getActiveSession(
   accessToken?: string
 ): Promise<SessionDetails | null> {
   try {
-    const response = await apiClient.get<SessionStatusResponse>(
+    const response = await apiClient.get(
       "/session/status",
+      sessionStatusResponseSchema,
       withAuth(accessToken)
     );
 
@@ -345,37 +307,6 @@ export async function getActiveSession(
 }
 
 /**
- * Response from GET /api/sessions/:id/outputs
- */
-export interface GetSessionOutputsResponse {
-  success: boolean;
-  data: {
-    outputs: Array<{
-      id: string;
-      sessionId: string;
-      type: string;
-      label: string | null;
-      content: string;
-      metadata: Record<string, unknown> | null;
-      createdAt: string;
-    }>;
-  };
-}
-
-/**
- * Session output item
- */
-export interface SessionOutput {
-  id: string;
-  sessionId: string;
-  type: string;
-  label: string | null;
-  content: string;
-  metadata: Record<string, unknown> | null;
-  createdAt: string;
-}
-
-/**
  * Get outputs for a specific session
  * @param id - Session ID
  * @param accessToken - Optional access token for authentication
@@ -384,8 +315,9 @@ export async function getSessionOutputs(
   id: string,
   accessToken?: string
 ): Promise<SessionOutput[]> {
-  const response = await apiClient.get<GetSessionOutputsResponse>(
+  const response = await apiClient.get(
     `/api/sessions/${encodeURIComponent(id)}/outputs`,
+    getSessionOutputsResponseSchema,
     withAuth(accessToken)
   );
 
@@ -394,16 +326,6 @@ export async function getSessionOutputs(
   }
 
   return response.data.outputs;
-}
-
-/**
- * Update session response
- */
-export interface UpdateSessionResponse {
-  success: boolean;
-  data: {
-    session: SessionListItem;
-  };
 }
 
 /**
@@ -417,8 +339,9 @@ export async function updateSession(
   updates: { title?: string; participants?: string[] },
   accessToken?: string
 ): Promise<SessionListItem> {
-  const response = await apiClient.patch<UpdateSessionResponse>(
+  const response = await apiClient.patch(
     `/api/sessions/${encodeURIComponent(id)}`,
+    updateSessionResponseSchema,
     updates,
     withAuth(accessToken)
   );
@@ -439,8 +362,11 @@ export async function deleteSession(
   id: string,
   accessToken?: string
 ): Promise<void> {
-  const response = await apiClient.delete<{ success: boolean }>(
+  const deleteResponseSchema = apiResponseSchema(sessionListItemSchema.optional());
+
+  const response = await apiClient.delete(
     `/api/sessions/${encodeURIComponent(id)}`,
+    deleteResponseSchema,
     withAuth(accessToken)
   );
 
@@ -448,3 +374,6 @@ export async function deleteSession(
     throw new Error(`Failed to delete session ${id}`);
   }
 }
+
+// Re-export types from schemas for convenience
+export type { SessionListItem, PaginationInfo };

@@ -8,6 +8,7 @@ import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { logger } from "@/lib/logger";
 
 interface PasswordRequirement {
   label: string;
@@ -115,7 +116,7 @@ export default function RegisterPage() {
       });
     } catch (error) {
       // Error is handled by AuthContext
-      console.error('Registration error:', error);
+      logger.error('Registration error:', error);
     }
   };
 

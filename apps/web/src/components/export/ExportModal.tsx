@@ -17,6 +17,7 @@ import type {
   CaptionTemplate,
 } from "./types";
 import { PLATFORM_CONFIGS, DEFAULT_CAPTION_TEMPLATES } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Icons
@@ -228,7 +229,7 @@ export function ExportModal({
         onClose();
       }, 1500);
     } catch (error) {
-      console.error("Export failed:", error);
+      logger.error("Export failed:", error);
     } finally {
       setIsExporting(false);
     }

@@ -16,6 +16,7 @@ import {
 } from "@/lib/api/outputs";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 /**
  * Idea interface matching the brainstorm dashboard's expected format
@@ -198,7 +199,7 @@ export function useIdeas(
 
         setPagination(ideasResult.pagination);
       } catch (err) {
-        console.error("Failed to load ideas:", err);
+        logger.error("Failed to load ideas:", err);
         setError(err instanceof Error ? err.message : "Failed to load ideas");
       } finally {
         setIsLoading(false);

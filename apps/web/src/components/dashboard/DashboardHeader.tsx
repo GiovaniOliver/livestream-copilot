@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 interface SessionInfo {
   id: string;
   name: string;
-  status: "live" | "paused" | "ended";
+  status: "live" | "paused" | "ended" | "active";
   duration?: string;
   workflow?: string;
 }
@@ -17,6 +17,8 @@ interface DashboardHeaderProps {
   title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
+  /** Whether there's an actual live stream (overrides session.status for Live indicator) */
+  isStreaming?: boolean;
 }
 
 const ChevronRightIcon = () => (
@@ -43,8 +45,24 @@ export function DashboardHeader({
   title,
   subtitle,
   actions,
+  isStreaming,
 }: DashboardHeaderProps) {
-  const getStatusBadge = (status: SessionInfo["status"]) => {
+  const getStatusBadge = (status: SessionInfo["status"], actuallyStreaming?: boolean) => {
+    // If isStreaming is explicitly provided, use that for "Live" display
+    if (actuallyStreaming === true) {
+      return (
+        <Badge variant="error" className="gap-1.5">
+          <LiveIndicator />
+          Live
+        </Badge>
+      );
+    }
+
+    // If isStreaming is explicitly false but session is active, show "Active" not "Live"
+    if (actuallyStreaming === false && (status === "live" || status === "active")) {
+      return <Badge variant="default">Active</Badge>;
+    }
+
     switch (status) {
       case "live":
         return (
@@ -53,6 +71,8 @@ export function DashboardHeader({
             Live
           </Badge>
         );
+      case "active":
+        return <Badge variant="default">Active</Badge>;
       case "paused":
         return <Badge variant="warning">Paused</Badge>;
       case "ended":
@@ -109,7 +129,7 @@ export function DashboardHeader({
         {/* Center: Session Status (if available) */}
         {session && (
           <div className="flex items-center gap-4">
-            {getStatusBadge(session.status)}
+            {getStatusBadge(session.status, isStreaming)}
             {session.duration && (
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-text-muted">Duration:</span>

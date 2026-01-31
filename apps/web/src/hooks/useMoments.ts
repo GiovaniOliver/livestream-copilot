@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/moments";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 /**
  * Moment with display-friendly properties
@@ -164,7 +165,7 @@ export function useMoments(
 
         setPagination(result.pagination);
       } catch (err) {
-        console.error("Failed to load moments:", err);
+        logger.error("Failed to load moments:", err);
         setError(err instanceof Error ? err.message : "Failed to load moments");
         // Keep existing data on error
       } finally {

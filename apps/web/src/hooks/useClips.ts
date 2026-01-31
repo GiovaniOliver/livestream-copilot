@@ -170,7 +170,7 @@ export function useClips(
 
         setPagination(result.pagination);
       } catch (err) {
-        console.error("Failed to load clips:", err);
+        logger.error("Failed to load clips:", err);
         setError(err instanceof Error ? err.message : "Failed to load clips");
         // Keep existing data on error
       } finally {
@@ -302,10 +302,11 @@ export function useClip(clipId: string): {
 
       // Import getClip lazily to avoid circular deps
       const { getClip } = await import("@/lib/api/clips");
+import { logger } from "@/lib/logger";
       const apiClip = await getClip(clipId, accessToken || undefined);
       setClip(transformClip(apiClip));
     } catch (err) {
-      console.error("Failed to load clip:", err);
+      logger.error("Failed to load clip:", err);
       setError(err instanceof Error ? err.message : "Failed to load clip");
       setClip(null);
     } finally {

@@ -1,49 +1,17 @@
 /**
  * Clip API methods for FluxBoard
+ * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
 import { apiClient } from "./client";
-
-/**
- * Clip artifact information from the API
- */
-export interface ClipInfo {
-  id: string;
-  artifactId: string;
-  sessionId: string;
-  path: string;
-  t0: number;
-  t1: number;
-  duration: number;
-  thumbnailId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Response from the clips list endpoint
- */
-interface ClipsListResponse {
-  success: boolean;
-  data: {
-    clips: ClipInfo[];
-    pagination: {
-      limit: number;
-      offset: number;
-      total: number;
-    };
-  };
-}
-
-/**
- * Response from the get clip endpoint
- */
-interface ClipResponse {
-  success: boolean;
-  data: {
-    clip: ClipInfo;
-  };
-}
+import {
+  clipsListResponseSchema,
+  clipResponseSchema,
+  clipIntentResponseSchema,
+  exportClipResponseSchema,
+  apiResponseSchema,
+  type ClipInfo,
+} from "./schemas";
 
 /**
  * Clip intent start/end response
@@ -73,8 +41,9 @@ export async function getSessionClips(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await apiClient.get<ClipsListResponse>(
+  const response = await apiClient.get(
     `/api/sessions/${sessionId}/clips`,
+    clipsListResponseSchema,
     {
       params: { limit, offset },
       headers,
@@ -95,7 +64,12 @@ export async function getClip(id: string, token?: string): Promise<ClipInfo> {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await apiClient.get<ClipResponse>(`/api/clips/${id}`, { headers });
+  const response = await apiClient.get(
+    `/api/clips/${id}`,
+    clipResponseSchema,
+    { headers }
+  );
+
   return response.data.clip;
 }
 
@@ -108,7 +82,11 @@ export async function startClip(
   t: number,
   source: "gesture" | "voice" | "button" | "api" = "api"
 ): Promise<ClipIntentResponse> {
-  return apiClient.post<ClipIntentResponse>("/api/clips/start", { t, source });
+  return apiClient.post(
+    "/api/clips/start",
+    clipIntentResponseSchema,
+    { t, source }
+  );
 }
 
 /**
@@ -120,7 +98,11 @@ export async function endClip(
   t: number,
   source: "gesture" | "voice" | "button" | "api" = "api"
 ): Promise<ClipIntentResponse> {
-  return apiClient.post<ClipIntentResponse>("/api/clips/end", { t, source });
+  return apiClient.post(
+    "/api/clips/end",
+    clipIntentResponseSchema,
+    { t, source }
+  );
 }
 
 /**
@@ -155,7 +137,13 @@ export async function deleteClip(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  return apiClient.delete<{ success: boolean }>(`/api/clips/${id}`, { headers });
+  const deleteResponseSchema = apiResponseSchema(undefined);
+
+  return apiClient.delete(
+    `/api/clips/${id}`,
+    deleteResponseSchema,
+    { headers }
+  );
 }
 
 /**
@@ -167,8 +155,12 @@ export async function exportClip(
   artifactId: string,
   format: "mp4" | "webm" | "gif" = "mp4"
 ): Promise<{ exportId: string; status: string }> {
-  return apiClient.post<{ exportId: string; status: string }>(
+  return apiClient.post(
     `/api/clips/${artifactId}/export`,
+    exportClipResponseSchema,
     { format }
   );
 }
+
+// Re-export types for convenience
+export type { ClipInfo };

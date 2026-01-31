@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { VideoPlayer } from "./VideoPlayer";
 import type { Clip } from "@/components/dashboards/streamer/types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Types
@@ -329,7 +330,7 @@ export function ClipPreviewModal({
               autoPlay
               className="w-full"
               onError={(error) => {
-                console.error("Video playback error:", error);
+                logger.error("Video playback error:", error);
               }}
             />
           </div>

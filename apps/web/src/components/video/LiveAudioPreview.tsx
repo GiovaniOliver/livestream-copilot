@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Types
@@ -222,7 +223,7 @@ export function LiveAudioPreview({
       setAudioContext(ctx);
       setAnalyser(analyserNode);
     } catch (err) {
-      console.error("Failed to set up audio analyzer:", err);
+      logger.error("Failed to set up audio analyzer:", err);
     }
   }, []);
 

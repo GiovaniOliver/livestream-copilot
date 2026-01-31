@@ -17,6 +17,7 @@ import {
   type PostInfo,
 } from "@/lib/api/posts";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 /**
  * Loading state for each operation
@@ -56,7 +57,7 @@ export interface UsePostsReturn {
  *
  * const handleApprove = async (postId: string) => {
  *   const success = await approvePost(postId, (post) => {
- *     console.log('Post approved:', post);
+ *     logger.debug('Post approved:', post);
  *     refreshPosts(); // Refresh the post list
  *   });
  * };
@@ -98,7 +99,7 @@ export function usePosts(): UsePostsReturn {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to approve post";
         setError(message);
-        console.error("Failed to approve post:", err);
+        logger.error("Failed to approve post:", err);
         return false;
       } finally {
         setOperationState((prev) => ({ ...prev, isApproving: false }));
@@ -122,7 +123,7 @@ export function usePosts(): UsePostsReturn {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to publish post";
         setError(message);
-        console.error("Failed to publish post:", err);
+        logger.error("Failed to publish post:", err);
         return false;
       } finally {
         setOperationState((prev) => ({ ...prev, isPublishing: false }));
@@ -150,7 +151,7 @@ export function usePosts(): UsePostsReturn {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to schedule post";
         setError(message);
-        console.error("Failed to schedule post:", err);
+        logger.error("Failed to schedule post:", err);
         return false;
       } finally {
         setOperationState((prev) => ({ ...prev, isScheduling: false }));
@@ -174,7 +175,7 @@ export function usePosts(): UsePostsReturn {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to delete post";
         setError(message);
-        console.error("Failed to delete post:", err);
+        logger.error("Failed to delete post:", err);
         return false;
       } finally {
         setOperationState((prev) => ({ ...prev, isDeleting: false }));

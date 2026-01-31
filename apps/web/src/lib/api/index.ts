@@ -6,6 +6,7 @@
  * @example
  * ```ts
  * import { sessions, clips, stt, health, websocket, outputs, moments } from "@/lib/api";
+import { logger } from "@/lib/logger";
  *
  * // Start a session
  * const session = await sessions.startSession({
@@ -18,7 +19,7 @@
  * const ws = websocket.getWebSocketManager();
  * ws.connect();
  * ws.on("transcript_segment", (segment) => {
- *   console.log("New transcript:", segment);
+ *   logger.debug("New transcript:", segment);
  * });
  *
  * // Get outputs for a session

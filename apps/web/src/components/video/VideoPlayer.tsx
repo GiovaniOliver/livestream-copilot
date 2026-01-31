@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Types
@@ -167,7 +168,7 @@ export function VideoPlayer({
       videoRef.current.pause();
     } else {
       videoRef.current.play().catch((err) => {
-        console.error("Play failed:", err);
+        logger.error("Play failed:", err);
       });
     }
   }, [isPlaying]);

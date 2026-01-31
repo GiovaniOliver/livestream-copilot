@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import type { ShowNotesResult } from "./types";
+import { logger } from "@/lib/logger";
 
 export interface ShowNotesPanelProps {
   showNotes?: ShowNotesResult | null;
@@ -31,7 +32,7 @@ export function ShowNotesPanel({
       setCopiedSection(section);
       setTimeout(() => setCopiedSection(null), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   }, []);
 

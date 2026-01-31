@@ -10,6 +10,7 @@ import { MomentRail, type Moment, type MomentType } from "./MomentRail";
 import { ClipPreviewModal } from "@/components/video";
 import { getClipMediaUrl } from "@/lib/api/clips";
 import type { Clip } from "@/components/dashboards/streamer/types";
+import { logger } from "@/lib/logger";
 
 interface ProducerDeskDashboardProps {
   sessionId: string;
@@ -215,12 +216,12 @@ export function ProducerDeskDashboard({
   }, []);
 
   const handleExportClip = useCallback((clip: ClipData) => {
-    console.log("Export clip:", clip.id);
+    logger.debug("Export clip:", clip.id);
     // TODO: Open export modal with clip data
   }, []);
 
   const handleEditHook = useCallback((clipId: string, hookIndex: number) => {
-    console.log("Edit hook:", clipId, hookIndex);
+    logger.debug("Edit hook:", clipId, hookIndex);
     // TODO: Open inline editor for hook variant
   }, []);
 
@@ -344,17 +345,17 @@ export function ProducerDeskDashboard({
 
   // Moment handlers
   const handleMomentClick = useCallback((moment: Moment) => {
-    console.log("Jump to moment:", moment.id, moment.timestamp);
+    logger.debug("Jump to moment:", moment.id, moment.timestamp);
     // TODO: Seek to moment timestamp in video player
   }, []);
 
   const handleMomentDelete = useCallback((momentId: string) => {
-    console.log("Delete moment:", momentId);
+    logger.debug("Delete moment:", momentId);
     // TODO: Call API to delete moment
   }, []);
 
   const handleAddMoment = useCallback(async (timestamp: number) => {
-    console.log("Add moment at:", timestamp);
+    logger.debug("Add moment at:", timestamp);
     try {
       // Create moment via API
       await createMoment({
@@ -363,7 +364,7 @@ export function ProducerDeskDashboard({
         timestamp,
       });
     } catch (error) {
-      console.error("Failed to create moment:", error);
+      logger.error("Failed to create moment:", error);
     }
   }, [createMoment]);
 

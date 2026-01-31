@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { logger } from "@/lib/logger";
 
 // Gesture categories that MediaPipe can detect
 export type GestureCategory =
@@ -130,10 +131,10 @@ export function useMediaPipeGestures(
           gestureRecognizerRef.current = gestureRecognizer;
           setIsReady(true);
           setIsLoading(false);
-          console.log("[MediaPipe] Gesture recognizer loaded successfully");
+          logger.debug("[MediaPipe] Gesture recognizer loaded successfully");
         }
       } catch (err) {
-        console.error("[MediaPipe] Failed to load:", err);
+        logger.error("[MediaPipe] Failed to load:", err);
         if (mounted) {
           setError(err instanceof Error ? err.message : "Failed to load MediaPipe");
           setIsLoading(false);
@@ -226,7 +227,7 @@ export function useMediaPipeGestures(
                   gestureHoldStartRef.current = null;
                   lastGestureRef.current = null;
 
-                  console.log(
+                  logger.debug(
                     `[MediaPipe] Gesture detected: ${label} (${(confidence * 100).toFixed(1)}%)`
                   );
                 }
@@ -250,7 +251,7 @@ export function useMediaPipeGestures(
         gestureHoldStartRef.current = null;
       }
     } catch (err) {
-      console.error("[MediaPipe] Processing error:", err);
+      logger.error("[MediaPipe] Processing error:", err);
     }
 
     animationFrameRef.current = requestAnimationFrame(processFrame);
@@ -295,7 +296,7 @@ export function useMediaPipeWithBackend(
   options: Omit<UseMediaPipeGesturesOptions, "onGestureDetected">
 ) {
   const wsRef = useRef<WebSocket | null>(null);
-  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3002";
+  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3124";
 
   // Connect to WebSocket
   useEffect(() => {
@@ -304,11 +305,11 @@ export function useMediaPipeWithBackend(
     const ws = new WebSocket(wsBase);
 
     ws.onopen = () => {
-      console.log("[MediaPipe] WebSocket connected for gesture events");
+      logger.debug("[MediaPipe] WebSocket connected for gesture events");
     };
 
     ws.onerror = (err) => {
-      console.error("[MediaPipe] WebSocket error:", err);
+      logger.error("[MediaPipe] WebSocket error:", err);
     };
 
     wsRef.current = ws;
@@ -341,7 +342,7 @@ export function useMediaPipeWithBackend(
       };
 
       wsRef.current.send(JSON.stringify(message));
-      console.log(`[MediaPipe] Sent detection to backend: ${detection.label}`);
+      logger.debug(`[MediaPipe] Sent detection to backend: ${detection.label}`);
     },
     [sessionId]
   );

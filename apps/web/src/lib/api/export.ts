@@ -12,6 +12,7 @@ import type {
   SocialPlatform,
   ExportFormatOptions,
 } from "@/components/export/types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // API Request/Response Types
@@ -116,7 +117,7 @@ export async function startExport(
  * ```ts
  * const status = await getExportStatus("export-456");
  * if (status.status === "completed") {
- *   console.log("Download URL:", status.downloadUrl);
+ *   logger.debug("Download URL:", status.downloadUrl);
  * }
  * ```
  */

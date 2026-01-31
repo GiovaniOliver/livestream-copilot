@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { GestureDetectionOverlay } from "@/components/gesture-detection";
+import type { GestureDetection } from "@/hooks/useMediaPipeGestures";
 
 // ============================================================
 // Types
@@ -23,6 +25,14 @@ export interface LiveVideoPreviewProps {
   onError?: (error: Error) => void;
   /** Whether the stream is expected to be active */
   isStreamActive?: boolean;
+  /** Session ID for gesture detection */
+  sessionId?: string | null;
+  /** Enabled gestures for detection */
+  enabledGestures?: string[];
+  /** Whether gesture detection is enabled */
+  gestureDetectionEnabled?: boolean;
+  /** Callback when a gesture triggers a clip */
+  onGestureTrigger?: (gesture: GestureDetection) => void;
 }
 
 // ============================================================
@@ -115,12 +125,16 @@ function ExclamationIcon({ className }: { className?: string }) {
 // ============================================================
 
 export function LiveVideoPreview({
-  webrtcUrl = "ws://localhost:8889/stream",
-  hlsUrl = "http://localhost:8888/stream/index.m3u8",
+  webrtcUrl = "http://localhost:8889/live/stream",
+  hlsUrl = "http://localhost:8888/live/stream/index.m3u8",
   className,
   onConnectionChange,
   onError,
   isStreamActive = false,
+  sessionId = null,
+  enabledGestures = [],
+  gestureDetectionEnabled = false,
+  onGestureTrigger,
 }: LiveVideoPreviewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -561,6 +575,17 @@ export function LiveVideoPreview({
         muted
         controls={false}
       />
+
+      {/* Gesture Detection Overlay */}
+      {connectionState === "connected" && gestureDetectionEnabled && (
+        <GestureDetectionOverlay
+          sessionId={sessionId}
+          videoRef={videoRef}
+          enabledGestures={enabledGestures}
+          enabled={gestureDetectionEnabled}
+          onGestureTrigger={onGestureTrigger}
+        />
+      )}
 
       {/* State-based Content */}
       {renderContent()}

@@ -14,6 +14,7 @@ import {
   getContentCreatorActions,
   getContentCreatorAutoActions,
 } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Action Hook State
@@ -103,13 +104,13 @@ export function useActions(): UseActionsReturn {
     async (actionId: string, inputs?: Record<string, unknown>) => {
       const action = actions.find((a) => a.actionId === actionId);
       if (!action) {
-        console.error(`Action not found: ${actionId}`);
+        logger.error(`Action not found: ${actionId}`);
         return;
       }
 
       // Check cooldown
       if (state.cooldowns[actionId] && state.cooldowns[actionId] > Date.now()) {
-        console.warn(`Action ${actionId} is on cooldown`);
+        logger.warn(`Action ${actionId} is on cooldown`);
         return;
       }
 

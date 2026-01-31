@@ -7,6 +7,7 @@ import { WORKFLOW_TYPES, WORKFLOW_META, CAPTURE_MODES, type WorkflowType, type C
 import { getCaptureModeLabel, getWorkflowPath } from "@/lib/stores/sessions";
 import { useSessions } from "@/hooks/useSessions";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface NewSessionModalProps {
   isOpen: boolean;
@@ -103,12 +104,14 @@ function mapFrontendCaptureModeToBackend(captureMode: CaptureMode): string {
 
 export function NewSessionModal({ isOpen, onClose, onSessionCreated }: NewSessionModalProps) {
   const router = useRouter();
-  const { createSession } = useSessions(false); // Don't auto-connect WebSocket in modal
+  const { createSession, forceStop } = useSessions(false); // Don't auto-connect WebSocket in modal
   const [step, setStep] = useState<"workflow" | "details">("workflow");
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowType | null>(null);
   const [selectedCaptureMode, setSelectedCaptureMode] = useState<CaptureMode>(CAPTURE_MODES.AUDIO_VIDEO);
   const [sessionName, setSessionName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [conflictError, setConflictError] = useState<{ message: string; session?: any } | null>(null);
+  const [isForceStopping, setIsForceStopping] = useState(false);
 
   const handleWorkflowSelect = useCallback((workflow: WorkflowType) => {
     setSelectedWorkflow(workflow);
@@ -123,7 +126,13 @@ export function NewSessionModal({ isOpen, onClose, onSessionCreated }: NewSessio
     if (!selectedWorkflow || !sessionName.trim()) return;
 
     setIsCreating(true);
+    setConflictError(null);
     try {
+      logger.debug("[NewSessionModal] Creating session...", {
+        workflow: selectedWorkflow,
+        title: sessionName,
+        captureMode: selectedCaptureMode
+      });
       // Call the API to create a new session
       const response = await createSession({
         workflow: mapFrontendWorkflowToBackend(selectedWorkflow) as any,
@@ -131,18 +140,53 @@ export function NewSessionModal({ isOpen, onClose, onSessionCreated }: NewSessio
         title: sessionName.trim(),
       });
 
+      logger.debug("[NewSessionModal] Session created successfully:", response);
       onSessionCreated?.();
       onClose();
 
       // Navigate to the session dashboard
       const workflowPath = getWorkflowPath(selectedWorkflow);
       router.push(`/dashboard/session/${response.sessionId}/${workflowPath}`);
-    } catch (error) {
-      console.error("Failed to create session:", error);
+    } catch (error: any) {
+      logger.error("[NewSessionModal] Failed to create session:", error);
+
+      // Check if it's a conflict error (409)
+      const isConflict =
+        error.message?.includes("already active") ||
+        error.message?.includes("409") ||
+        error.status === 409 ||
+        (error as any).body?.error?.includes("already active") ||
+        (error as any).response?.status === 409;
+
+      if (isConflict) {
+        setConflictError({
+          message: error.message || "Session already active",
+        });
+      } else {
+        // Generic error
+        alert(`Failed to start session: ${error.message || "Unknown error"}`);
+      }
     } finally {
       setIsCreating(false);
     }
   }, [selectedWorkflow, sessionName, selectedCaptureMode, router, onClose, onSessionCreated, createSession]);
+
+  const handleForceStop = useCallback(async () => {
+    logger.debug("[NewSessionModal] Force stopping active session...");
+    setIsForceStopping(true);
+    try {
+      await forceStop();
+      logger.debug("[NewSessionModal] Force stop successful, retrying create...");
+      setConflictError(null);
+      // Automatically retry creation
+      handleCreate();
+    } catch (err: any) {
+      logger.error("[NewSessionModal] Failed to force stop session:", err);
+      alert("Failed to clear session state. Please check the backend logs.");
+    } finally {
+      setIsForceStopping(false);
+    }
+  }, [forceStop, handleCreate]);
 
   const handleClose = useCallback(() => {
     setStep("workflow");
@@ -277,6 +321,44 @@ export function NewSessionModal({ isOpen, onClose, onSessionCreated }: NewSessio
                 ))}
               </div>
             </div>
+
+            {/* Conflict Error / Force Stop */}
+            {conflictError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-red-500/20 text-red-500">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-500">Conflict: Session already active</p>
+                    <p className="mt-1 text-xs text-text-muted">
+                      There is already an active session in memory. This usually happens if a previous session wasn't stopped correctly.
+                    </p>
+                    <div className="mt-4 flex gap-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleForceStop}
+                        disabled={isForceStopping}
+                        className="h-8 border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20"
+                      >
+                        {isForceStopping ? "Stopping..." : "Clear Active Session & Retry"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setConflictError(null)}
+                        className="h-8"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex justify-end gap-3 border-t border-stroke pt-6">

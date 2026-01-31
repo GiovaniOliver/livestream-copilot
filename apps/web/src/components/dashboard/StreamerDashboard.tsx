@@ -15,6 +15,7 @@ import { VideoPlayer, ClipPreviewModal } from "@/components/video";
 import { getClipMediaUrl } from "@/lib/api/clips";
 import type { EventEnvelope } from "@livestream-copilot/shared";
 import type { Clip } from "@/components/dashboards/streamer/types";
+import { logger } from "@/lib/logger";
 
 interface StreamerDashboardProps {
   sessionId: string;
@@ -163,7 +164,7 @@ export function StreamerDashboard({ sessionId, wsUrl }: StreamerDashboardProps) 
   };
 
   const handleExportClip = (clip: Clip) => {
-    console.log("Export clip:", clip.id);
+    logger.debug("Export clip:", clip.id);
     // TODO: Implement export functionality
   };
 

@@ -2,30 +2,19 @@
  * Outputs API methods for FluxBoard
  *
  * Provides API methods for managing outputs (AI-generated post drafts, content suggestions, etc.)
+ * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
 import { apiClient, type RequestOptions } from "./client";
-
-/**
- * Output status types
- */
-export type OutputStatus = "draft" | "approved" | "published" | "archived";
-
-/**
- * Output information from the API
- */
-export interface OutputInfo {
-  id: string;
-  sessionId: string;
-  category: string;
-  title: string | null;
-  text: string;
-  refs: string[];
-  meta: Record<string, unknown> | null;
-  status: OutputStatus;
-  createdAt: string;
-  updatedAt: string;
-}
+import {
+  outputsListResponseSchema,
+  outputResponseSchema,
+  outputMutationResponseSchema,
+  approveAllResponseSchema,
+  type OutputStatus,
+  type OutputInfo,
+  type PaginationInfo,
+} from "./schemas";
 
 /**
  * Output with session information
@@ -35,58 +24,6 @@ export interface OutputWithSession extends OutputInfo {
     id: string;
     workflow: string;
     title: string | null;
-  };
-}
-
-/**
- * Pagination information
- */
-export interface PaginationInfo {
-  limit: number;
-  offset: number;
-  total: number;
-}
-
-/**
- * Response from the outputs list endpoint
- */
-interface OutputsListResponse {
-  success: boolean;
-  data: {
-    outputs: OutputInfo[];
-    pagination: PaginationInfo;
-  };
-}
-
-/**
- * Response from the get output endpoint
- */
-interface OutputResponse {
-  success: boolean;
-  data: {
-    output: OutputWithSession;
-  };
-}
-
-/**
- * Response from update/delete operations
- */
-interface OutputMutationResponse {
-  success: boolean;
-  data: {
-    output?: OutputInfo;
-    message?: string;
-  };
-}
-
-/**
- * Response from approve all drafts
- */
-interface ApproveAllResponse {
-  success: boolean;
-  data: {
-    message: string;
-    count: number;
   };
 }
 
@@ -132,8 +69,9 @@ export async function getSessionOutputs(
   if (category) params.category = category;
   if (status) params.status = status;
 
-  const response = await apiClient.get<OutputsListResponse>(
+  const response = await apiClient.get(
     "/api/outputs",
+    outputsListResponseSchema,
     withAuth(token, { params })
   );
 
@@ -146,8 +84,9 @@ export async function getSessionOutputs(
  * @param token - Optional auth token
  */
 export async function getOutput(id: string, token?: string): Promise<OutputWithSession> {
-  const response = await apiClient.get<OutputResponse>(
+  const response = await apiClient.get(
     `/api/outputs/${encodeURIComponent(id)}`,
+    outputResponseSchema,
     withAuth(token)
   );
 
@@ -171,8 +110,9 @@ export async function updateOutput(
   },
   token?: string
 ): Promise<OutputInfo> {
-  const response = await apiClient.patch<OutputMutationResponse>(
+  const response = await apiClient.patch(
     `/api/outputs/${encodeURIComponent(id)}`,
+    outputMutationResponseSchema,
     updates,
     withAuth(token)
   );
@@ -195,8 +135,9 @@ export async function updateOutputStatus(
   status: OutputStatus,
   token?: string
 ): Promise<OutputInfo> {
-  const response = await apiClient.patch<OutputMutationResponse>(
+  const response = await apiClient.patch(
     `/api/outputs/${encodeURIComponent(id)}/status`,
+    outputMutationResponseSchema,
     { status },
     withAuth(token)
   );
@@ -214,8 +155,9 @@ export async function updateOutputStatus(
  * @param token - Optional auth token
  */
 export async function deleteOutput(id: string, token?: string): Promise<void> {
-  await apiClient.delete<OutputMutationResponse>(
+  await apiClient.delete(
     `/api/outputs/${encodeURIComponent(id)}`,
+    outputMutationResponseSchema,
     withAuth(token)
   );
 }
@@ -229,11 +171,15 @@ export async function approveAllDrafts(
   sessionId: string,
   token?: string
 ): Promise<{ count: number }> {
-  const response = await apiClient.post<ApproveAllResponse>(
+  const response = await apiClient.post(
     `/api/sessions/${encodeURIComponent(sessionId)}/outputs/approve-all`,
+    approveAllResponseSchema,
     {},
     withAuth(token)
   );
 
   return { count: response.data.count };
 }
+
+// Re-export types for convenience
+export type { OutputStatus, OutputInfo, OutputWithSession, PaginationInfo };

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { logger } from "@/lib/logger";
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function OAuthCallbackPage() {
         // Redirect to dashboard
         router.push('/dashboard');
       } catch (err) {
-        console.error('OAuth callback error:', err);
+        logger.error('OAuth callback error:', err);
         setError('Failed to complete authentication');
       }
     };

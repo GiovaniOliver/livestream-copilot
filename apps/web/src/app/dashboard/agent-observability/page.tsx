@@ -11,6 +11,7 @@ import {
   Button,
   Badge,
 } from "@/components/ui";
+import { logger } from "@/lib/logger";
 
 // Storage key for API configuration
 const API_CONFIG_KEY = "fluxboard_api_config";
@@ -299,7 +300,7 @@ export default function AgentObservabilityPage() {
       }
     } catch (err) {
       setStatsError(err instanceof Error ? err.message : "Unknown error");
-      console.error("Failed to fetch agent stats:", err);
+      logger.error("Failed to fetch agent stats:", err);
     } finally {
       setStatsLoading(false);
     }
@@ -312,7 +313,7 @@ export default function AgentObservabilityPage() {
       try {
         setApiConfig(JSON.parse(stored));
       } catch {
-        console.error("Failed to parse API config from localStorage");
+        logger.error("Failed to parse API config from localStorage");
       }
     }
     fetchAgentStats();

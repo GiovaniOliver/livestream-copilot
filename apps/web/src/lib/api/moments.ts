@@ -2,58 +2,17 @@
  * Moments API methods for FluxBoard
  *
  * Provides API methods for managing moment markers (hype moments, Q&A, sponsor reads, etc.)
+ * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
 import { apiClient, type RequestOptions } from "./client";
-
-/**
- * Moment type categories
- */
-export type MomentType = "hype" | "qa" | "sponsor" | "clip" | "highlight" | "marker";
-
-/**
- * Moment information from the API
- */
-export interface MomentInfo {
-  id: string;
-  sessionId: string;
-  type: MomentType;
-  label: string;
-  description?: string;
-  timestamp: number; // in seconds from session start
-  clipId?: string;
-  createdAt: string;
-}
-
-/**
- * Pagination information
- */
-export interface PaginationInfo {
-  limit: number;
-  offset: number;
-  total: number;
-}
-
-/**
- * Response from the moments list endpoint
- */
-interface MomentsListResponse {
-  success: boolean;
-  data: {
-    moments: MomentInfo[];
-    pagination: PaginationInfo;
-  };
-}
-
-/**
- * Response from the create moment endpoint
- */
-interface CreateMomentResponse {
-  success: boolean;
-  data: {
-    moment: MomentInfo;
-  };
-}
+import {
+  momentsListResponseSchema,
+  createMomentResponseSchema,
+  type MomentType,
+  type MomentInfo,
+  type PaginationInfo,
+} from "./schemas";
 
 /**
  * Create request options with optional auth header
@@ -86,8 +45,9 @@ export async function getSessionMoments(
 ): Promise<{ moments: MomentInfo[]; pagination: PaginationInfo }> {
   const { limit = 100, offset = 0 } = options;
 
-  const response = await apiClient.get<MomentsListResponse>(
+  const response = await apiClient.get(
     `/api/sessions/${encodeURIComponent(sessionId)}/events/moments`,
+    momentsListResponseSchema,
     withAuth(token, { params: { limit, offset } })
   );
 
@@ -111,8 +71,9 @@ export async function createMoment(
   },
   token?: string
 ): Promise<MomentInfo> {
-  const response = await apiClient.post<CreateMomentResponse>(
+  const response = await apiClient.post(
     `/api/sessions/${encodeURIComponent(sessionId)}/events/moments`,
+    createMomentResponseSchema,
     moment,
     withAuth(token)
   );
@@ -138,10 +99,14 @@ export async function getMoments(
   const params: Record<string, string | number> = { limit, offset };
   if (sessionId) params.sessionId = sessionId;
 
-  const response = await apiClient.get<MomentsListResponse>(
+  const response = await apiClient.get(
     "/api/events/moments",
+    momentsListResponseSchema,
     withAuth(token, { params })
   );
 
   return response.data;
 }
+
+// Re-export types for convenience
+export type { MomentType, MomentInfo, PaginationInfo };

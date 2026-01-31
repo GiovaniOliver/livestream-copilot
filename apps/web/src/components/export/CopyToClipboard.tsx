@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Icons
@@ -92,7 +93,7 @@ export function CopyToClipboard({
         setCopied(false);
       }, successDuration);
     } catch (err) {
-      console.error("Failed to copy to clipboard:", err);
+      logger.error("Failed to copy to clipboard:", err);
     }
   };
 

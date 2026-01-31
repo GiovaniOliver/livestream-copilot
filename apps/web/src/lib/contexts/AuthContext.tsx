@@ -23,6 +23,7 @@ import {
 import { useRouter } from 'next/navigation';
 import * as authApi from '@/lib/api/auth';
 import type { User, LoginRequest, RegisterRequest } from '@/lib/api/auth';
+import { logger } from "@/lib/logger";
 
 // =============================================================================
 // TYPES
@@ -199,7 +200,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         scheduleTokenRefresh(response.expiresIn);
       }
     } catch (error) {
-      console.error('[AuthContext] Token refresh failed:', error);
+      logger.error('[AuthContext] Token refresh failed:', error);
       await logout();
     }
   }, [loadFromStorage, saveToStorage, scheduleTokenRefresh]);
@@ -279,7 +280,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await authApi.logout(storedRefreshToken);
       }
     } catch (error) {
-      console.error('[AuthContext] Logout error:', error);
+      logger.error('[AuthContext] Logout error:', error);
     } finally {
       // Clear state and storage regardless of API call success
       setState({
@@ -351,7 +352,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             scheduleTokenRefresh(response.expiresIn);
           } catch (error) {
-            console.error('[AuthContext] Auto-refresh failed:', error);
+            logger.error('[AuthContext] Auto-refresh failed:', error);
             clearStorage();
             setState(prev => ({ ...prev, isLoading: false }));
           }
@@ -373,7 +374,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           }
         }
       } catch (error) {
-        console.error('[AuthContext] Initialization error:', error);
+        logger.error('[AuthContext] Initialization error:', error);
         setState(prev => ({ ...prev, isLoading: false }));
       }
     };
