@@ -8,11 +8,12 @@
  */
 
 import { vi, beforeAll, afterAll, afterEach } from "vitest";
+import crypto from "crypto";
 
 // Mock environment variables
 process.env.NODE_ENV = "test";
-process.env.JWT_SECRET = "test-jwt-secret-key-for-testing";
-process.env.JWT_REFRESH_SECRET = "test-refresh-secret-key-for-testing";
+process.env.JWT_SECRET = crypto.randomBytes(32).toString("base64");
+process.env.JWT_REFRESH_SECRET = crypto.randomBytes(32).toString("base64");
 process.env.DATABASE_URL = "file:./test.db";
 process.env.PORT = "3123";
 process.env.WS_PORT = "3124";

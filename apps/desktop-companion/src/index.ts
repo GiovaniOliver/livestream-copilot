@@ -412,6 +412,15 @@ async function main() {
       { config: mediamtxManager.getConfig() },
       "MediaMTX binary found - video streaming available"
     );
+
+    // Auto-start MediaMTX server on backend startup
+    try {
+      videoLogger.info("Auto-starting MediaMTX server...");
+      await mediamtxManager.start();
+      videoLogger.info("MediaMTX server auto-started successfully");
+    } catch (err) {
+      videoLogger.error({ err }, "Failed to auto-start MediaMTX server - video streaming may be unavailable");
+    }
   } else {
     videoLogger.warn("MediaMTX binary not found - video streaming disabled");
   }
@@ -468,6 +477,12 @@ async function main() {
   await connectOBS();
 
   const app = express();
+
+  // Configure Express to trust proxy headers for correct IP detection
+  // This is CRITICAL for rate limiting to work correctly behind reverse proxies
+  // Trust first proxy (e.g., nginx, Cloudflare, AWS ALB)
+  app.set("trust proxy", 1);
+
   const corsOrigins = new Set(
     [config.APP_URL, config.FRONTEND_URL, ...config.CORS_ORIGINS.split(",")]
       .map((origin) => origin.trim())
@@ -482,9 +497,7 @@ async function main() {
 
     if (origin) {
       const isAllowed = corsOrigins.has(origin) ||
-        config.NODE_ENV === "development" ||
-        origin.includes("localhost") ||
-        origin.includes("127.0.0.1");
+        (config.NODE_ENV === "development" && corsOrigins.size === 0);
 
       if (isAllowed) {
         res.setHeader("Access-Control-Allow-Origin", origin);

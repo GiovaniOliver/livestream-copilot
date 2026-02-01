@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { ScriptPageProps, ScriptElement, ScriptInsertData } from "./types";
 import { ScriptInsert } from "./ScriptInsert";
 import { MOCK_CONTRIBUTORS, MOCK_INSERTS } from "./mockData";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // Script Page Component
@@ -263,13 +264,13 @@ const ScriptPage: FC<ScriptPageProps> = ({
   const handleInsertAccept = (insertId: string) => {
     onInsertAccept?.(insertId);
     // In a real implementation, this would update the elements state
-    console.log("Accepted insert:", insertId);
+    logger.debug("Accepted insert:", insertId);
   };
 
   const handleInsertReject = (insertId: string) => {
     onInsertReject?.(insertId);
     // In a real implementation, this would remove the insert elements
-    console.log("Rejected insert:", insertId);
+    logger.debug("Rejected insert:", insertId);
   };
 
   const getContributor = (id: string) =>

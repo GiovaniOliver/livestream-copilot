@@ -11,6 +11,7 @@ import {
   Badge,
   Button,
 } from "@/components/ui";
+import { LivePreview, useLiveStream } from "@/components/video";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { useParams } from "next/navigation";
@@ -154,6 +155,9 @@ export default function PodcastPage() {
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [promos, setPromos] = useState<Promo[]>([]);
 
+  // Live stream status
+  const { status: videoStatus } = useLiveStream();
+
   // Load session from API
   const { session: apiSession } = useSession(id);
   useEffect(() => {
@@ -185,7 +189,7 @@ export default function PodcastPage() {
   const headerSession = {
     id,
     name: session?.name || "Loading...",
-    status: session?.status || ("live" as const),
+    status: session?.status || ("active" as const),
     duration,
     workflow: "Podcast Console",
   };
@@ -194,6 +198,7 @@ export default function PodcastPage() {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
         session={headerSession}
+        isStreaming={videoStatus?.isStreaming}
         title="Podcast Console"
         subtitle="Chapter markers, quote extraction, and highlight tracking"
       />
@@ -355,6 +360,22 @@ export default function PodcastPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Audio/Video Preview */}
+            <Card variant="elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LivePreview
+                  captureMode={session?.captureMode}
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Promos Section */}
             <Card variant="elevated">
               <CardHeader>

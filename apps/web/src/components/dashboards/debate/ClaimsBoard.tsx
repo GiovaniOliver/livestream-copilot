@@ -16,6 +16,7 @@ import {
   mockInterventionPrompts,
   moderatorActions,
 } from "./mockData";
+import { logger } from "@/lib/logger";
 
 export interface ClaimsBoardProps {
   className?: string;
@@ -31,12 +32,12 @@ export function ClaimsBoard({ className }: ClaimsBoardProps) {
 
   const handleAddEvidence = useCallback(() => {
     // In a real app, this would open a modal or form
-    console.log("Add evidence for claim:", selectedClaim?.id);
+    logger.debug("Add evidence for claim:", selectedClaim?.id);
   }, [selectedClaim]);
 
   const handleModeratorAction = useCallback((actionId: string) => {
     // In a real app, this would trigger the action
-    console.log("Moderator action triggered:", actionId);
+    logger.debug("Moderator action triggered:", actionId);
   }, []);
 
   const handleDismissPrompt = useCallback((promptId: string) => {

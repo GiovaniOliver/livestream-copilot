@@ -8,6 +8,7 @@ import { PromoDrafts } from "./PromoDrafts";
 import { PublishingChecklist } from "./PublishingChecklist";
 import { mockEpisode } from "./mockData";
 import type { Chapter, Quote, PromoDraft, ChecklistItem, PodcastEpisode } from "./types";
+import { logger } from "@/lib/logger";
 
 export interface PodcastConsoleProps {
   episode?: PodcastEpisode;
@@ -37,12 +38,12 @@ export function PodcastConsole({
   }, []);
 
   const handleTimestampClick = useCallback((timestamp: number) => {
-    console.log("Jump to timestamp:", timestamp);
+    logger.debug("Jump to timestamp:", timestamp);
     // In a real app, this would control a media player
   }, []);
 
   const handleExport = useCallback(() => {
-    console.log("Exporting episode:", episode);
+    logger.debug("Exporting episode:", episode);
     // In a real app, this would trigger an export workflow
     alert("Episode export started! Check your downloads.");
   }, [episode]);

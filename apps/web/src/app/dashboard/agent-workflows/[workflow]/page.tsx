@@ -44,7 +44,7 @@ interface WorkflowPageProps {
 }
 
 // Tab types
-type TabId = "prompt" | "model" | "actions" | "outputs" | "integrations";
+type TabId = "prompt" | "model" | "actions" | "outputs" | "integrations" | "triggers";
 
 interface Tab {
   id: TabId;
@@ -95,6 +95,15 @@ const TABS: Tab[] = [
     icon: (
       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+    ),
+  },
+  {
+    id: "triggers",
+    label: "Triggers",
+    icon: (
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 0112.728 0" />
       </svg>
     ),
   },
@@ -511,6 +520,8 @@ export default function WorkflowEditPage({ params }: WorkflowPageProps) {
         );
       case "integrations":
         return <IntegrationsTab config={config} onChange={updateIntegrations} />;
+      case "triggers":
+        return <TriggersTab workflowPath={workflowPath} />;
       default:
         return null;
     }
@@ -1299,6 +1310,668 @@ function IntegrationsTab({
           <li>- Markdown export is ideal for documentation and note-taking apps</li>
         </ul>
       </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Triggers Tab - Auto-clip trigger configuration
+// ============================================================================
+
+interface TriggerConfig {
+  id: string;
+  workflow: string;
+  audioEnabled: boolean;
+  audioTriggers: AudioTrigger[];
+  visualEnabled: boolean;
+  visualTriggers: VisualTrigger[];
+  visualProvider: string;
+  frameSampleRate: number;
+  autoClipEnabled: boolean;
+  autoClipDuration: number;
+  triggerCooldown: number;
+}
+
+interface AudioTrigger {
+  id: string;
+  phrase: string;
+  enabled: boolean;
+  caseSensitive: boolean;
+}
+
+interface VisualTrigger {
+  id: string;
+  label: string;
+  imageId: string;
+  threshold: number;
+  enabled: boolean;
+}
+
+interface ReferenceImage {
+  id: string;
+  workflow: string;
+  label: string;
+  imagePath: string;
+  threshold: number;
+  enabled: boolean;
+}
+
+const SUGGESTED_PHRASES = [
+  "clip that",
+  "that's a clip",
+  "highlight this",
+  "save that",
+  "mark it",
+  "that was sick",
+];
+
+const AUTO_CLIP_DURATIONS = [
+  { id: "15", label: "15 seconds" },
+  { id: "20", label: "20 seconds" },
+  { id: "30", label: "30 seconds" },
+  { id: "60", label: "60 seconds" },
+  { id: "90", label: "90 seconds" },
+  { id: "120", label: "2 minutes" },
+];
+
+const FRAME_SAMPLE_RATES = [
+  { id: "1", label: "1 second - ~$10.80/hr (most accurate)" },
+  { id: "2", label: "2 seconds - ~$5.40/hr" },
+  { id: "5", label: "5 seconds - ~$2.16/hr (recommended)" },
+  { id: "10", label: "10 seconds - ~$1.08/hr (most affordable)" },
+];
+
+// Provider pricing (approximate, as of 2025)
+// MediaPipe: FREE (runs locally in browser)
+// Claude Vision: ~$0.003/image (1024px)
+// Gemini Pro Vision: ~$0.0025/image (free tier available)
+// GPT-4 Vision: ~$0.01/image (low detail) to $0.03/image (high detail)
+const VISUAL_PROVIDERS = [
+  { id: "mediapipe", label: "MediaPipe - FREE (runs in browser)", cost: 0 },
+  { id: "claude", label: "Claude Vision - ~$0.003/frame", cost: 0.003 },
+  { id: "gemini", label: "Gemini Pro Vision - ~$0.0025/frame", cost: 0.0025 },
+  { id: "openai", label: "GPT-4 Vision - ~$0.01-0.03/frame", cost: 0.01 },
+] as const;
+
+function TriggersTab({ workflowPath }: { workflowPath: string }) {
+  const [triggerConfig, setTriggerConfig] = useState<TriggerConfig | null>(null);
+  const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newPhrase, setNewPhrase] = useState("");
+
+  // Desktop companion API base URL
+  const apiBase = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+
+  // Load trigger config
+  useEffect(() => {
+    async function loadConfig() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`${apiBase}/api/workflows/${workflowPath}/triggers`);
+        if (!response.ok) {
+          throw new Error("Failed to load trigger configuration");
+        }
+        const data = await response.json();
+        setTriggerConfig(data.config);
+        setReferenceImages(data.referenceImages || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load configuration");
+        // Set defaults if API fails
+        setTriggerConfig({
+          id: "",
+          workflow: workflowPath,
+          audioEnabled: false,
+          audioTriggers: [],
+          visualEnabled: false,
+          visualTriggers: [],
+          visualProvider: "mediapipe",
+          frameSampleRate: 5,
+          autoClipEnabled: false,
+          autoClipDuration: 60,
+          triggerCooldown: 30,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadConfig();
+  }, [workflowPath, apiBase]);
+
+  // Save config
+  const saveConfig = async (updates: Partial<TriggerConfig>) => {
+    if (!triggerConfig) return;
+
+    const newConfig = { ...triggerConfig, ...updates };
+    setTriggerConfig(newConfig);
+    setIsSaving(true);
+
+    try {
+      const response = await fetch(`${apiBase}/api/workflows/${workflowPath}/triggers`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newConfig),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save configuration");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Add audio phrase
+  const addAudioPhrase = async (phrase: string) => {
+    if (!phrase.trim() || !triggerConfig) return;
+
+    try {
+      const response = await fetch(`${apiBase}/api/workflows/${workflowPath}/triggers/audio`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phrase: phrase.trim(), caseSensitive: false }),
+      });
+
+      if (!response.ok) throw new Error("Failed to add phrase");
+
+      const data = await response.json();
+      setTriggerConfig({
+        ...triggerConfig,
+        audioTriggers: [...triggerConfig.audioTriggers, data.trigger],
+      });
+      setNewPhrase("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add phrase");
+    }
+  };
+
+  // Remove audio phrase
+  const removeAudioPhrase = async (triggerId: string) => {
+    if (!triggerConfig) return;
+
+    try {
+      const response = await fetch(
+        `${apiBase}/api/workflows/${workflowPath}/triggers/audio/${triggerId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) throw new Error("Failed to remove phrase");
+
+      setTriggerConfig({
+        ...triggerConfig,
+        audioTriggers: triggerConfig.audioTriggers.filter((t) => t.id !== triggerId),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove phrase");
+    }
+  };
+
+  // Toggle audio phrase enabled
+  const toggleAudioPhrase = (triggerId: string, enabled: boolean) => {
+    if (!triggerConfig) return;
+
+    const newTriggers = triggerConfig.audioTriggers.map((t) =>
+      t.id === triggerId ? { ...t, enabled } : t
+    );
+
+    saveConfig({ audioTriggers: newTriggers });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-text-muted">Loading trigger configuration...</div>
+      </div>
+    );
+  }
+
+  if (!triggerConfig) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-error">Failed to load trigger configuration</p>
+        {error && <p className="text-xs text-text-dim mt-2">{error}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Error Banner */}
+      {error && (
+        <div className="rounded-lg border border-error/30 bg-error/10 p-4">
+          <p className="text-sm text-error">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-xs text-error/70 hover:text-error mt-1"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Auto-Clip Settings */}
+      <section>
+        <h4 className="text-sm font-medium text-text mb-3 flex items-center gap-2">
+          <svg className="h-4 w-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Auto-Clip Settings
+        </h4>
+        <p className="text-xs text-text-dim mb-4">
+          Configure automatic clip creation when triggers are detected.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-surface">
+            <div>
+              <p className="text-sm font-medium text-text">Enable Auto-Clip</p>
+              <p className="text-xs text-text-dim">Automatically create clips when triggers fire</p>
+            </div>
+            <Toggle
+              checked={triggerConfig.autoClipEnabled}
+              onChange={(checked) => saveConfig({ autoClipEnabled: checked })}
+            />
+          </div>
+
+          {triggerConfig.autoClipEnabled && (
+            <>
+              <div className="p-4 rounded-lg bg-surface">
+                <label className="block text-sm font-medium text-text mb-2">
+                  Clip Duration
+                </label>
+                <p className="text-xs text-text-dim mb-3">
+                  How long to record after a trigger is detected.
+                </p>
+                <Select
+                  value={triggerConfig.autoClipDuration.toString()}
+                  options={AUTO_CLIP_DURATIONS}
+                  onChange={(value) => saveConfig({ autoClipDuration: parseInt(value) })}
+                />
+              </div>
+
+              <div className="p-4 rounded-lg bg-surface">
+                <label className="block text-sm font-medium text-text mb-2">
+                  Trigger Cooldown: {triggerConfig.triggerCooldown} seconds
+                </label>
+                <p className="text-xs text-text-dim mb-3">
+                  Minimum time between trigger activations to prevent spam.
+                </p>
+                <Slider
+                  value={triggerConfig.triggerCooldown}
+                  min={5}
+                  max={120}
+                  step={5}
+                  onChange={(value) => saveConfig({ triggerCooldown: value })}
+                />
+                <div className="flex justify-between mt-1 text-xs text-text-dim">
+                  <span>5s</span>
+                  <span>120s</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Audio Triggers */}
+      <section>
+        <h4 className="text-sm font-medium text-text mb-3 flex items-center gap-2">
+          <svg className="h-4 w-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+          Audio Triggers
+        </h4>
+        <p className="text-xs text-text-dim mb-4">
+          Trigger clips when specific phrases are spoken during the stream.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-surface">
+            <div>
+              <p className="text-sm font-medium text-text">Enable Audio Triggers</p>
+              <p className="text-xs text-text-dim">Listen for trigger phrases in speech</p>
+            </div>
+            <Toggle
+              checked={triggerConfig.audioEnabled}
+              onChange={(checked) => saveConfig({ audioEnabled: checked })}
+            />
+          </div>
+
+          {triggerConfig.audioEnabled && (
+            <>
+              {/* Phrase List */}
+              <div className="p-4 rounded-lg bg-surface">
+                <label className="block text-sm font-medium text-text mb-3">
+                  Trigger Phrases
+                </label>
+
+                {triggerConfig.audioTriggers.length === 0 ? (
+                  <p className="text-xs text-text-dim mb-4">No phrases configured. Add some below.</p>
+                ) : (
+                  <div className="space-y-2 mb-4">
+                    {triggerConfig.audioTriggers.map((trigger) => (
+                      <div
+                        key={trigger.id}
+                        className="flex items-center justify-between p-3 rounded-lg border border-stroke hover:border-teal/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Toggle
+                            checked={trigger.enabled}
+                            onChange={(checked) => toggleAudioPhrase(trigger.id, checked)}
+                          />
+                          <span className={`text-sm ${trigger.enabled ? "text-text" : "text-text-dim"}`}>
+                            &quot;{trigger.phrase}&quot;
+                          </span>
+                          {trigger.caseSensitive && (
+                            <Badge variant="default" className="text-xs">Case-sensitive</Badge>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => removeAudioPhrase(trigger.id)}
+                          className="p-1 text-text-dim hover:text-error transition-colors"
+                          title="Remove phrase"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add New Phrase */}
+                <div className="flex gap-2">
+                  <Input
+                    value={newPhrase}
+                    onChange={setNewPhrase}
+                    placeholder="Enter a trigger phrase..."
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => addAudioPhrase(newPhrase)}
+                    disabled={!newPhrase.trim()}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {/* Suggested Phrases */}
+                <div className="mt-4">
+                  <p className="text-xs text-text-dim mb-2">Suggested phrases:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {SUGGESTED_PHRASES.filter(
+                      (p) => !triggerConfig.audioTriggers.some((t) => t.phrase.toLowerCase() === p.toLowerCase())
+                    ).map((phrase) => (
+                      <button
+                        key={phrase}
+                        onClick={() => addAudioPhrase(phrase)}
+                        className="px-3 py-1 text-xs rounded-full border border-stroke bg-surface hover:bg-surface-hover hover:border-teal/50 transition-colors"
+                      >
+                        + {phrase}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Visual Triggers */}
+      <section>
+        <h4 className="text-sm font-medium text-text mb-3 flex items-center gap-2">
+          <svg className="h-4 w-4 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Visual Triggers
+        </h4>
+        <p className="text-xs text-text-dim mb-4">
+          Trigger clips when gestures (thumbs up, peace sign, etc.) are detected on camera.
+          <strong className="text-teal"> MediaPipe is FREE</strong> and runs entirely in your browser.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-surface">
+            <div>
+              <p className="text-sm font-medium text-text">Enable Visual Triggers</p>
+              <p className="text-xs text-text-dim">Detect gestures and visual cues from video</p>
+            </div>
+            <Toggle
+              checked={triggerConfig.visualEnabled}
+              onChange={(checked) => saveConfig({ visualEnabled: checked })}
+            />
+          </div>
+
+          {triggerConfig.visualEnabled && (
+            <>
+              {/* Detection Provider */}
+              <div className="p-4 rounded-lg bg-surface">
+                <label className="block text-sm font-medium text-text mb-2">
+                  Detection Provider
+                </label>
+                <p className="text-xs text-text-dim mb-3">
+                  Choose how visual cues are detected. <strong>MediaPipe (recommended)</strong> runs
+                  locally in your browser with zero cost.
+                </p>
+                <Select
+                  value={triggerConfig.visualProvider || "mediapipe"}
+                  options={VISUAL_PROVIDERS.map(p => ({ id: p.id, label: p.label }))}
+                  onChange={(value) => saveConfig({ visualProvider: value })}
+                />
+
+                {triggerConfig.visualProvider === "mediapipe" && (
+                  <div className="mt-3 p-3 rounded-lg border border-success/30 bg-success/10 space-y-2">
+                    <p className="text-xs font-medium text-success flex items-center gap-2">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      FREE - Runs 100% in your browser
+                    </p>
+                    <p className="text-xs text-success/80">
+                      No frames are sent anywhere. Detection happens in real-time locally using
+                      Google&apos;s MediaPipe ML library. Perfect for gesture detection!
+                    </p>
+                  </div>
+                )}
+
+                {(triggerConfig.visualProvider === "claude" ||
+                  triggerConfig.visualProvider === "gemini" ||
+                  triggerConfig.visualProvider === "openai") && (
+                  <div className="mt-3 space-y-3">
+                    {/* Cost warning */}
+                    <div className="p-3 rounded-lg border border-warning/30 bg-warning/10">
+                      <p className="text-xs font-medium text-warning mb-1">💰 Cloud Provider Costs</p>
+                      <p className="text-xs text-warning/80 mb-2">
+                        With cloud providers, we extract frames from your video at the interval below
+                        and send each frame to the AI for analysis.
+                      </p>
+                      <div className="text-xs text-warning font-mono">
+                        {triggerConfig.visualProvider === "claude" && (
+                          <>At {triggerConfig.frameSampleRate}s intervals: ~${((3600 / triggerConfig.frameSampleRate) * 0.003).toFixed(2)}/hour</>
+                        )}
+                        {triggerConfig.visualProvider === "gemini" && (
+                          <>At {triggerConfig.frameSampleRate}s intervals: ~${((3600 / triggerConfig.frameSampleRate) * 0.0025).toFixed(2)}/hour</>
+                        )}
+                        {triggerConfig.visualProvider === "openai" && (
+                          <>At {triggerConfig.frameSampleRate}s intervals: ~${((3600 / triggerConfig.frameSampleRate) * 0.01).toFixed(2)}-${((3600 / triggerConfig.frameSampleRate) * 0.03).toFixed(2)}/hour</>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* When to use cloud */}
+                    <div className="p-3 rounded-lg border border-stroke bg-surface-hover">
+                      <p className="text-xs font-medium text-text mb-1">When to use cloud providers?</p>
+                      <ul className="text-xs text-text-dim space-y-1 list-disc list-inside">
+                        <li>Detecting custom objects (branded items, specific products)</li>
+                        <li>Complex scene understanding (&quot;person holding phone&quot;)</li>
+                        <li>Text/logo detection in frame</li>
+                        <li>Custom visual cues MediaPipe can&apos;t detect</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Frame Sample Rate - only for cloud providers */}
+              {triggerConfig.visualProvider !== "mediapipe" && (
+                <div className="p-4 rounded-lg bg-surface">
+                  <label className="block text-sm font-medium text-text mb-2">
+                    Frame Sample Rate
+                  </label>
+                  <div className="text-xs text-text-dim mb-3 space-y-2">
+                    <p>
+                      <strong>How it works:</strong> We extract a single screenshot from your video stream
+                      at this interval and send it to the AI for analysis.
+                    </p>
+                    <p>
+                      <strong>Example:</strong> At 5 seconds, we capture 12 frames per minute (720/hour).
+                      Each frame costs ~${(VISUAL_PROVIDERS.find(p => p.id === triggerConfig.visualProvider)?.cost || 0.003).toFixed(4)}.
+                    </p>
+                    <p className="text-teal">
+                      💡 <strong>Note:</strong> There&apos;s natural delay (2-5s) in the video processing pipeline,
+                      so 5-10 second intervals are usually sufficient for clip triggers.
+                    </p>
+                  </div>
+                  <Select
+                    value={triggerConfig.frameSampleRate.toString()}
+                    options={FRAME_SAMPLE_RATES.map(r => ({ id: r.id, label: r.label }))}
+                    onChange={(value) => saveConfig({ frameSampleRate: parseInt(value) })}
+                  />
+                  <div className="mt-3 p-2 rounded bg-surface-hover text-xs text-text-dim">
+                    <span className="font-medium">Selected:</span> {triggerConfig.frameSampleRate} seconds =
+                    {" "}{Math.round(3600 / triggerConfig.frameSampleRate)} frames/hour =
+                    {" "}~${((3600 / triggerConfig.frameSampleRate) * (VISUAL_PROVIDERS.find(p => p.id === triggerConfig.visualProvider)?.cost || 0.003)).toFixed(2)}/hour
+                  </div>
+                </div>
+              )}
+
+              {/* Built-in Gestures for MediaPipe */}
+              {triggerConfig.visualProvider === "mediapipe" && (
+                <div className="p-4 rounded-lg bg-surface">
+                  <label className="block text-sm font-medium text-text mb-2">
+                    Built-in Gesture Detection
+                  </label>
+                  <div className="text-xs text-text-dim mb-4 space-y-2">
+                    <p>
+                      MediaPipe detects these gestures <strong>in real-time</strong> using your webcam
+                      or video feed. No frames are sent to any server - everything runs locally!
+                    </p>
+                    <p className="text-teal">
+                      ✨ <strong>Recommended:</strong> Use &quot;Thumbs Up&quot; or &quot;Open Palm&quot; as your trigger gesture.
+                      Hold the gesture for 1-2 seconds to trigger.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {["Thumbs Up", "Thumbs Down", "Open Palm", "Peace Sign", "Fist", "Pointing Up"].map((gesture) => (
+                      <div
+                        key={gesture}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-stroke hover:border-teal/30 transition-colors"
+                      >
+                        <Toggle
+                          checked={triggerConfig.visualTriggers.some(
+                            (t) => t.label === gesture && t.enabled
+                          )}
+                          onChange={(checked) => {
+                            const existing = triggerConfig.visualTriggers.find((t) => t.label === gesture);
+                            if (existing) {
+                              const newTriggers = triggerConfig.visualTriggers.map((t) =>
+                                t.label === gesture ? { ...t, enabled: checked } : t
+                              );
+                              saveConfig({ visualTriggers: newTriggers });
+                            } else if (checked) {
+                              saveConfig({
+                                visualTriggers: [
+                                  ...triggerConfig.visualTriggers,
+                                  { id: `mediapipe-${gesture.toLowerCase().replace(/\s/g, "-")}`, label: gesture, imageId: "", threshold: 0.8, enabled: true },
+                                ],
+                              });
+                            }
+                          }}
+                        />
+                        <span className="text-sm text-text">{gesture}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Alternative detection methods hint */}
+                  <div className="mt-4 p-3 rounded-lg border border-stroke bg-surface-hover">
+                    <p className="text-xs font-medium text-text mb-2">💡 Other Free Detection Ideas</p>
+                    <ul className="text-xs text-text-dim space-y-1">
+                      <li>• <strong>Colored cards:</strong> Hold up a bright colored card (red/green) - we can detect it!</li>
+                      <li>• <strong>QR codes:</strong> Flash a QR code at camera - instant recognition</li>
+                      <li>• <strong>Face detection:</strong> Cover/uncover face for triggers</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Reference Images - for cloud providers */}
+              {triggerConfig.visualProvider !== "mediapipe" && (
+                <div className="p-4 rounded-lg bg-surface">
+                  <label className="block text-sm font-medium text-text mb-3">
+                    Reference Images
+                  </label>
+                  <p className="text-xs text-text-dim mb-4">
+                    Upload images of gestures or visual cues to detect.
+                  </p>
+
+                  {referenceImages.length === 0 ? (
+                    <div className="text-center py-8 border-2 border-dashed border-stroke rounded-lg">
+                      <svg className="h-12 w-12 mx-auto text-text-dim mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-sm text-text-dim mb-3">No reference images uploaded</p>
+                      <Button variant="ghost" size="sm">
+                        Upload Image
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-4">
+                      {referenceImages.map((img) => (
+                        <div
+                          key={img.id}
+                          className="relative rounded-lg border border-stroke overflow-hidden group"
+                        >
+                          <div className="aspect-square bg-surface-hover flex items-center justify-center">
+                            <span className="text-xs text-text-dim">{img.label}</span>
+                          </div>
+                          <div className="p-2">
+                            <p className="text-xs font-medium text-text truncate">{img.label}</p>
+                          </div>
+                        </div>
+                      ))}
+                      <button className="aspect-square rounded-lg border-2 border-dashed border-stroke hover:border-teal/50 flex flex-col items-center justify-center gap-2 transition-colors">
+                        <svg className="h-6 w-6 text-text-dim" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span className="text-xs text-text-dim">Add Image</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Saving indicator */}
+      {isSaving && (
+        <div className="fixed bottom-4 right-4 px-4 py-2 rounded-lg bg-surface border border-stroke shadow-lg">
+          <span className="text-sm text-text-muted">Saving...</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { useParams } from "next/navigation";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 // Types for Court Session data
 interface Exhibit {
@@ -225,6 +226,9 @@ export default function CourtSessionPage() {
     notes: [],
   });
 
+  // Live stream status
+  const { status: videoStatus } = useLiveStream();
+
   // Load session from API
   const { session: apiSession, isLoading: sessionLoading } = useSession(id);
   useEffect(() => {
@@ -262,7 +266,7 @@ export default function CourtSessionPage() {
     : {
         id,
         name: "Court Session",
-        status: "live" as const,
+        status: "active" as const,
         duration: "0:00:00",
         workflow: "Court Session",
       };
@@ -271,6 +275,7 @@ export default function CourtSessionPage() {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
         session={sessionInfo}
+        isStreaming={videoStatus?.isStreaming}
         title="Court Session"
         subtitle="Track evidence, witnesses, arguments, and verdict progress in real-time"
       />
@@ -591,6 +596,22 @@ export default function CourtSessionPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LivePreview
+                  captureMode={session?.captureMode}
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Verdict Progress */}
             <Card variant="elevated">
               <CardHeader>

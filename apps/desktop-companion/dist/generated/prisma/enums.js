@@ -7,4 +7,59 @@
 *
 * 🟢 You can import this file directly.
 */
-export {};
+export const PlatformRole = {
+    USER: 'USER',
+    ADMIN: 'ADMIN',
+    SUPER_ADMIN: 'SUPER_ADMIN'
+};
+export const OrgRole = {
+    VIEWER: 'VIEWER',
+    MEMBER: 'MEMBER',
+    ADMIN: 'ADMIN',
+    OWNER: 'OWNER'
+};
+export const UserStatus = {
+    PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+    DELETED: 'DELETED'
+};
+export const SubscriptionTier = {
+    FREE: 'FREE',
+    STARTER: 'STARTER',
+    PRO: 'PRO',
+    ENTERPRISE: 'ENTERPRISE'
+};
+export const SubscriptionStatus = {
+    ACTIVE: 'ACTIVE',
+    PAST_DUE: 'PAST_DUE',
+    CANCELED: 'CANCELED',
+    PAUSED: 'PAUSED'
+};
+export const ExportType = {
+    POST: 'POST',
+    CLIP: 'CLIP',
+    BATCH: 'BATCH'
+};
+export const ExportStatus = {
+    PENDING: 'PENDING',
+    PROCESSING: 'PROCESSING',
+    COMPLETED: 'COMPLETED',
+    FAILED: 'FAILED'
+};
+export const SocialPlatform = {
+    TWITTER: 'TWITTER',
+    LINKEDIN: 'LINKEDIN',
+    INSTAGRAM: 'INSTAGRAM',
+    TIKTOK: 'TIKTOK',
+    YOUTUBE: 'YOUTUBE',
+    FACEBOOK: 'FACEBOOK',
+    THREADS: 'THREADS',
+    BLUESKY: 'BLUESKY'
+};
+export const ExportFormat = {
+    MP4: 'MP4',
+    WEBM: 'WEBM',
+    GIF: 'GIF',
+    MOV: 'MOV'
+};

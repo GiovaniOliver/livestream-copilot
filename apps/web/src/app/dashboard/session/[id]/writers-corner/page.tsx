@@ -13,6 +13,7 @@ import {
 } from "@/components/ui";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 interface WritersCornerPageProps {
   params: Promise<{ id: string }>;
@@ -229,6 +230,9 @@ export default function WritersCornerPage({ params }: WritersCornerPageProps) {
     }
   }, [apiSession]);
 
+  // Get live stream status
+  const { status: videoStatus } = useLiveStream();
+
   const sessionInfo = session
     ? {
         id: session.id,
@@ -245,6 +249,7 @@ export default function WritersCornerPage({ params }: WritersCornerPageProps) {
         session={sessionInfo}
         title="Writers Corner"
         subtitle="Your creative writing space for capturing ideas, organizing chapters, and tracking progress"
+        isStreaming={videoStatus?.isStreaming}
       />
 
       <div className="flex-1 p-6">
@@ -445,6 +450,22 @@ export default function WritersCornerPage({ params }: WritersCornerPageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader>
+                <CardTitle>Live Preview</CardTitle>
+                <CardDescription>Your stream feed</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <LivePreview
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Quote Bank */}
             <Card variant="elevated">
               <CardHeader>

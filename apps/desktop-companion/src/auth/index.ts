@@ -10,6 +10,7 @@
  * - API key generation and verification
  * - Express middleware for authentication and authorization
  * - Express routes for authentication endpoints
+ * - Rate limiting for brute force protection
  *
  * Security Features:
  * - bcrypt password hashing with cost factor 12
@@ -21,6 +22,7 @@
  * - Protection against enumeration attacks
  * - Role-based access control (platform and organization levels)
  * - Input validation using Zod schemas
+ * - Rate limiting on authentication endpoints (SOC-397)
  *
  * @module auth
  */
@@ -68,6 +70,18 @@ export type {
 
 // Routes
 export { authRouter, createAuthRouter } from "./routes.js";
+
+// Rate Limiters
+export {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  resendVerificationLimiter,
+  verifyEmailLimiter,
+  refreshTokenLimiter,
+  generalAuthLimiter,
+  rateLimiters,
+} from "./rate-limiters.js";
 
 // OAuth
 export { oauthRouter, createOAuthRouter } from "./oauth-routes.js";

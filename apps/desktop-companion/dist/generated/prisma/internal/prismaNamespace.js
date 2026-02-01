@@ -67,10 +67,20 @@ export const JsonNull = runtime.objectEnumValues.instances.JsonNull;
  */
 export const AnyNull = runtime.objectEnumValues.instances.AnyNull;
 export const ModelName = {
+    User: 'User',
+    OAuthConnection: 'OAuthConnection',
+    RefreshToken: 'RefreshToken',
+    APIKey: 'APIKey',
+    Organization: 'Organization',
+    OrganizationMember: 'OrganizationMember',
+    Subscription: 'Subscription',
+    AuditLog: 'AuditLog',
+    MediaAsset: 'MediaAsset',
     Session: 'Session',
     Event: 'Event',
     Output: 'Output',
-    Clip: 'Clip'
+    Clip: 'Clip',
+    Export: 'Export'
 };
 /**
  * Enums
@@ -81,14 +91,135 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
     RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
 });
+export const UserScalarFieldEnum = {
+    id: 'id',
+    email: 'email',
+    emailVerified: 'emailVerified',
+    passwordHash: 'passwordHash',
+    name: 'name',
+    avatarUrl: 'avatarUrl',
+    platformRole: 'platformRole',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const OAuthConnectionScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    provider: 'provider',
+    providerId: 'providerId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const RefreshTokenScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    tokenHash: 'tokenHash',
+    deviceInfo: 'deviceInfo',
+    ipAddress: 'ipAddress',
+    expiresAt: 'expiresAt',
+    revokedAt: 'revokedAt',
+    createdAt: 'createdAt'
+};
+export const APIKeyScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    organizationId: 'organizationId',
+    name: 'name',
+    keyHash: 'keyHash',
+    keyPrefix: 'keyPrefix',
+    permissions: 'permissions',
+    rateLimit: 'rateLimit',
+    lastUsedAt: 'lastUsedAt',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+};
+export const OrganizationScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    description: 'description',
+    avatarUrl: 'avatarUrl',
+    ownerId: 'ownerId',
+    settings: 'settings',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const OrganizationMemberScalarFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    userId: 'userId',
+    role: 'role',
+    invitedBy: 'invitedBy',
+    inviteEmail: 'inviteEmail',
+    inviteToken: 'inviteToken',
+    inviteExpiresAt: 'inviteExpiresAt',
+    joinedAt: 'joinedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const SubscriptionScalarFieldEnum = {
+    id: 'id',
+    organizationId: 'organizationId',
+    tier: 'tier',
+    status: 'status',
+    stripeCustomerId: 'stripeCustomerId',
+    stripeSubId: 'stripeSubId',
+    stripePriceId: 'stripePriceId',
+    currentPeriodStart: 'currentPeriodStart',
+    currentPeriodEnd: 'currentPeriodEnd',
+    cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+    usageThisMonth: 'usageThisMonth',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const AuditLogScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    action: 'action',
+    resourceType: 'resourceType',
+    resourceId: 'resourceId',
+    organizationId: 'organizationId',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    metadata: 'metadata',
+    createdAt: 'createdAt'
+};
+export const MediaAssetScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    organizationId: 'organizationId',
+    sessionId: 'sessionId',
+    type: 'type',
+    filename: 'filename',
+    mimeType: 'mimeType',
+    sizeBytes: 'sizeBytes',
+    duration: 'duration',
+    storageZone: 'storageZone',
+    storagePath: 'storagePath',
+    cdnUrl: 'cdnUrl',
+    streamVideoId: 'streamVideoId',
+    streamStatus: 'streamStatus',
+    metadata: 'metadata',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
 export const SessionScalarFieldEnum = {
     id: 'id',
+    userId: 'userId',
+    organizationId: 'organizationId',
     workflow: 'workflow',
     captureMode: 'captureMode',
     title: 'title',
+    description: 'description',
     participants: 'participants',
+    status: 'status',
     startedAt: 'startedAt',
     endedAt: 'endedAt',
+    workflowConfig: 'workflowConfig',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -123,6 +254,27 @@ export const ClipScalarFieldEnum = {
     t1: 't1',
     thumbnailId: 'thumbnailId',
     createdAt: 'createdAt'
+};
+export const ExportScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    organizationId: 'organizationId',
+    sessionId: 'sessionId',
+    clipId: 'clipId',
+    type: 'type',
+    status: 'status',
+    platform: 'platform',
+    format: 'format',
+    content: 'content',
+    filePath: 'filePath',
+    fileSize: 'fileSize',
+    thumbnailPath: 'thumbnailPath',
+    metadata: 'metadata',
+    errorMessage: 'errorMessage',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 export const SortOrder = {
     asc: 'asc',

@@ -11,6 +11,7 @@ import {
   Badge,
 } from "@/components/ui";
 import { LiveVideoPreview, useLiveStream } from "@/components/video";
+import { ClipQueueDashboard } from "@/components/clip-queue";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { useClips } from "@/hooks/useClips";
@@ -18,6 +19,7 @@ import { useOutputs, type Output } from "@/hooks/useOutputs";
 import { getHealth } from "@/lib/api/health";
 import { cn } from "@/lib/utils";
 import type { OutputStatus } from "@/lib/api/outputs";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Types
@@ -419,7 +421,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
         setCopySuccess(false);
       }, 2000);
     } catch (err) {
-      console.error("Failed to copy to clipboard:", err);
+      logger.error("Failed to copy to clipboard:", err);
       // Fallback for older browsers
       try {
         const textArea = document.createElement("textarea");
@@ -435,7 +437,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000);
       } catch {
-        console.error("Fallback copy also failed");
+        logger.error("Fallback copy also failed");
       }
     }
   }, [output.title, output.text]);
@@ -466,7 +468,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
       });
       setIsEditing(false);
     } catch (err) {
-      console.error("Failed to save edit:", err);
+      logger.error("Failed to save edit:", err);
     } finally {
       setIsSaving(false);
     }
@@ -480,7 +482,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
     try {
       await onDelete(output.id);
     } catch (err) {
-      console.error("Failed to delete:", err);
+      logger.error("Failed to delete:", err);
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -500,7 +502,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
       // Placeholder: show alert for now
       alert("Regenerate feature coming soon! This will use AI to create a new version of this post.");
     } catch (err) {
-      console.error("Failed to regenerate:", err);
+      logger.error("Failed to regenerate:", err);
     } finally {
       setIsRegenerating(false);
     }
@@ -736,6 +738,9 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
   // Live duration ticker (for live sessions)
   const [liveDuration, setLiveDuration] = useState<string>("0:00:00");
 
+  // Clip queue sidebar state
+  const [isClipQueueCollapsed, setIsClipQueueCollapsed] = useState(false);
+
   // Live stream status hook
   const { status: videoStatus } = useLiveStream();
 
@@ -829,7 +834,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
       try {
         await updateOutputStatus(outputId, "approved");
       } catch (err) {
-        console.error("Failed to approve output:", err);
+        logger.error("Failed to approve output:", err);
       }
     },
     [updateOutputStatus]
@@ -841,7 +846,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
       try {
         await deleteOutput(outputId);
       } catch (err) {
-        console.error("Failed to delete output:", err);
+        logger.error("Failed to delete output:", err);
       }
     },
     [deleteOutput]
@@ -853,7 +858,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
       try {
         await updateOutput(outputId, updates);
       } catch (err) {
-        console.error("Failed to update output:", err);
+        logger.error("Failed to update output:", err);
         throw err; // Re-throw so PostCard can handle the error
       }
     },
@@ -878,6 +883,8 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Add margin-right when clip queue sidebar is expanded */}
+      <div className={cn("transition-all duration-300", !isClipQueueCollapsed && "mr-80")}>
       <DashboardHeader
         session={
           session
@@ -891,10 +898,11 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
             : {
                 id: sessionId,
                 name: "Session",
-                status: "live",
+                status: "active",
                 workflow: "Content Creator",
               }
         }
+        isStreaming={videoStatus?.isStreaming}
         title="Content Creator"
         subtitle="Clip queue, post drafts by platform, and moment rail for fast publishing"
       />
@@ -1339,6 +1347,14 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
           </CardContent>
         </Card>
       </div>
+      </div>
+
+      {/* Clip Queue Sidebar */}
+      <ClipQueueDashboard
+        sessionId={sessionId}
+        isCollapsed={isClipQueueCollapsed}
+        onToggleCollapse={() => setIsClipQueueCollapsed(!isClipQueueCollapsed)}
+      />
     </div>
   );
 }

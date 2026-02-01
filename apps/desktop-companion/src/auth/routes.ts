@@ -12,7 +12,11 @@
  *
  * Security Features:
  * - Input validation using Zod schemas
- * - Rate limiting ready (implement at API gateway level)
+ * - Rate limiting on all auth endpoints (general + specific limiters)
+ * - Login: 5 attempts per 15min per IP:email (prevents brute force)
+ * - Registration: 3 per hour per IP (prevents bot signups)
+ * - Password reset: 3 per hour per IP (prevents email bombing)
+ * - Token refresh: 10 per minute per IP (prevents token enumeration)
  * - Secure error handling (no sensitive data exposure)
  * - Audit logging through authService
  * - Device and IP tracking for session management
@@ -27,6 +31,15 @@ import {
   authenticateToken,
   type AuthenticatedRequest,
 } from "./middleware.js";
+import {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  resendVerificationLimiter,
+  verifyEmailLimiter,
+  refreshTokenLimiter,
+  generalAuthLimiter,
+} from "./rate-limiters.js";
 
 // =============================================================================
 // VALIDATION SCHEMAS
@@ -596,22 +609,31 @@ async function getMeHandler(req: Request, res: Response): Promise<void> {
 /**
  * Creates and configures the authentication router.
  *
+ * Security layers:
+ * - General rate limiting applied to all auth endpoints
+ * - Specific rate limiting on sensitive endpoints (login, register, password reset)
+ * - Input validation via Zod schemas
+ * - Authentication middleware on protected routes
+ *
  * @returns Configured Express router
  */
 export function createAuthRouter(): Router {
   const router = Router();
 
-  // Public routes (no authentication required)
-  router.post("/register", registerHandler);
-  router.post("/login", loginHandler);
-  router.post("/refresh", refreshHandler);
-  router.post("/logout", logoutHandler);
-  router.post("/verify-email", verifyEmailHandler);
-  router.post("/resend-verification", resendVerificationHandler);
-  router.post("/forgot-password", forgotPasswordHandler);
-  router.post("/reset-password", resetPasswordHandler);
+  // Apply general rate limiting to all auth endpoints as base protection
+  router.use(generalAuthLimiter);
 
-  // Protected routes (authentication required)
+  // Public routes with specific rate limiters
+  router.post("/register", registerLimiter, registerHandler);
+  router.post("/login", loginLimiter, loginHandler);
+  router.post("/refresh", refreshTokenLimiter, refreshHandler);
+  router.post("/logout", logoutHandler);
+  router.post("/verify-email", verifyEmailLimiter, verifyEmailHandler);
+  router.post("/resend-verification", resendVerificationLimiter, resendVerificationHandler);
+  router.post("/forgot-password", passwordResetLimiter, forgotPasswordHandler);
+  router.post("/reset-password", passwordResetLimiter, resetPasswordHandler);
+
+  // Protected routes (authentication required, no additional rate limiting needed)
   router.post("/logout-all", authenticateToken, logoutAllHandler);
   router.get("/me", authenticateToken, getMeHandler);
 

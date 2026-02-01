@@ -12,3 +12,6 @@ export * from "./dashboard";
 
 // Error handling
 export { default as ErrorBoundary, withErrorBoundary } from "./ErrorBoundary";
+
+// Clip queue components
+export * from "./clip-queue";

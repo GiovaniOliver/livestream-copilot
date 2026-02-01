@@ -8,6 +8,7 @@ import { CopyToClipboard, ExportButton, ExportModal, type ExportContent } from "
 import { useExport } from "@/hooks/useExport";
 import type { PostCardProps, Platform, PostStatus } from "./types";
 import { PLATFORM_CONFIG } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Platform Icons
@@ -140,7 +141,7 @@ export function PostCardWithExport({
     generateHashtagSuggestions,
   } = useExport({
     onSuccess: () => {
-      console.log("Export successful");
+      logger.debug("Export successful");
       onShare?.(post);
     },
   });

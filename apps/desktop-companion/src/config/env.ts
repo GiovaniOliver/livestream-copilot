@@ -219,6 +219,26 @@ export const envSchema = z.object({
     .describe("Max tokens for AI responses"),
 
   // ===================
+  // Vision AI Configuration
+  // ===================
+  GEMINI_API_KEY: z
+    .string()
+    .optional()
+    .describe("Google Gemini API key for vision detection"),
+  VISUAL_TRIGGER_FRAME_INTERVAL: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(2000)
+    .describe("Minimum interval between frame checks in milliseconds"),
+  VISUAL_TRIGGER_TIMEOUT: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(10000)
+    .describe("Timeout for vision detection in milliseconds"),
+
+  // ===================
   // Observability (Opik) Configuration
   // ===================
   OPIK_WORKSPACE_NAME: z

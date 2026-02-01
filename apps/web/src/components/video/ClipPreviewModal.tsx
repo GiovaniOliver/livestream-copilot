@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { VideoPlayer } from "./VideoPlayer";
 import type { Clip } from "@/components/dashboards/streamer/types";
+import { getClipVideoUrl } from "@/components/dashboards/streamer/types";
 import { logger } from "@/lib/logger";
 
 // ============================================================
@@ -232,8 +233,8 @@ export function ClipPreviewModal({
     return null;
   }
 
-  // Construct video URL from clip data or use provided videoSrc
-  const videoUrl = videoSrc || clip.thumbnailUrl.replace("/thumbnail", "/media");
+  // Use provided videoSrc or generate from artifact ID
+  const videoUrl = videoSrc || getClipVideoUrl(clip.artifactId);
 
   return (
     <div

@@ -139,8 +139,8 @@ export default async function StreamerPage({ params }: StreamerPageProps) {
     workflow: "Producer Desk",
   };
 
-  // WebSocket URL - default to localhost:3001, should be configurable
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
+  // WebSocket URL - default to localhost:3124 (WebSocket runs on separate port from HTTP API)
+  const wsUrl = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3124";
 
   return (
     <div className="flex min-h-screen flex-col">

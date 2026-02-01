@@ -13,6 +13,7 @@ import {
 } from "@/components/ui";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 interface ScriptStudioPageProps {
   params: Promise<{ id: string }>;
@@ -222,6 +223,9 @@ export default function ScriptStudioPage({ params }: ScriptStudioPageProps) {
     }
   }, [apiSession]);
 
+  // Get live stream status
+  const { status: videoStatus } = useLiveStream();
+
   const sessionInfo = session
     ? {
         id: session.id,
@@ -233,7 +237,7 @@ export default function ScriptStudioPage({ params }: ScriptStudioPageProps) {
     : {
         id: sessionId,
         name: "Untitled Script",
-        status: "live" as const,
+        status: "active" as const,
         duration: "0:00:00",
         workflow: "Script Studio",
       };
@@ -244,6 +248,7 @@ export default function ScriptStudioPage({ params }: ScriptStudioPageProps) {
         session={sessionInfo}
         title="Script Studio"
         subtitle="Professional screenplay writing with scene breakdown and character tracking"
+        isStreaming={videoStatus?.isStreaming}
       />
 
       <div className="flex-1 p-6">
@@ -608,6 +613,22 @@ export default function ScriptStudioPage({ params }: ScriptStudioPageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader>
+                <CardTitle>Live Preview</CardTitle>
+                <CardDescription>Your stream feed</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <LivePreview
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Act Structure Visualization */}
             <Card variant="elevated">
               <CardHeader>

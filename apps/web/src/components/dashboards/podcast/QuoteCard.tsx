@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Quote } from "./types";
+import { logger } from "@/lib/logger";
 
 export interface QuoteCardProps {
   quote: Quote;
@@ -28,7 +29,7 @@ export function QuoteCard({
       onCopy?.(quote.text);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   };
 

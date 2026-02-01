@@ -12,6 +12,7 @@ import {
 } from "@/components/ui";
 import { useIdeas, type Idea } from "@/hooks/useIdeas";
 import { useSession } from "@/hooks/useSessions";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 interface BrainstormDashboardClientProps {
   sessionId: string;
@@ -135,6 +136,9 @@ export function BrainstormDashboardClient({ sessionId }: BrainstormDashboardClie
   // Fetch session info
   const { session, isLoading: sessionLoading } = useSession(sessionId);
 
+  // Get live stream status
+  const { status: videoStatus } = useLiveStream();
+
   // Compute clusters from categories
   const clusters = categories.map((category) => ({
     name: category.charAt(0).toUpperCase() + category.slice(1),
@@ -159,6 +163,7 @@ export function BrainstormDashboardClient({ sessionId }: BrainstormDashboardClie
           session={sessionInfo}
           title="Mind Map Room"
           subtitle="Loading brainstorm data..."
+          isStreaming={videoStatus?.isStreaming}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -178,6 +183,7 @@ export function BrainstormDashboardClient({ sessionId }: BrainstormDashboardClie
           session={sessionInfo}
           title="Mind Map Room"
           subtitle="Error loading data"
+          isStreaming={videoStatus?.isStreaming}
         />
         <div className="flex flex-1 items-center justify-center">
           <div className="rounded-xl border border-error/30 bg-error/10 p-6 text-center">
@@ -197,6 +203,7 @@ export function BrainstormDashboardClient({ sessionId }: BrainstormDashboardClie
         session={sessionInfo}
         title="Mind Map Room"
         subtitle="Collaborative brainstorming with idea clustering and connection mapping"
+        isStreaming={videoStatus?.isStreaming}
       />
 
       <div className="flex-1 p-6">
@@ -323,6 +330,22 @@ export function BrainstormDashboardClient({ sessionId }: BrainstormDashboardClie
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader>
+                <CardTitle>Live Preview</CardTitle>
+                <CardDescription>Your stream feed</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <LivePreview
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Categories/Clusters */}
             <Card variant="elevated">
               <CardHeader>

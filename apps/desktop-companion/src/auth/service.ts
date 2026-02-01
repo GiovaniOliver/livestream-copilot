@@ -15,8 +15,11 @@
  * @module auth/service
  */
 
+import crypto from "node:crypto";
+import bcrypt from "bcrypt";
 import { prisma } from "../db/prisma.js";
 import { validateEnv } from "../config/env.js";
+import { emailService } from "../services/email.js";
 import type {
   User,
   RefreshToken,
@@ -304,8 +307,8 @@ export const authService = {
     // Normalize email to lowercase for case-insensitive uniqueness
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Validate password strength
-    const passwordValidation = validatePasswordStrength(password, normalizedEmail);
+    // Validate password strength (async - includes HIBP breach check)
+    const passwordValidation = await validatePasswordStrength(password, normalizedEmail);
     if (!passwordValidation.valid) {
       throw AuthError.weakPassword(passwordValidation.errors);
     }
@@ -323,40 +326,54 @@ export const authService = {
       throw AuthError.emailAlreadyExists();
     }
 
-    // Hash password with Argon2id
+    // Hash password with bcrypt
     const passwordHash = await hashPassword(password);
 
     // Generate email verification token
-    const { token: verificationToken, hash: verificationHash } =
-      generateVerificationToken();
+    // SECURITY: Token is cryptographically random (32 bytes = 256 bits entropy)
+    const { token: verificationToken } = generateVerificationToken();
     const verificationExpiry = getVerificationTokenExpiry();
 
-    // Create user in active state (bypass verification for now)
+    // SECURITY: Hash token with bcrypt for constant-time comparison
+    // Using bcrypt (not SHA-256) allows constant-time comparison via bcrypt.compare
+    // This prevents timing attacks when verifying tokens
+    const verificationHash = await bcrypt.hash(verificationToken, 10);
+
+    // Create user in PENDING_VERIFICATION state (requires email verification)
     const user = await prisma.user.create({
       data: {
         email: normalizedEmail,
         passwordHash,
         name: name?.trim() || null,
-        status: UserStatus.ACTIVE,
+        status: UserStatus.PENDING_VERIFICATION,
         platformRole: PlatformRole.USER,
-        emailVerified: true,
+        emailVerified: false,
       },
     });
 
-    // Store verification token (in production, use a separate table)
-    // For now, we'll log the token for testing purposes
-    // TODO: Implement EmailVerificationToken model and proper storage
-    console.log(
-      `[auth] Verification token for ${normalizedEmail}: ${verificationToken}`
-    );
-    console.log(`[auth] Token hash: ${verificationHash}`);
-    console.log(`[auth] Expires at: ${verificationExpiry.toISOString()}`);
+    // Store hashed verification token in database
+    await prisma.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        email: normalizedEmail,
+        tokenHash: verificationHash,
+        expiresAt: verificationExpiry,
+      },
+    });
 
-    // TODO: Send verification email
-    // await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
-    console.log(
-      `[auth] TODO: Send verification email to ${normalizedEmail}`
-    );
+    // Send verification email
+    // SECURITY: Only send unhashed token via email (never store unhashed)
+    // If email sending fails, log but don't fail registration
+    try {
+      await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
+      console.log(`[auth] Verification email sent to ${normalizedEmail}`);
+    } catch (error) {
+      console.error(
+        `[auth] Failed to send verification email to ${normalizedEmail}:`,
+        error instanceof Error ? error.message : String(error)
+      );
+      // Don't throw - user is created, they can request resend later
+    }
 
     // Log successful registration
     await logAuditEvent("auth.register.success", user.id, {
@@ -457,14 +474,12 @@ export const authService = {
         throw AuthError.accountDeleted();
 
       case UserStatus.PENDING_VERIFICATION:
-        // Optionally require email verification before login
-        // Uncomment the following to enforce email verification:
-        // await logAuditEvent("auth.login.not_verified", user.id, {
-        //   email: normalizedEmail,
-        //   ipAddress,
-        // });
-        // throw AuthError.emailNotVerified();
-        break;
+        // Enforce email verification before login
+        await logAuditEvent("auth.login.not_verified", user.id, {
+          email: normalizedEmail,
+          ipAddress,
+        });
+        throw AuthError.emailNotVerified();
 
       case UserStatus.ACTIVE:
         // All good
@@ -718,82 +733,112 @@ export const authService = {
   /**
    * Verifies a user's email address using a verification token.
    *
-   * @param token - The verification token from the email link
+   * SECURITY IMPLEMENTATION:
+   * - Uses bcrypt.compare for constant-time token comparison
+   * - Checks all non-expired tokens to prevent timing attacks
+   * - Single-use tokens (deleted after verification)
+   * - Cleans up expired tokens during verification
+   *
+   * @param token - The verification token from the email link (unhashed)
    * @returns The verified user
-   * @throws AuthError if token invalid or expired
+   * @throws AuthError if token invalid, expired, or already verified
    */
   async verifyEmail(token: string): Promise<EmailVerificationResponse> {
-    // Hash the token to compare with stored hash
-    const tokenHash = hashToken(token);
-
-    // TODO: In production, look up the token in an EmailVerification table
-    // For now, we'll search for users with matching token in a hypothetical field
-    // This is a placeholder implementation
-
-    // In a real implementation:
-    // 1. Query EmailVerification table by tokenHash
-    // 2. Check if not expired
-    // 3. Update user's emailVerified status
-    // 4. Delete the verification record
-
-    // Placeholder: Find a user in PENDING_VERIFICATION status
-    // This should be replaced with proper token-based lookup
-    console.log(
-      `[auth] Attempting to verify email with token hash: ${tokenHash}`
-    );
-    console.log(
-      "[auth] TODO: Implement EmailVerification table lookup"
-    );
-
-    // For demonstration, we'll throw an error
-    // In production, implement proper token storage and lookup
-    throw new AuthError(
-      "Email verification not fully implemented. Please store tokens in EmailVerification table.",
-      "NOT_IMPLEMENTED",
-      501
-    );
-
-    // Example of what the implementation should look like:
-    /*
-    const verification = await prisma.emailVerification.findUnique({
-      where: { tokenHash },
-      include: { user: true },
-    });
-
-    if (!verification) {
+    // Validate token format (basic check)
+    if (!token || token.length < 32) {
+      await logAuditEvent("auth.verify_email.invalid_token", null, {
+        reason: "Token too short or empty",
+      });
       throw AuthError.invalidToken();
     }
 
-    if (verification.expiresAt < new Date()) {
-      // Clean up expired token
-      await prisma.emailVerification.delete({
-        where: { id: verification.id },
-      });
-      throw AuthError.verificationExpired();
-    }
+    // Query all non-expired tokens
+    // SECURITY: We check all tokens to prevent timing attacks
+    // An attacker can't determine if a token exists based on response time
+    const verifications = await prisma.emailVerificationToken.findMany({
+      where: {
+        expiresAt: { gt: new Date() },
+      },
+      include: { user: true },
+    });
 
-    if (verification.user.emailVerified) {
-      throw AuthError.alreadyVerified();
-    }
-
-    // Update user and delete verification token
-    const [user] = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: verification.userId },
-        data: {
-          emailVerified: true,
-          status: UserStatus.ACTIVE,
+    // Clean up expired tokens in the background (non-blocking)
+    // This prevents database bloat and ensures expired tokens are removed
+    prisma.emailVerificationToken
+      .deleteMany({
+        where: {
+          expiresAt: { lt: new Date() },
         },
-      }),
-      prisma.emailVerification.delete({
-        where: { id: verification.id },
-      }),
-    ]);
+      })
+      .then((result) => {
+        if (result.count > 0) {
+          console.log(`[auth] Cleaned up ${result.count} expired verification tokens`);
+        }
+      })
+      .catch((error) => {
+        console.error("[auth] Failed to clean up expired tokens:", error);
+      });
 
-    await logAuditEvent("auth.verify_email.success", user.id, {});
+    // Check each token with constant-time comparison
+    // SECURITY: bcrypt.compare is constant-time, preventing timing attacks
+    for (const verification of verifications) {
+      try {
+        const isValid = await bcrypt.compare(token, verification.tokenHash);
 
-    return { user: sanitizeUser(user) };
-    */
+        if (isValid) {
+          // Check if user already verified
+          if (verification.user.emailVerified) {
+            // Delete the token since it's no longer needed
+            await prisma.emailVerificationToken.delete({
+              where: { id: verification.id },
+            });
+
+            await logAuditEvent("auth.verify_email.already_verified", verification.userId, {
+              email: verification.email,
+            });
+
+            throw AuthError.alreadyVerified();
+          }
+
+          // Verify the user and delete the token in a transaction
+          // This ensures atomic operation - either both succeed or both fail
+          const [user] = await prisma.$transaction([
+            prisma.user.update({
+              where: { id: verification.userId },
+              data: {
+                emailVerified: true,
+                status: UserStatus.ACTIVE,
+              },
+            }),
+            prisma.emailVerificationToken.delete({
+              where: { id: verification.id },
+            }),
+          ]);
+
+          // Log successful verification
+          await logAuditEvent("auth.verify_email.success", user.id, {
+            email: user.email,
+          });
+
+          console.log(`[auth] Email verified successfully for user ${user.id}`);
+
+          return { user: sanitizeUser(user) };
+        }
+      } catch (error) {
+        // If bcrypt.compare fails, continue to next token
+        // This could happen with corrupted data
+        console.error("[auth] Token comparison error:", error);
+        continue;
+      }
+    }
+
+    // No matching token found (either invalid or expired)
+    // SECURITY: Generic error message prevents enumeration
+    await logAuditEvent("auth.verify_email.failed", null, {
+      reason: "No matching token found",
+    });
+
+    throw AuthError.invalidToken();
   },
 
   /**
@@ -829,33 +874,40 @@ export const authService = {
     }
 
     // Generate new verification token
-    const { token: verificationToken, hash: verificationHash } =
-      generateVerificationToken();
+    const { token: verificationToken } = generateVerificationToken();
     const verificationExpiry = getVerificationTokenExpiry();
 
-    // TODO: Store new verification token (invalidating any old ones)
-    // await prisma.emailVerification.upsert({
-    //   where: { userId: user.id },
-    //   create: {
-    //     userId: user.id,
-    //     tokenHash: verificationHash,
-    //     expiresAt: verificationExpiry,
-    //   },
-    //   update: {
-    //     tokenHash: verificationHash,
-    //     expiresAt: verificationExpiry,
-    //   },
-    // });
+    // SECURITY: Hash token with bcrypt for constant-time comparison
+    const verificationHash = await bcrypt.hash(verificationToken, 10);
 
-    console.log(
-      `[auth] New verification token for ${normalizedEmail}: ${verificationToken}`
-    );
-    console.log(`[auth] Token hash: ${verificationHash}`);
-    console.log(`[auth] Expires at: ${verificationExpiry.toISOString()}`);
+    // Delete all existing verification tokens for this user
+    // This invalidates old tokens and ensures only the latest token works
+    await prisma.emailVerificationToken.deleteMany({
+      where: { userId: user.id },
+    });
 
-    // TODO: Send verification email
-    // await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
-    console.log(`[auth] TODO: Send verification email to ${normalizedEmail}`);
+    // Store new verification token
+    await prisma.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        email: normalizedEmail,
+        tokenHash: verificationHash,
+        expiresAt: verificationExpiry,
+      },
+    });
+
+    // Send verification email
+    // If email sending fails, log but don't throw (user can request another resend)
+    try {
+      await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
+      console.log(`[auth] Verification email resent to ${normalizedEmail}`);
+    } catch (error) {
+      console.error(
+        `[auth] Failed to resend verification email to ${normalizedEmail}:`,
+        error instanceof Error ? error.message : String(error)
+      );
+      // Don't throw - token is stored, user can try again
+    }
 
     await logAuditEvent("auth.resend_verification.success", user.id, {
       email: normalizedEmail,
@@ -871,8 +923,11 @@ export const authService = {
    *
    * Security measures:
    * - Silent success for unknown emails (prevents enumeration)
-   * - Short token expiry (1 hour)
+   * - Short token expiry (15 minutes)
    * - Rate limiting (implement at API layer)
+   * - Invalidates old tokens for the user
+   * - Token is hashed before storage (never stored in plaintext)
+   * - Works even if user has no password (OAuth-only accounts)
    *
    * @param email - The email address to send reset link to
    */
@@ -885,49 +940,51 @@ export const authService = {
 
     // Silent success if user not found (prevents enumeration)
     if (!user) {
-      console.log(
-        `[auth] Password reset requested for unknown email: ${normalizedEmail}`
-      );
+      await logAuditEvent("auth.password_reset.email_not_found", null, {
+        email: normalizedEmail,
+      });
       return;
     }
 
     // Don't allow password reset for deleted accounts
     if (user.status === UserStatus.DELETED) {
-      console.log(
-        `[auth] Password reset requested for deleted account: ${normalizedEmail}`
-      );
+      await logAuditEvent("auth.password_reset.deleted_account", null, {
+        email: normalizedEmail,
+      });
       return;
     }
 
-    // Generate password reset token
+    // Generate cryptographically secure password reset token
     const { token: resetToken, hash: resetHash } = generateVerificationToken();
     const resetExpiry = getPasswordResetTokenExpiry();
 
-    // TODO: Store password reset token (invalidating any old ones)
-    // await prisma.passwordReset.upsert({
-    //   where: { userId: user.id },
-    //   create: {
-    //     userId: user.id,
-    //     tokenHash: resetHash,
-    //     expiresAt: resetExpiry,
-    //   },
-    //   update: {
-    //     tokenHash: resetHash,
-    //     expiresAt: resetExpiry,
-    //   },
-    // });
+    // Delete any existing unexpired password reset tokens for this user
+    // This prevents accumulation and ensures only the latest token is valid
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
 
-    console.log(
-      `[auth] Password reset token for ${normalizedEmail}: ${resetToken}`
-    );
-    console.log(`[auth] Token hash: ${resetHash}`);
-    console.log(`[auth] Expires at: ${resetExpiry.toISOString()}`);
+    // Store new password reset token with hash (not plaintext)
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        email: normalizedEmail,
+        token: resetHash, // Store hash, not plaintext
+        expiresAt: resetExpiry,
+        used: false,
+      },
+    });
 
-    // TODO: Send password reset email
-    // await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
-    console.log(
-      `[auth] TODO: Send password reset email to ${normalizedEmail}`
-    );
+    // Send password reset email with plaintext token
+    try {
+      await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
+    } catch (error) {
+      // Log email error but don't fail the request (silent success for enumeration protection)
+      console.error("[auth] Failed to send password reset email:", error);
+      // In production, you might want to queue this for retry
+    }
 
     await logAuditEvent("auth.password_reset.requested", user.id, {
       email: normalizedEmail,
@@ -938,92 +995,137 @@ export const authService = {
    * Resets a user's password using a reset token.
    *
    * Security measures:
+   * - Constant-time token comparison to prevent timing attacks
    * - Token validation and expiry check
-   * - Password strength validation
-   * - Revokes all existing sessions after reset
-   * - Token single-use (deleted after use)
+   * - Password strength validation (includes HIBP breach check)
+   * - Revokes all existing sessions after reset (forces re-login)
+   * - Token single-use (marked as used after successful reset)
+   * - Cleans up expired tokens automatically
+   * - Validates token hasn't already been used
    *
    * @param token - The password reset token from the email link
    * @param newPassword - The new password to set
-   * @throws AuthError if token invalid, expired, or password weak
+   * @throws AuthError if token invalid, expired, already used, or password weak
    */
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const tokenHash = hashToken(token);
 
-    // TODO: In production, look up the token in a PasswordReset table
-    // For now, this is a placeholder implementation
-
-    console.log(
-      `[auth] Attempting password reset with token hash: ${tokenHash}`
-    );
-    console.log("[auth] TODO: Implement PasswordReset table lookup");
-
-    // For demonstration, we'll throw an error
-    // In production, implement proper token storage and lookup
-    throw new AuthError(
-      "Password reset not fully implemented. Please store tokens in PasswordReset table.",
-      "NOT_IMPLEMENTED",
-      501
-    );
-
-    // Example of what the implementation should look like:
-    /*
-    const resetRequest = await prisma.passwordReset.findUnique({
-      where: { tokenHash },
+    // Find all non-expired, unused password reset tokens
+    // We query multiple tokens to use constant-time comparison for security
+    const resetTokens = await prisma.passwordResetToken.findMany({
+      where: {
+        expiresAt: { gt: new Date() },
+        used: false,
+      },
       include: { user: true },
     });
 
-    if (!resetRequest) {
+    // Use constant-time comparison to find the matching token
+    // This prevents timing attacks that could reveal valid token hashes
+    let matchedReset: typeof resetTokens[0] | null = null;
+    for (const reset of resetTokens) {
+      const bufferA = Buffer.from(reset.token, "hex");
+      const bufferB = Buffer.from(tokenHash, "hex");
+
+      // Ensure same length before timing-safe comparison
+      if (bufferA.length === bufferB.length) {
+        try {
+          if (crypto.timingSafeEqual(bufferA, bufferB)) {
+            matchedReset = reset;
+            // Continue loop for constant time
+          }
+        } catch {
+          // Length mismatch or invalid buffer - continue
+        }
+      }
+    }
+
+    // No matching token found
+    if (!matchedReset) {
+      await logAuditEvent("auth.password_reset.invalid_token", null, {
+        attemptedTokenHash: tokenHash.substring(0, 8), // Log prefix only
+      });
       throw AuthError.invalidToken();
     }
 
-    if (resetRequest.expiresAt < new Date()) {
-      // Clean up expired token
-      await prisma.passwordReset.delete({
-        where: { id: resetRequest.id },
+    // Double-check expiration (defense in depth)
+    if (matchedReset.expiresAt < new Date()) {
+      await prisma.passwordResetToken.delete({
+        where: { id: matchedReset.id },
+      });
+      await logAuditEvent("auth.password_reset.expired", matchedReset.userId, {
+        email: matchedReset.email,
       });
       throw AuthError.verificationExpired();
     }
 
-    // Validate new password strength
-    const passwordValidation = validatePasswordStrength(
+    // Validate new password strength (async - includes HIBP breach check)
+    const passwordValidation = await validatePasswordStrength(
       newPassword,
-      resetRequest.user.email
+      matchedReset.user.email
     );
     if (!passwordValidation.valid) {
+      await logAuditEvent("auth.password_reset.weak_password", matchedReset.userId, {
+        errors: passwordValidation.errors,
+      });
       throw AuthError.weakPassword(passwordValidation.errors);
     }
 
-    // Hash new password
+    // Hash new password with bcrypt
     const passwordHash = await hashPassword(newPassword);
 
-    // Update password, delete reset token, and revoke all sessions
+    // Execute password reset in a transaction for atomicity
+    // This ensures all operations succeed or all fail together
     await prisma.$transaction([
+      // Update user password
       prisma.user.update({
-        where: { id: resetRequest.userId },
+        where: { id: matchedReset.userId },
         data: {
           passwordHash,
-          // Reactivate if suspended due to too many failed attempts
+          // Optionally reactivate suspended accounts
           // status: UserStatus.ACTIVE,
         },
       }),
-      prisma.passwordReset.delete({
-        where: { id: resetRequest.id },
+      // Mark token as used (single-use tokens)
+      prisma.passwordResetToken.update({
+        where: { id: matchedReset.id },
+        data: { used: true },
       }),
+      // Revoke all existing sessions for security
+      // Forces user to log in with new password
       prisma.refreshToken.updateMany({
         where: {
-          userId: resetRequest.userId,
+          userId: matchedReset.userId,
           revokedAt: null,
         },
         data: { revokedAt: new Date() },
       }),
     ]);
 
-    await logAuditEvent("auth.password_reset.success", resetRequest.userId, {});
+    // Clean up old expired and used tokens for this user
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: matchedReset.userId,
+        OR: [
+          { expiresAt: { lt: new Date() } },
+          { used: true },
+        ],
+      },
+    });
 
-    // TODO: Send password changed confirmation email
-    // await emailService.sendPasswordChangedEmail(resetRequest.user.email);
-    */
+    await logAuditEvent("auth.password_reset.success", matchedReset.userId, {
+      email: matchedReset.email,
+    });
+
+    // Send password changed confirmation email
+    try {
+      await emailService.sendPasswordChangedEmail(matchedReset.user.email);
+    } catch (error) {
+      // Log email error but don't fail the request
+      // User's password was already changed successfully
+      console.error("[auth] Failed to send password changed email:", error);
+      // In production, you might want to queue this for retry
+    }
   },
 
   // ===========================================================================

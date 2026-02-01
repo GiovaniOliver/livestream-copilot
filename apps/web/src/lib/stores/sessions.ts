@@ -15,7 +15,7 @@ export interface Session {
   name: string;
   workflow: WorkflowType;
   captureMode: CaptureMode;
-  status: "live" | "paused" | "ended";
+  status: "live" | "active" | "paused" | "ended";
   startedAt: string;
   endedAt?: string;
   duration: string;

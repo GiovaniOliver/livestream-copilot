@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import type { PostCardProps, Platform, PostStatus } from "./types";
 import { PLATFORM_CONFIG } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Platform Icons
@@ -190,7 +191,7 @@ export function PostCard({
       setTimeout(() => setCopied(false), 2000);
       onCopy?.(post);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   };
 

@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { PromoDraft } from "./types";
+import { logger } from "@/lib/logger";
 
 export interface PromoDraftsProps {
   promoDrafts: PromoDraft[];
@@ -95,13 +96,13 @@ export function PromoDrafts({
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   }, []);
 
   const handleRegenerate = useCallback((id: string) => {
     // In a real app, this would trigger an AI regeneration
-    console.log("Regenerating draft:", id);
+    logger.debug("Regenerating draft:", id);
     // For now, just show a visual feedback
     const updated = drafts.map((d) =>
       d.id === id

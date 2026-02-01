@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { DashboardHeader } from "@/components/dashboard";
@@ -14,9 +14,10 @@ import {
   Badge,
 } from "@/components/ui";
 import { useSession } from "@/hooks/useSessions";
+import { useLiveStream } from "@/hooks/useLiveStream";
 import { WORKFLOW_META, type WorkflowType } from "@/lib/constants";
 
-type ConnectionStatus = "idle" | "waiting" | "connected" | "recording";
+type ConnectionStatus = "idle" | "waiting" | "connected" | "streaming";
 
 const PlayIcon = () => (
   <svg
@@ -111,8 +112,8 @@ function ConnectionStatusBadge({ status }: { status: ConnectionStatus }) {
       label: "Connected to OBS",
       className: "bg-success/20 text-success",
     },
-    recording: {
-      label: "Recording",
+    streaming: {
+      label: "Streaming",
       className: "bg-error/20 text-error",
     },
   };
@@ -131,27 +132,28 @@ export default function SessionPage() {
   const id = params.id as string;
 
   const { session, isLoading } = useSession(id);
-  const [connectionStatus, setConnectionStatus] =
-    useState<ConnectionStatus>("idle");
 
-  const handleStartRecording = () => {
-    if (connectionStatus === "idle") {
-      setConnectionStatus("waiting");
-      // Simulate connection to OBS
-      setTimeout(() => {
-        setConnectionStatus("connected");
-        setTimeout(() => {
-          setConnectionStatus("recording");
-        }, 500);
-      }, 1500);
+  // Use real stream status from backend
+  const { status: videoStatus, isLoading: videoLoading, startServer, isActionPending } = useLiveStream();
+
+  // Derive connection status from actual stream state
+  const getConnectionStatus = (): ConnectionStatus => {
+    if (!videoStatus) return "idle";
+    if (videoStatus.isStreaming) return "streaming";
+    if (videoStatus.isRunning) return "connected";
+    return "idle";
+  };
+
+  const connectionStatus = getConnectionStatus();
+  const isStreaming = connectionStatus === "streaming";
+
+  const handleStartServer = async () => {
+    try {
+      await startServer();
+    } catch (error) {
+      // Error is already handled in hook
     }
   };
-
-  const handleStopRecording = () => {
-    setConnectionStatus("idle");
-  };
-
-  const isRecording = connectionStatus === "recording";
 
   if (isLoading) {
     return (
@@ -184,9 +186,10 @@ export default function SessionPage() {
           status: session.status,
           duration: session.duration,
         }}
+        isStreaming={isStreaming}
         actions={
           <div className="flex items-center gap-2">
-            {session.status === "live" ? (
+            {isStreaming ? (
               <Button variant="outline" size="sm" className="gap-2">
                 <PauseIcon />
                 Pause
@@ -240,53 +243,64 @@ export default function SessionPage() {
           </CardContent>
         </Card>
 
-        {/* Recording Control Section */}
+        {/* Stream Status Section */}
         <div className="mb-8 flex flex-col items-center justify-center gap-6 rounded-2xl border border-bg2 bg-bg1 p-12">
           <ConnectionStatusBadge status={connectionStatus} />
 
-          <button
-            onClick={isRecording ? handleStopRecording : handleStartRecording}
+          <div
             className={`group flex h-32 w-32 items-center justify-center rounded-full border-4 transition-all duration-300 ${
-              isRecording
-                ? "border-error bg-error/10 hover:bg-error/20"
-                : "border-text-muted bg-bg2 hover:border-teal hover:bg-teal/10"
+              isStreaming
+                ? "border-error bg-error/10"
+                : connectionStatus === "connected"
+                  ? "border-success bg-success/10"
+                  : "border-text-muted bg-bg2"
             }`}
           >
-            <RecordingDot isRecording={isRecording} />
-          </button>
+            <RecordingDot isRecording={isStreaming} />
+          </div>
 
           <div className="text-center">
             <p className="text-lg font-semibold text-text">
-              {isRecording ? "Recording in Progress" : "Ready to Record"}
+              {isStreaming
+                ? "Stream Active"
+                : connectionStatus === "connected"
+                  ? "MediaMTX Server Running"
+                  : "Waiting for Stream"}
             </p>
             <p className="mt-1 text-sm text-text-muted">
-              {isRecording
-                ? "Click to stop recording"
-                : "Click to start recording from OBS"}
+              {isStreaming
+                ? "OBS is actively streaming"
+                : connectionStatus === "connected"
+                  ? "Ready to receive OBS stream"
+                  : "Start MediaMTX server or connect OBS to begin streaming"}
             </p>
+            {videoStatus && (
+              <p className="mt-2 text-xs text-text-dim font-mono">
+                RTMP URL: {videoStatus.rtmpUrl}
+              </p>
+            )}
           </div>
 
-          <Button
-            size="lg"
-            onClick={isRecording ? handleStopRecording : handleStartRecording}
-            className={`min-w-[200px] gap-3 text-lg ${
-              isRecording
-                ? "bg-error hover:bg-error/90"
-                : "bg-teal hover:bg-teal/90"
-            }`}
-          >
-            {isRecording ? (
-              <>
-                <StopIcon />
-                Stop Recording
-              </>
-            ) : (
-              <>
-                <RecordingDot isRecording={false} />
-                Start Recording
-              </>
-            )}
-          </Button>
+          {connectionStatus === "idle" && (
+            <Button
+              size="lg"
+              onClick={handleStartServer}
+              disabled={isActionPending || videoLoading}
+              className="min-w-[200px] gap-3 text-lg bg-teal hover:bg-teal/90"
+            >
+              {isActionPending ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Starting...
+                </>
+              ) : (
+                <>
+                  <PlayIcon />
+                  Start Video Server
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         {/* Assigned Workflow Info */}

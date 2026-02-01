@@ -21,6 +21,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { SignOptions, JwtPayload } from "jsonwebtoken";
 import crypto from "node:crypto";
+import { pwnedPassword } from "hibp";
 import { validateEnv } from "../config/env.js";
 
 // JsonWebTokenError and TokenExpiredError are accessed via jwt namespace
@@ -206,25 +207,28 @@ export async function verifyPassword(
  * - At least one number
  * - At least one special character
  * - Should not be similar to email (if provided)
+ * - Must not appear in known data breaches (HIBP check)
  *
  * Security notes:
- * - Does NOT check against common password lists (should be done separately)
- * - Consider integrating with Have I Been Pwned API for breach detection
+ * - Uses Have I Been Pwned API v3 with k-anonymity (only sends first 5 chars of SHA-1 hash)
+ * - Gracefully degrades if HIBP API is unavailable (logs warning but doesn't block user)
+ * - All checks are performed server-side for security
+ * - HIBP API is rate-limited but designed for this use case
  *
  * @param password - The password to validate
  * @param email - Optional email to check for similarity (prevents using email as password)
- * @returns Object containing validation result and any error messages
+ * @returns Promise resolving to object containing validation result and any error messages
  *
  * @example
- * const result = validatePasswordStrength('weak');
+ * const result = await validatePasswordStrength('weak');
  * if (!result.valid) {
  *   console.log(result.errors); // ['Password must be at least 12 characters', ...]
  * }
  */
-export function validatePasswordStrength(
+export async function validatePasswordStrength(
   password: string,
   email?: string
-): PasswordValidationResult {
+): Promise<PasswordValidationResult> {
   const errors: string[] = [];
 
   // Check minimum length
@@ -268,6 +272,31 @@ export function validatePasswordStrength(
     ) {
       errors.push("Password should not be similar to your email address");
     }
+  }
+
+  // Check against breached passwords using Have I Been Pwned API
+  // This uses k-anonymity: only the first 5 characters of the SHA-1 hash are sent
+  // The full hash never leaves the client, providing strong privacy guarantees
+  try {
+    const pwnedCount = await pwnedPassword(password);
+
+    if (pwnedCount > 0) {
+      // Password has been exposed in data breaches
+      errors.push(
+        `This password has appeared in ${pwnedCount.toLocaleString()} data breaches and should not be used. Please choose a different password.`
+      );
+    }
+  } catch (error) {
+    // HIBP API failure should not block user registration
+    // Log the error for monitoring but continue with other validations
+    // This provides defense in depth - if HIBP is down, other checks still apply
+    console.warn("[auth] HIBP API check failed:", {
+      error: error instanceof Error ? error.message : String(error),
+      timestamp: new Date().toISOString(),
+    });
+
+    // In production, you might want to emit a metric/alert here
+    // to monitor HIBP API availability
   }
 
   return {
@@ -717,12 +746,13 @@ export function getVerificationTokenExpiry(): Date {
 
 /**
  * Calculates the expiration date for a password reset token.
- * Password reset tokens expire in 1 hour for security.
+ * Password reset tokens expire in 15 minutes for security.
+ * Short window minimizes exposure if token is intercepted.
  *
  * @returns Date when password reset token should expire
  */
 export function getPasswordResetTokenExpiry(): Date {
-  return new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  return new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 }
 
 // ============================================================================

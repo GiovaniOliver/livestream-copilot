@@ -9,6 +9,8 @@ import { VideoThumbnail } from "@/components/video";
 import { ExportModal, ExportButton, type ExportContent } from "@/components/export";
 import { useExport } from "@/hooks/useExport";
 import type { ClipCardProps, ClipStatus } from "./types";
+import { getClipVideoUrl } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Status Configuration
@@ -94,11 +96,11 @@ export function ClipCardWithExport({
     generateHashtagSuggestions,
   } = useExport({
     onSuccess: (result) => {
-      console.log("Export successful:", result);
+      logger.debug("Export successful:", result);
       onExport?.(clip);
     },
     onError: (error) => {
-      console.error("Export failed:", error);
+      logger.error("Export failed:", error);
     },
   });
 
@@ -116,13 +118,16 @@ export function ClipCardWithExport({
   const handleExportClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
+    // Generate video URL from artifact ID
+    const videoUrl = getClipVideoUrl(clip.artifactId);
+
     // Convert clip to ExportContent
     const exportContent: ExportContent = {
       id: clip.id,
       type: "clip",
       title: clip.title,
       caption: clip.hookText,
-      videoUrl: clip.thumbnailUrl, // TODO: Use actual video URL
+      videoUrl, // Use generated video URL from artifact ID
       thumbnailUrl: clip.thumbnailUrl,
       duration: clip.duration,
       createdAt: clip.createdAt,

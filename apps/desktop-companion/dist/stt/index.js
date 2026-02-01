@@ -152,6 +152,31 @@ export class STTManager {
         }
     }
     /**
+     * Start STT with the given config
+     */
+    async start(config) {
+        if (!this.provider) {
+            this.createProvider();
+        }
+        await this.provider.start(config);
+    }
+    /**
+     * Stop STT
+     */
+    async stop() {
+        if (this.provider) {
+            await this.provider.stop();
+        }
+    }
+    /**
+     * Send audio data to the active provider
+     */
+    sendAudio(audioData) {
+        if (this.provider && this.provider.isReady()) {
+            this.provider.sendAudio(audioData);
+        }
+    }
+    /**
      * Get provider status
      */
     getStatus() {
@@ -159,9 +184,10 @@ export class STTManager {
             return { active: false, provider: null, status: null };
         }
         return {
-            active: true,
+            active: this.provider.status !== "stopped" && this.provider.status !== "idle",
             provider: this.provider.name,
             status: this.provider.status,
+            sessionId: this.provider.sessionId, // Some providers might have sessionId
         };
     }
 }

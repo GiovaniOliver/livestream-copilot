@@ -14,6 +14,7 @@ import {
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { use } from "react";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 interface MindMapPageProps {
   params: Promise<{ id: string }>;
@@ -204,6 +205,9 @@ export default function MindMapPage({ params }: MindMapPageProps) {
   );
   const totalActions = actionItems.length;
 
+  // Live stream status
+  const { status: videoStatus } = useLiveStream();
+
   // Load session from API
   const { session: apiSession, isLoading: sessionLoading } = useSession(id);
   useEffect(() => {
@@ -234,7 +238,7 @@ export default function MindMapPage({ params }: MindMapPageProps) {
     : {
         id,
         name: "Mind Map Session",
-        status: "live" as const,
+        status: "active" as const,
         duration: "0:00:00",
         workflow: "Mind Map Room",
       };
@@ -243,6 +247,7 @@ export default function MindMapPage({ params }: MindMapPageProps) {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
         session={sessionInfo}
+        isStreaming={videoStatus?.isStreaming}
         title="Mind Map Room"
         subtitle="Collaborative brainstorming with idea clustering and connection mapping"
       />
@@ -438,6 +443,22 @@ export default function MindMapPage({ params }: MindMapPageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LivePreview
+                  captureMode={session?.captureMode}
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Idea Clusters Panel */}
             <Card variant="elevated">
               <CardHeader>

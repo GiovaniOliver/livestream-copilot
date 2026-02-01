@@ -15,6 +15,13 @@ import * as TriggerConfigService from "../db/services/trigger-config.service.js"
 import * as ReferenceImageService from "../db/services/reference-image.service.js";
 import type { VisualTrigger } from "../db/services/trigger-config.service.js";
 import type { EventEnvelope } from "@livestream-copilot/shared";
+import { GeminiVisionProvider } from "./vision-providers/gemini.js";
+import { OpenAIVisionProvider } from "./vision-providers/openai.js";
+import { FrameExtractor, createFrameExtractor } from "./frame-extractor.js";
+import { config } from "../config/index.js";
+import { createLogger } from "../logger/index.js";
+
+const logger = createLogger("visual-trigger");
 
 /**
  * Visual detection result
@@ -99,7 +106,7 @@ export class ClaudeVisionProvider implements VisualDetectionProvider {
 
   async detect(frame: Buffer, triggers: VisualTrigger[]): Promise<VisualDetection[]> {
     if (!this.apiKey) {
-      console.warn("[visual-trigger] Claude API key not configured");
+      logger.warn("[ClaudeVision] API key not configured");
       return [];
     }
 
@@ -167,7 +174,7 @@ Response format: [{"label": "...", "confidence": 0.95}]`,
       const detections: VisualDetection[] = JSON.parse(jsonMatch[0]);
       return detections;
     } catch (error) {
-      console.error("[visual-trigger] Claude detection error:", error);
+      logger.error({ error }, "[ClaudeVision] Detection error");
       return [];
     }
   }
@@ -190,14 +197,41 @@ export class VisualTriggerService {
   private enabled: boolean = false;
   private triggers: VisualTrigger[] = [];
   private provider: VisualDetectionProvider | null = null;
+  private geminiProvider: GeminiVisionProvider | null = null;
+  private openaiProvider: OpenAIVisionProvider | null = null;
+  private frameExtractor: FrameExtractor | null = null;
   private frameSampleRate: number = 5;
   private extractionInterval: NodeJS.Timeout | null = null;
   private lastTriggerTime: Map<string, number> = new Map();
+  private lastFrameCheck: Map<string, number> = new Map();
   private cooldownMs: number = 30000;
+  private frameCheckInterval: number = 2000; // Minimum 2 seconds between frame checks
   private sessionStartTime: number = 0;
 
   constructor(wss: WebSocketServer) {
     this.wss = wss;
+
+    // Initialize vision providers
+    if (config.GEMINI_API_KEY) {
+      try {
+        this.geminiProvider = new GeminiVisionProvider(config.GEMINI_API_KEY);
+        logger.info("[VisualTrigger] Gemini vision provider initialized");
+      } catch (error) {
+        logger.warn({ error }, "[VisualTrigger] Failed to initialize Gemini provider");
+      }
+    }
+
+    if (config.OPENAI_API_KEY) {
+      try {
+        this.openaiProvider = new OpenAIVisionProvider(config.OPENAI_API_KEY);
+        logger.info("[VisualTrigger] OpenAI vision provider initialized");
+      } catch (error) {
+        logger.warn({ error }, "[VisualTrigger] Failed to initialize OpenAI provider");
+      }
+    }
+
+    // Get frame check interval from config
+    this.frameCheckInterval = config.VISUAL_TRIGGER_FRAME_INTERVAL || 2000;
   }
 
   /**
@@ -216,8 +250,9 @@ export class VisualTriggerService {
     await this.loadConfig();
 
     if (!this.enabled || this.triggers.length === 0) {
-      console.log(
-        `[visual-trigger] Visual triggers disabled or no cues configured for workflow "${workflow}"`
+      logger.info(
+        { workflow },
+        "[VisualTrigger] Visual triggers disabled or no cues configured"
       );
       return;
     }
@@ -230,8 +265,9 @@ export class VisualTriggerService {
       this.startFrameExtraction();
     }
 
-    console.log(
-      `[visual-trigger] Started with ${this.triggers.length} visual cues for workflow "${workflow}" using ${providerType}`
+    logger.info(
+      { workflow, triggerCount: this.triggers.length, providerType },
+      "[VisualTrigger] Started monitoring"
     );
   }
 
@@ -244,6 +280,11 @@ export class VisualTriggerService {
       this.extractionInterval = null;
     }
 
+    if (this.frameExtractor) {
+      this.frameExtractor.stopPeriodicExtraction();
+      this.frameExtractor = null;
+    }
+
     if (this.provider) {
       this.provider.dispose();
       this.provider = null;
@@ -252,8 +293,9 @@ export class VisualTriggerService {
     this.sessionId = null;
     this.workflow = null;
     this.lastTriggerTime.clear();
+    this.lastFrameCheck.clear();
 
-    console.log("[visual-trigger] Stopped monitoring");
+    logger.info("[VisualTrigger] Stopped monitoring");
   }
 
   /**
@@ -309,8 +351,10 @@ export class VisualTriggerService {
       // Check cooldown
       const lastTrigger = this.lastTriggerTime.get(trigger.id) ?? 0;
       if (now - lastTrigger < this.cooldownMs) {
-        console.log(
-          `[visual-trigger] "${trigger.label}" detected but in cooldown (${Math.round((this.cooldownMs - (now - lastTrigger)) / 1000)}s remaining)`
+        const remainingSec = Math.round((this.cooldownMs - (now - lastTrigger)) / 1000);
+        logger.debug(
+          { label: trigger.label, remainingSec },
+          "[VisualTrigger] Detection in cooldown"
         );
         continue;
       }
@@ -318,8 +362,13 @@ export class VisualTriggerService {
       // Update last trigger time
       this.lastTriggerTime.set(trigger.id, now);
 
-      console.log(
-        `[visual-trigger] Detected: "${trigger.label}" at t=${t.toFixed(2)}s (confidence: ${(detection.confidence * 100).toFixed(1)}%)`
+      logger.info(
+        {
+          label: trigger.label,
+          t: t.toFixed(2),
+          confidence: (detection.confidence * 100).toFixed(1),
+        },
+        "[VisualTrigger] Detected visual cue"
       );
 
       // Emit trigger event
@@ -335,7 +384,7 @@ export class VisualTriggerService {
         try {
           callback(triggerEvent);
         } catch (error) {
-          console.error("[visual-trigger] Callback error:", error);
+          logger.error({ error }, "[VisualTrigger] Callback error");
         }
       }
 
@@ -371,11 +420,16 @@ export class VisualTriggerService {
       this.cooldownMs = config.triggerCooldown * 1000;
       this.triggers = config.visualTriggers.filter((t) => t.enabled);
 
-      console.log(
-        `[visual-trigger] Loaded config: enabled=${this.enabled}, sampleRate=${this.frameSampleRate}s, triggers=${this.triggers.length}`
+      logger.info(
+        {
+          enabled: this.enabled,
+          sampleRate: this.frameSampleRate,
+          triggerCount: this.triggers.length,
+        },
+        "[VisualTrigger] Config loaded"
       );
     } catch (error) {
-      console.error("[visual-trigger] Failed to load config:", error);
+      logger.error({ error }, "[VisualTrigger] Failed to load config");
       this.enabled = false;
       this.triggers = [];
     }
@@ -392,15 +446,29 @@ export class VisualTriggerService {
       case "claude":
         const claudeKey = process.env.ANTHROPIC_API_KEY;
         if (!claudeKey) {
-          console.warn("[visual-trigger] ANTHROPIC_API_KEY not set");
+          logger.warn("[VisualTrigger] ANTHROPIC_API_KEY not set");
           return null;
         }
         return new ClaudeVisionProvider(claudeKey);
 
-      // TODO: Add GeminiVisionProvider, OpenAIVisionProvider
+      case "gemini":
+        if (!this.geminiProvider) {
+          logger.warn("[VisualTrigger] Gemini provider not initialized");
+          return null;
+        }
+        logger.info("[VisualTrigger] Using Gemini vision provider");
+        return null; // Gemini uses new interface, handled separately
+
+      case "openai":
+        if (!this.openaiProvider) {
+          logger.warn("[VisualTrigger] OpenAI provider not initialized");
+          return null;
+        }
+        logger.info("[VisualTrigger] Using OpenAI vision provider");
+        return null; // OpenAI uses new interface, handled separately
 
       default:
-        console.warn(`[visual-trigger] Unknown provider: ${type}`);
+        logger.warn({ type }, "[VisualTrigger] Unknown provider, defaulting to MediaPipe");
         return new MediaPipeProvider();
     }
   }
@@ -413,19 +481,153 @@ export class VisualTriggerService {
       clearInterval(this.extractionInterval);
     }
 
+    // Initialize frame extractor for RTSP stream
+    this.frameExtractor = createFrameExtractor("live/stream", {
+      maxWidth: 1024,
+      quality: 85,
+    });
+
+    logger.info(
+      { sampleRate: this.frameSampleRate },
+      "[VisualTrigger] Starting frame extraction"
+    );
+
     this.extractionInterval = setInterval(async () => {
-      if (!this.provider || !this.enabled) return;
+      if (!this.enabled || this.triggers.length === 0) return;
 
       try {
-        // TODO: Extract frame from MediaMTX RTSP stream
-        // For now, this is a placeholder
-        // const frame = await extractFrameFromStream();
-        // const detections = await this.provider.detect(frame, this.triggers);
-        // this.processDetections(detections);
+        await this.checkVisualTriggers();
       } catch (error) {
-        console.error("[visual-trigger] Frame extraction error:", error);
+        logger.error({ error }, "[VisualTrigger] Frame extraction error");
       }
     }, this.frameSampleRate * 1000);
+  }
+
+  /**
+   * Check all enabled visual triggers
+   */
+  private async checkVisualTriggers(): Promise<void> {
+    if (!this.frameExtractor) {
+      logger.warn("[VisualTrigger] Frame extractor not initialized");
+      return;
+    }
+
+    const now = Date.now();
+
+    // Check rate limiting
+    const lastCheck = this.lastFrameCheck.get("global") || 0;
+    if (now - lastCheck < this.frameCheckInterval) {
+      logger.debug(
+        { remaining: this.frameCheckInterval - (now - lastCheck) },
+        "[VisualTrigger] Rate limited, skipping frame check"
+      );
+      return;
+    }
+
+    this.lastFrameCheck.set("global", now);
+
+    try {
+      // Extract frame with timeout
+      const frameBuffer = await Promise.race([
+        this.frameExtractor.extractFrame(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Frame extraction timeout")), 5000)
+        ),
+      ]);
+
+      logger.debug(
+        { size: frameBuffer.length },
+        "[VisualTrigger] Frame extracted successfully"
+      );
+
+      // Process triggers based on provider type
+      await this.processTriggersWithVision(frameBuffer);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("timeout")) {
+          logger.warn("[VisualTrigger] Frame extraction timeout");
+        } else {
+          logger.error({ error }, "[VisualTrigger] Frame extraction failed");
+        }
+      }
+    }
+  }
+
+  /**
+   * Process triggers with vision API
+   */
+  private async processTriggersWithVision(frameBuffer: Buffer): Promise<void> {
+    for (const trigger of this.triggers) {
+      if (!trigger.enabled) continue;
+
+      // Check trigger cooldown
+      const now = Date.now();
+      const lastTrigger = this.lastTriggerTime.get(trigger.id) ?? 0;
+      if (now - lastTrigger < this.cooldownMs) {
+        continue;
+      }
+
+      try {
+        // Determine provider from trigger config
+        const visionProvider = (trigger as any).visionProvider || "gemini";
+        const confidenceThreshold = (trigger as any).confidenceThreshold || 0.7;
+        const visualQuery = (trigger as any).visualQuery || trigger.label;
+
+        // Detect with appropriate provider
+        let detection: VisualDetection | null = null;
+
+        if (visionProvider === "gemini" && this.geminiProvider) {
+          detection = await Promise.race([
+            this.geminiProvider.detect(frameBuffer, visualQuery, confidenceThreshold),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error("Vision detection timeout")), config.VISUAL_TRIGGER_TIMEOUT || 10000)
+            ),
+          ]);
+        } else if (visionProvider === "openai" && this.openaiProvider) {
+          detection = await Promise.race([
+            this.openaiProvider.detect(frameBuffer, visualQuery, confidenceThreshold),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error("Vision detection timeout")), config.VISUAL_TRIGGER_TIMEOUT || 10000)
+            ),
+          ]);
+        } else if (visionProvider === "claude" && this.provider) {
+          // Use legacy provider interface
+          const detections = await this.provider.detect(frameBuffer, [trigger]);
+          if (detections.length > 0) {
+            detection = detections[0];
+          }
+        }
+
+        // Process detection result
+        if (detection && detection.confidence >= confidenceThreshold) {
+          logger.info(
+            {
+              label: trigger.label,
+              confidence: detection.confidence,
+              provider: visionProvider,
+            },
+            "[VisualTrigger] Visual cue detected"
+          );
+
+          this.lastTriggerTime.set(trigger.id, now);
+          this.processDetections([detection]);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.includes("timeout")) {
+            logger.warn(
+              { trigger: trigger.label },
+              "[VisualTrigger] Detection timeout"
+            );
+          } else {
+            logger.error(
+              { error, trigger: trigger.label },
+              "[VisualTrigger] Detection error"
+            );
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -452,8 +654,9 @@ export class VisualTriggerService {
       }
     });
 
-    console.log(
-      `[visual-trigger] Emitted AUTO_TRIGGER_DETECTED: "${triggerEvent.detection.label}"`
+    logger.info(
+      { label: triggerEvent.detection.label },
+      "[VisualTrigger] Emitted AUTO_TRIGGER_DETECTED"
     );
   }
 }

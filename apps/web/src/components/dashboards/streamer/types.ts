@@ -11,9 +11,11 @@ export type ClipStatus = "processing" | "ready" | "error";
 
 export interface Clip {
   id: string;
+  artifactId: string; // Artifact ID used to generate media URLs
   title: string;
   hookText: string;
   thumbnailUrl: string;
+  path: string; // Path to video file on backend
   duration: number; // in seconds
   status: ClipStatus;
   createdAt: Date;
@@ -210,3 +212,27 @@ export const MOMENT_TYPE_CONFIG: Record<MomentType, MomentTypeConfig> = {
     borderColor: "border-teal/40",
   },
 };
+
+// ============================================================
+// Utility Functions
+// ============================================================
+
+/**
+ * Generate video URL for a clip
+ * @param artifactId - The artifact ID of the clip
+ * @returns Full URL to the clip's video file
+ */
+export function getClipVideoUrl(artifactId: string): string {
+  const baseUrl = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  return `${baseUrl}/api/clips/${artifactId}/media`;
+}
+
+/**
+ * Generate thumbnail URL for a clip
+ * @param artifactId - The artifact ID of the clip
+ * @returns Full URL to the clip's thumbnail
+ */
+export function getClipThumbnailUrl(artifactId: string): string {
+  const baseUrl = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  return `${baseUrl}/api/clips/${artifactId}/thumbnail`;
+}

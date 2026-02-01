@@ -310,34 +310,34 @@ model AuditLog {
 }
 
 /// Email verification token for confirming user email addresses
+/// SECURITY: Tokens are stored as bcrypt hashes for constant-time comparison
 model EmailVerificationToken {
   id        String   @id @default(cuid())
-  token     String   @unique
+  tokenHash String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   email     String   // The email address being verified
   expiresAt DateTime
-  used      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([token])
+  @@index([tokenHash])
   @@index([userId])
   @@index([email])
   @@index([expiresAt])
 }
 
 /// Password reset token for secure password recovery
+/// SECURITY: Tokens are stored as bcrypt hashes for constant-time comparison
 model PasswordResetToken {
   id        String   @id @default(cuid())
-  token     String   @unique
+  tokenHash String   @unique
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   email     String   // The email address associated with the reset request
   expiresAt DateTime
-  used      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([token])
+  @@index([tokenHash])
   @@index([userId])
   @@index([email])
   @@index([expiresAt])

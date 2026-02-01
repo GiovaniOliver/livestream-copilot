@@ -14,6 +14,7 @@ import {
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { use } from "react";
+import { LivePreview, useLiveStream } from "@/components/video";
 
 // =============================================================================
 // Types
@@ -309,6 +310,9 @@ export default function DebateRoomPage({ params }: DebateRoomPageProps) {
   const conClaims = claims.filter((c) => c.side === "con");
   const pendingRebuttals = rebuttals.filter((r) => r.status === "pending");
 
+  // Live stream status
+  const { status: videoStatus } = useLiveStream();
+
   // Load session from API
   const { session: apiSession, isLoading: sessionLoading } = useSession(id);
   useEffect(() => {
@@ -339,7 +343,7 @@ export default function DebateRoomPage({ params }: DebateRoomPageProps) {
     : {
         id,
         name: "Debate Session",
-        status: "live" as const,
+        status: "active" as const,
         duration: "0:00:00",
         workflow: "Debate Room",
       };
@@ -348,6 +352,7 @@ export default function DebateRoomPage({ params }: DebateRoomPageProps) {
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
         session={sessionInfo}
+        isStreaming={videoStatus?.isStreaming}
         title="Debate Room"
         subtitle="Structured debate analysis with argument tracking and evidence management"
       />
@@ -683,6 +688,22 @@ export default function DebateRoomPage({ params }: DebateRoomPageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Live Preview */}
+            <Card variant="elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LivePreview
+                  captureMode={session?.captureMode}
+                  webrtcUrl={videoStatus?.webrtcUrl}
+                  hlsUrl={videoStatus?.hlsUrl}
+                  isStreamActive={videoStatus?.isStreaming}
+                  size="sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Rebuttal Queue */}
             <Card variant="elevated">
               <CardHeader>

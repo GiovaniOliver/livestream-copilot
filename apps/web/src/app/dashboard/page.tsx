@@ -19,6 +19,7 @@ import {
   type Session,
 } from "@/lib/stores/sessions";
 import { useSessions } from "@/hooks/useSessions";
+import { logger } from "@/lib/logger";
 
 const PlusIcon = () => (
   <svg
@@ -177,7 +178,7 @@ export default function DashboardPage() {
       await endSessionApi(id);
     } catch (err) {
       // Error is already set in the hook
-      console.error("Failed to end session:", err);
+      logger.error("Failed to end session:", err);
     }
   }, [endSessionApi]);
 
@@ -187,7 +188,7 @@ export default function DashboardPage() {
         await deleteSessionApi(id);
       } catch (err) {
         // Error is already set in the hook
-        console.error("Failed to delete session:", err);
+        logger.error("Failed to delete session:", err);
       }
     }
   }, [deleteSessionApi]);

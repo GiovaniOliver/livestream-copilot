@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { QuoteCard } from "./QuoteCard";
 import type { Quote } from "./types";
+import { logger } from "@/lib/logger";
 
 export interface QuoteBankProps {
   quotes: Quote[];
@@ -56,7 +57,7 @@ export function QuoteBank({
   );
 
   const handleCopy = useCallback((text: string) => {
-    console.log("Copied:", text);
+    logger.debug("Copied:", text);
   }, []);
 
   const filteredAndSortedQuotes = useMemo(() => {

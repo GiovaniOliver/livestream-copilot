@@ -11,6 +11,7 @@ import type {
   ActionItemData,
   IdeaConnection,
 } from "./types";
+import { logger } from "@/lib/logger";
 
 // Define all Mind Map actions based on the AI Agent Actions spec
 export const MIND_MAP_ACTIONS: MindMapAction[] = [
@@ -227,13 +228,13 @@ export function useMindMapActions({
       // Check cooldown
       const cooldownEnd = cooldowns.get(actionId);
       if (cooldownEnd && Date.now() < cooldownEnd) {
-        console.log(`Action ${actionId} is on cooldown`);
+        logger.debug(`Action ${actionId} is on cooldown`);
         return;
       }
 
       // Check if selection is required
       if (action.requiresSelection && (!context?.selectedNodeIds?.length && !context?.selectedIdeaIds?.length)) {
-        console.log(`Action ${actionId} requires a selection`);
+        logger.debug(`Action ${actionId} requires a selection`);
         return;
       }
 
@@ -501,13 +502,13 @@ async function simulateActionExecution(
 
     case "mind_map.cluster_ideas": {
       // Simulate clustering - in production would use actual AI
-      console.log("Clustering ideas based on semantic similarity...");
+      logger.debug("Clustering ideas based on semantic similarity...");
       break;
     }
 
     case "mind_map.prioritize_ideas": {
       // Simulate prioritization
-      console.log("Prioritizing ideas based on criteria...");
+      logger.debug("Prioritizing ideas based on criteria...");
       break;
     }
 

@@ -9,6 +9,7 @@ import { ClipPreviewModal } from "@/components/video";
 import { getClipMediaUrl } from "@/lib/api/clips";
 import { mockClips, mockPosts, mockMoments, MOCK_STREAM_DURATION } from "./mockData";
 import type { ProducerDeskProps, Clip, Post, Moment } from "./types";
+import { logger } from "@/lib/logger";
 
 // ============================================================
 // Icons
@@ -170,37 +171,37 @@ export function ProducerDesk({
 
   const handleClipEdit = (clip: Clip) => {
     onClipEdit?.(clip);
-    console.log("Edit clip:", clip.id);
+    logger.debug("Edit clip:", clip.id);
   };
 
   const handleClipExport = (clip: Clip) => {
     onClipExport?.(clip);
-    console.log("Export clip:", clip.id);
+    logger.debug("Export clip:", clip.id);
   };
 
   const handlePostEdit = (post: Post) => {
     onPostEdit?.(post);
-    console.log("Edit post:", post.id);
+    logger.debug("Edit post:", post.id);
   };
 
   const handlePostCopy = (post: Post) => {
     onPostCopy?.(post);
-    console.log("Copy post:", post.id);
+    logger.debug("Copy post:", post.id);
   };
 
   const handlePostApprove = (post: Post) => {
     onPostApprove?.(post);
-    console.log("Approve post:", post.id);
+    logger.debug("Approve post:", post.id);
   };
 
   const handlePostShare = (post: Post) => {
     onPostShare?.(post);
-    console.log("Share post:", post.id);
+    logger.debug("Share post:", post.id);
   };
 
   const handleMomentClick = (moment: Moment) => {
     onMomentClick?.(moment);
-    console.log("Click moment:", moment.id);
+    logger.debug("Click moment:", moment.id);
   };
 
   const togglePanelExpand = (panel: "clips" | "posts" | "moments") => {

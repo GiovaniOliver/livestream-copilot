@@ -4,6 +4,7 @@ import { useState, type DragEvent } from "react";
 import { cn } from "@/lib/utils";
 import type { ActionItemData, FunnelColumn } from "./types";
 import { ActionItem } from "./ActionItem";
+import { logger } from "@/lib/logger";
 
 export interface DecisionFunnelProps {
   items: ActionItemData[];
@@ -101,7 +102,7 @@ function DecisionFunnel({ items, onItemsChange, className }: DecisionFunnelProps
 
   // Edit item (placeholder)
   const handleEdit = (itemId: string) => {
-    console.log("Edit item:", itemId);
+    logger.debug("Edit item:", itemId);
     // Would open an edit modal in production
   };
 

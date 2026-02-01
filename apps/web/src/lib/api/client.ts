@@ -1,6 +1,67 @@
 /**
  * Base API client for FluxBoard desktop companion service communication
  * Enhanced with comprehensive Zod schema validation for runtime type safety
+ * and configurable request timeout handling (SOC-409)
+ *
+ * @module api/client
+ *
+ * Features:
+ * - Type-safe HTTP methods (GET, POST, PUT, PATCH, DELETE)
+ * - Automatic Zod schema validation
+ * - Request timeout with AbortController (default: 30s)
+ * - Comprehensive error handling
+ * - Development mode logging
+ *
+ * @example Basic usage
+ * ```ts
+ * import { apiClient } from '@/lib/api/client';
+ * import { z } from 'zod';
+ *
+ * const userSchema = z.object({
+ *   id: z.string(),
+ *   name: z.string(),
+ * });
+ *
+ * // GET request with schema validation
+ * const user = await apiClient.get('/users/123', userSchema);
+ *
+ * // POST request with timeout
+ * const newUser = await apiClient.post(
+ *   '/users',
+ *   userSchema,
+ *   { name: 'John' },
+ *   { timeout: 5000 }
+ * );
+ * ```
+ *
+ * @example Timeout configuration
+ * ```ts
+ * // Use default timeout (30 seconds)
+ * await apiClient.get('/data');
+ *
+ * // Custom timeout for long-running operations
+ * await apiClient.post('/process', { data }, { timeout: 60000 });
+ *
+ * // Quick timeout for health checks
+ * await apiClient.get('/health', { timeout: 5000 });
+ * ```
+ *
+ * @example Error handling
+ * ```ts
+ * try {
+ *   const data = await apiClient.get('/data', schema);
+ * } catch (error) {
+ *   if (error instanceof ApiError) {
+ *     if (error.statusText === 'Request Timeout') {
+ *       console.error('Request timed out after', error.body.message);
+ *     } else {
+ *       console.error('API error:', error.status, error.statusText);
+ *     }
+ *   } else if (error instanceof ValidationError) {
+ *     console.error('Validation failed:', error.getFormattedErrors());
+ *   }
+ * }
+ * ```
  */
 
 import { z } from "zod";
@@ -10,7 +71,18 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123";
 const isDev = process.env.NODE_ENV === "development";
 
 /**
+ * Default request timeout in milliseconds
+ * Can be overridden per-request via RequestOptions.timeout
+ */
+const DEFAULT_TIMEOUT = 30000; // 30 seconds
+
+/**
  * API error with status code and response body
+ *
+ * @example
+ * ```ts
+ * throw new ApiError(404, 'Not Found', { message: 'User not found' });
+ * ```
  */
 export class ApiError extends Error {
   constructor(
@@ -25,6 +97,17 @@ export class ApiError extends Error {
 
 /**
  * Validation error when API response doesn't match expected schema
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await apiClient.get('/user', userSchema);
+ * } catch (error) {
+ *   if (error instanceof ValidationError) {
+ *     console.error(error.getFormattedErrors());
+ *   }
+ * }
+ * ```
  */
 export class ValidationError extends Error {
   constructor(
@@ -47,11 +130,26 @@ export class ValidationError extends Error {
 
 /**
  * Request configuration options
+ *
+ * @property {unknown} body - Request body (will be JSON.stringified)
+ * @property {Record<string, string | number | boolean | undefined>} params - URL query parameters
+ * @property {boolean} skipValidation - Skip Zod schema validation (use with caution)
+ * @property {number} timeout - Request timeout in milliseconds (default: 30000)
+ *
+ * @example
+ * ```ts
+ * const options: RequestOptions = {
+ *   headers: { 'X-Custom-Header': 'value' },
+ *   timeout: 60000, // 60 seconds
+ *   params: { page: 1, limit: 10 },
+ * };
+ * ```
  */
-export interface RequestOptions extends Omit<RequestInit, "body"> {
+export interface RequestOptions extends Omit<RequestInit, "body" | "signal"> {
   body?: unknown;
   params?: Record<string, string | number | boolean | undefined>;
-  skipValidation?: boolean; // Allow bypassing validation for edge cases
+  skipValidation?: boolean;
+  timeout?: number;
 }
 
 /**
@@ -115,7 +213,7 @@ function buildUrl(path: string, params?: Record<string, string | number | boolea
 async function request<T>(
   method: string,
   path: string,
-  options: RequestOptions = {}
+  options?: RequestOptions
 ): Promise<T>;
 
 async function request<T>(
@@ -138,7 +236,15 @@ async function request<T>(
     ? (maybeOptions ?? {})
     : (schemaOrOptions as RequestOptions) ?? {};
 
-  const { body, params, headers: customHeaders, skipValidation, ...fetchOptions } = options;
+  const {
+    body,
+    params,
+    headers: customHeaders,
+    skipValidation,
+    timeout = DEFAULT_TIMEOUT,
+    ...fetchOptions
+  } = options;
+
   const url = buildUrl(path, params);
 
   const headers: HeadersInit = {
@@ -147,6 +253,10 @@ async function request<T>(
     ...customHeaders,
   };
 
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
   logRequest(method, url, options);
 
   try {
@@ -154,8 +264,11 @@ async function request<T>(
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
       ...fetchOptions,
     });
+
+    clearTimeout(timeoutId);
 
     let data: unknown;
     const contentType = response.headers.get("content-type");
@@ -189,10 +302,18 @@ async function request<T>(
 
     return data as T;
   } catch (error) {
+    clearTimeout(timeoutId);
     logError(method, url, error);
 
     if (error instanceof ApiError || error instanceof ValidationError) {
       throw error;
+    }
+
+    // Handle timeout errors
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new ApiError(0, "Request Timeout", {
+        message: `Request timed out after ${timeout}ms`,
+      });
     }
 
     // Network or other fetch errors
