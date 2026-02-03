@@ -12,6 +12,7 @@ import {
   Badge,
 } from "@/components/ui";
 import { useLiveStream } from "@/hooks/useLiveStream";
+import { logger } from "@/lib/logger";
 
 // Storage keys
 const OBS_SETTINGS_KEY = "fluxboard_obs_settings";
@@ -947,5 +948,4 @@ export default function SettingsPage() {
       </div>
     </>
   );
-import { logger } from "@/lib/logger";
 }

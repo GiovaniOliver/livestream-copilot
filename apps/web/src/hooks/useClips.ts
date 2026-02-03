@@ -16,6 +16,7 @@ import {
 } from "@/lib/api/clips";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 /**
  * Clip with formatted display properties
@@ -302,7 +303,6 @@ export function useClip(clipId: string): {
 
       // Import getClip lazily to avoid circular deps
       const { getClip } = await import("@/lib/api/clips");
-import { logger } from "@/lib/logger";
       const apiClip = await getClip(clipId, accessToken || undefined);
       setClip(transformClip(apiClip));
     } catch (err) {

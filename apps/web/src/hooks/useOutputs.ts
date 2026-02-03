@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/outputs";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 /**
  * Output with display-friendly properties
@@ -398,7 +399,6 @@ export function useOutput(outputId: string): {
 
       // Import getOutput lazily to avoid circular deps
       const { getOutput } = await import("@/lib/api/outputs");
-import { logger } from "@/lib/logger";
       const apiOutput = await getOutput(outputId, accessToken || undefined);
       setOutput(transformOutput(apiOutput));
     } catch (err) {
