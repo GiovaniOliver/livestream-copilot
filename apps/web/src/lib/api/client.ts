@@ -66,15 +66,11 @@
 
 import { z } from "zod";
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from "@/lib/config";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123";
-const isDev = process.env.NODE_ENV === "development";
-
-/**
- * Default request timeout in milliseconds
- * Can be overridden per-request via RequestOptions.timeout
- */
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
+const BASE_URL = API_CONFIG.baseUrl;
+const DEFAULT_TIMEOUT = API_CONFIG.timeout;
+const isDev = API_CONFIG.enableLogging;
 
 /**
  * API error with status code and response body
@@ -330,8 +326,6 @@ export const apiClient = {
   /**
    * Make a GET request
    */
-  get<T>(path: string, params?: Record<string, string | number | boolean | undefined> | RequestOptions): Promise<T>;
-  get<T>(path: string, schema: z.ZodSchema<T>, options?: RequestOptions): Promise<T>;
   get<T>(
     path: string,
     schemaOrParams?: z.ZodSchema<T> | Record<string, string | number | boolean | undefined> | RequestOptions,
@@ -353,8 +347,6 @@ export const apiClient = {
   /**
    * Make a POST request
    */
-  post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
-  post<T>(path: string, schema: z.ZodSchema<T>, body?: unknown, options?: RequestOptions): Promise<T>;
   post<T>(
     path: string,
     schemaOrBody?: z.ZodSchema<T> | unknown,
@@ -378,8 +370,6 @@ export const apiClient = {
   /**
    * Make a PUT request
    */
-  put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
-  put<T>(path: string, schema: z.ZodSchema<T>, body?: unknown, options?: RequestOptions): Promise<T>;
   put<T>(
     path: string,
     schemaOrBody?: z.ZodSchema<T> | unknown,
@@ -403,8 +393,6 @@ export const apiClient = {
   /**
    * Make a PATCH request
    */
-  patch<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
-  patch<T>(path: string, schema: z.ZodSchema<T>, body?: unknown, options?: RequestOptions): Promise<T>;
   patch<T>(
     path: string,
     schemaOrBody?: z.ZodSchema<T> | unknown,
@@ -428,8 +416,6 @@ export const apiClient = {
   /**
    * Make a DELETE request
    */
-  delete<T>(path: string, options?: RequestOptions): Promise<T>;
-  delete<T>(path: string, schema: z.ZodSchema<T>, options?: RequestOptions): Promise<T>;
   delete<T>(
     path: string,
     schemaOrOptions?: z.ZodSchema<T> | RequestOptions,
