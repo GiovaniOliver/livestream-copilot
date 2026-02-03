@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { forgotPassword } from '@/lib/api/auth';
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -71,11 +72,12 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="pt-4 space-y-3">
-            <Link href="/auth/login">
-              <Button fullWidth>
-                Back to login
-              </Button>
-            </Link>
+            <Button
+              onClick={() => router.push('/auth/login')}
+              fullWidth
+            >
+              Back to login
+            </Button>
 
             <button
               onClick={() => {
@@ -130,7 +132,7 @@ export default function ForgotPasswordPage() {
       </form>
 
       <div className="mt-6 text-center">
-        <Link
+        <a
           href="/auth/login"
           className="text-sm text-neutral-400 hover:text-neutral-300 transition-colors inline-flex items-center gap-2"
         >
@@ -138,7 +140,7 @@ export default function ForgotPasswordPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to login
-        </Link>
+        </a>
       </div>
     </AuthLayout>
   );
