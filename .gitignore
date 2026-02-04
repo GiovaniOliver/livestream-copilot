@@ -1,9 +1,5 @@
 node_modules
 
-# Documentation (generated)
-docs/
-**/docs/
-
 # Session data
 sessions/
 **/sessions/
