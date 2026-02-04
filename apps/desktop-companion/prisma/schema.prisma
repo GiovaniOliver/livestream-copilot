@@ -388,25 +388,25 @@ model MediaAsset {
 
 /// Represents a livestream capture session
 model Session {
-  id              String        @id @default(cuid())
+  id              String            @id @default(cuid())
   userId          String?
-  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   organizationId  String?
-  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization    Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  workflow        String        // content-creator, podcast, script-studio, etc.
-  captureMode     String        // audio-only, video-only, audio+video
+  workflow        String            // content-creator, podcast, script-studio, etc.
+  captureMode     String            // audio-only, video-only, audio+video
   title           String?
   description     String?
   participants    String[]
 
   // Session state
-  status          String        @default("draft") // draft, live, processing, completed
+  status          String            @default("draft") // draft, live, processing, completed
   startedAt       DateTime?
   endedAt         DateTime?
 
   // Workflow-specific settings
-  workflowConfig  Json          @default("{}")
+  workflowConfig  Json              @default("{}")
 
   // Relations
   events          Event[]
@@ -415,9 +415,10 @@ model Session {
   mediaAssets     MediaAsset[]
   exports         Export[]
   clipQueueItems  ClipQueueItem[]
+  mobileRecordings MobileRecording[]
 
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([userId])
   @@index([organizationId])
@@ -473,6 +474,25 @@ model Clip {
   createdAt   DateTime @default(now())
 
   @@index([sessionId])
+}
+
+/// Represents a recording uploaded from mobile device
+model MobileRecording {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  deviceId    String
+  filePath    String
+  filename    String
+  size        BigInt
+  mimeType    String
+  captureMode String   @default("av") // audio, video, av
+  uploadedAt  DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([deviceId])
+  @@index([uploadedAt])
 }
 
 // ============================================================================

@@ -7,6 +7,8 @@
  * - POST /batch - Batch export multiple items
  * - GET /history - Get export history
  * - GET /stats - Get export statistics
+ * - GET /:id/download - Download export file
+ * - GET /:id/status - Get export status
  * - DELETE /:id - Delete an export
  * - POST /preview - Preview formatted post without saving
  *
@@ -15,6 +17,9 @@
 
 import { Router, type Request, type Response } from 'express';
 import { z, ZodError } from 'zod';
+import { createReadStream } from 'fs';
+import fs from 'fs';
+import path from 'path';
 import { authenticateToken, type AuthenticatedRequest } from '../auth/middleware.js';
 import * as exportService from './service.js';
 import type {
@@ -22,7 +27,8 @@ import type {
   ExportClipRequest,
   ExportBatchRequest,
 } from './types.js';
-import { SocialPlatform, ExportFormat } from './types.js';
+import { SocialPlatform, ExportFormat, ExportStatus } from './types.js';
+import * as ExportDBService from '../db/services/export.service.js';
 
 // =============================================================================
 // VALIDATION SCHEMAS
@@ -237,6 +243,127 @@ async function exportBatchHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
+ * GET /api/export/:id/status
+ * Get export job status
+ */
+async function getExportStatusHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const user = (req as AuthenticatedRequest).user;
+    const exportId = req.params.id;
+
+    const exportJob = await ExportDBService.getExportById(exportId);
+
+    if (!exportJob) {
+      sendError(res, 404, 'EXPORT_NOT_FOUND', 'Export not found');
+      return;
+    }
+
+    if (exportJob.userId !== user.id) {
+      sendError(res, 403, 'UNAUTHORIZED', 'Unauthorized to access this export');
+      return;
+    }
+
+    // Calculate progress
+    let progress = 0;
+    if (exportJob.status === ExportStatus.COMPLETED) {
+      progress = 100;
+    } else if (exportJob.status === ExportStatus.PROCESSING) {
+      progress = 50; // Rough estimate
+    }
+
+    sendSuccess(res, {
+      id: exportJob.id,
+      status: exportJob.status,
+      progress,
+      createdAt: exportJob.createdAt,
+      completedAt: exportJob.completedAt,
+      errorMessage: exportJob.errorMessage,
+      metadata: exportJob.metadata,
+    });
+  } catch (error: any) {
+    console.error('[export/routes] Get status error:', error);
+    sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
+  }
+}
+
+/**
+ * GET /api/export/:id/download
+ * Download export file
+ */
+async function downloadExportHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const user = (req as AuthenticatedRequest).user;
+    const exportId = req.params.id;
+
+    const exportJob = await ExportDBService.getExportById(exportId);
+
+    if (!exportJob) {
+      sendError(res, 404, 'EXPORT_NOT_FOUND', 'Export not found');
+      return;
+    }
+
+    if (exportJob.userId !== user.id) {
+      sendError(res, 403, 'UNAUTHORIZED', 'Unauthorized to access this export');
+      return;
+    }
+
+    if (exportJob.status !== ExportStatus.COMPLETED) {
+      sendError(res, 400, 'EXPORT_NOT_READY', 'Export is not ready for download');
+      return;
+    }
+
+    if (!exportJob.filePath || !fs.existsSync(exportJob.filePath)) {
+      sendError(res, 404, 'FILE_NOT_FOUND', 'Export file not found');
+      return;
+    }
+
+    // Determine content type
+    const ext = path.extname(exportJob.filePath).toLowerCase();
+    let contentType = 'application/octet-stream';
+
+    if (ext === '.zip') {
+      contentType = 'application/zip';
+    } else if (ext === '.mp4') {
+      contentType = 'video/mp4';
+    } else if (ext === '.webm') {
+      contentType = 'video/webm';
+    } else if (ext === '.mov') {
+      contentType = 'video/quicktime';
+    } else if (ext === '.txt') {
+      contentType = 'text/plain';
+    }
+
+    // Set headers
+    res.setHeader('Content-Type', contentType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${path.basename(exportJob.filePath)}"`
+    );
+
+    if (exportJob.fileSize) {
+      res.setHeader('Content-Length', exportJob.fileSize.toString());
+    }
+
+    // Stream file
+    const fileStream = createReadStream(exportJob.filePath);
+
+    fileStream.on('error', (err) => {
+      console.error('[export/routes] File stream error:', err);
+      if (!res.headersSent) {
+        res.status(500).end();
+      }
+    });
+
+    fileStream.pipe(res);
+  } catch (error: any) {
+    console.error('[export/routes] Download error:', error);
+    if (!res.headersSent) {
+      sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
+    }
+  }
+}
+
+/**
  * GET /api/export/history
  * Get export history for current user
  */
@@ -355,6 +482,10 @@ export function createExportRouter(): Router {
   router.post('/post', exportPostHandler);
   router.post('/clip', exportClipHandler);
   router.post('/batch', exportBatchHandler);
+
+  // Status and download
+  router.get('/:id/status', getExportStatusHandler);
+  router.get('/:id/download', downloadExportHandler);
 
   // History and statistics
   router.get('/history', getExportHistoryHandler);

@@ -11,6 +11,7 @@
  * - Opik observability integration
  * - Sentry error monitoring
  * - Social media export functionality
+ * - Mobile recording uploads (SOC-407)
  */
 
 // Initialize Sentry BEFORE any other imports to capture all errors
@@ -91,6 +92,7 @@ import { sessionsRouter, setActiveSessionGetter, setActiveSessionClearer } from 
 import { clipsRouter, sessionClipsRouter } from "./api/clips.js";
 import { outputsRouter, sessionOutputsRouter } from "./api/outputs.js";
 import { eventsRouter, sessionEventsRouter } from "./api/events.js";
+import { recordingsRouter } from "./api/recordings.js";
 // Note: triggersRouter requires multer - will be loaded dynamically if available
 import { clipQueueRouter, sessionClipQueueRouter } from "./api/clip-queue.js";
 import { billingRouter } from "./billing/index.js";
@@ -560,6 +562,12 @@ async function main() {
   app.use("/api/events", eventsRouter);
   app.use("/api/sessions/:sessionId/events", sessionEventsRouter);
   apiLogger.info("Events routes mounted at /api/events and /api/sessions/:sessionId/events");
+
+  // =============================================================================
+  // Recordings Routes (Mobile uploads)
+  // =============================================================================
+  app.use("/api/sessions", recordingsRouter);
+  apiLogger.info("Recordings routes mounted at /api/sessions/:sessionId/recordings");
 
   // =============================================================================
   // Triggers Routes (Auto-marker configuration)

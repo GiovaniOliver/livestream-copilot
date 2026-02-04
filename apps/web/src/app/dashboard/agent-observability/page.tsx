@@ -12,10 +12,11 @@ import {
   Badge,
 } from "@/components/ui";
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from '@/lib/config';
 
 // Storage key for API configuration
 const API_CONFIG_KEY = "fluxboard_api_config";
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3123";
+const BACKEND_URL = API_CONFIG.baseUrl;
 
 // Types
 interface APIConfig {

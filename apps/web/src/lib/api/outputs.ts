@@ -181,5 +181,46 @@ export async function approveAllDrafts(
   return { count: response.data.count };
 }
 
+/**
+ * Regenerate output content using AI
+ * @param id - Output ID
+ * @param options - Regeneration options
+ * @param token - Optional auth token
+ * @returns Updated output with regenerated content
+ *
+ * @example
+ * ```ts
+ * // Regenerate with default AI settings
+ * const output = await regenerateOutput('output-123');
+ *
+ * // Regenerate with custom instructions
+ * const output = await regenerateOutput('output-123', {
+ *   instructions: 'Make it more casual and add emojis'
+ * });
+ * ```
+ */
+export async function regenerateOutput(
+  id: string,
+  options?: {
+    instructions?: string;
+  },
+  token?: string
+): Promise<OutputInfo> {
+  const response = await apiClient.post(
+    `/api/outputs/${encodeURIComponent(id)}/regenerate`,
+    outputMutationResponseSchema,
+    {
+      instructions: options?.instructions,
+    },
+    withAuth(token, { timeout: 60000 }) // 60 second timeout for AI generation
+  );
+
+  if (!response.data.output) {
+    throw new Error("Output not returned from regeneration");
+  }
+
+  return response.data.output;
+}
+
 // Re-export types for convenience
 export type { OutputStatus, OutputInfo, OutputWithSession, PaginationInfo };

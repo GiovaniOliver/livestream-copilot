@@ -12,6 +12,7 @@ import {
   apiResponseSchema,
   type ClipInfo,
 } from "./schemas";
+import { API_CONFIG } from '@/lib/config';
 
 /**
  * Clip intent start/end response
@@ -110,7 +111,7 @@ export async function endClip(
  * @param artifactId - Artifact ID of the clip
  */
 export function getClipMediaUrl(artifactId: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123";
+  const baseUrl = API_CONFIG.baseUrl;
   return `${baseUrl}/api/clips/${artifactId}/media`;
 }
 
@@ -119,7 +120,7 @@ export function getClipMediaUrl(artifactId: string): string {
  * @param artifactId - Artifact ID of the clip
  */
 export function getClipThumbnailUrl(artifactId: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123";
+  const baseUrl = API_CONFIG.baseUrl;
   return `${baseUrl}/api/clips/${artifactId}/thumbnail`;
 }
 

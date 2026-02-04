@@ -3,6 +3,8 @@
 // TypeScript interfaces for the Live Streamer workflow dashboard
 // ============================================================
 
+import { API_CONFIG } from '@/lib/config';
+
 // ============================================================
 // Clip Types
 // ============================================================
@@ -223,7 +225,7 @@ export const MOMENT_TYPE_CONFIG: Record<MomentType, MomentTypeConfig> = {
  * @returns Full URL to the clip's video file
  */
 export function getClipVideoUrl(artifactId: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  const baseUrl = API_CONFIG.desktopApiUrl;
   return `${baseUrl}/api/clips/${artifactId}/media`;
 }
 
@@ -233,6 +235,6 @@ export function getClipVideoUrl(artifactId: string): string {
  * @returns Full URL to the clip's thumbnail
  */
 export function getClipThumbnailUrl(artifactId: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  const baseUrl = API_CONFIG.desktopApiUrl;
   return `${baseUrl}/api/clips/${artifactId}/thumbnail`;
 }

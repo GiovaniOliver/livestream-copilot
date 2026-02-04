@@ -10,6 +10,7 @@
  */
 
 import { apiClient } from './client';
+import { API_CONFIG } from '@/lib/config';
 
 // =============================================================================
 // TYPES
@@ -250,7 +251,7 @@ export async function getOAuthProviders(): Promise<OAuthProvider[]> {
  * Get OAuth authorization URL for a provider
  */
 export function getOAuthUrl(provider: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3123';
+  const baseUrl = API_CONFIG.baseUrl;
   return `${baseUrl}/api/v1/auth/oauth/${provider}`;
 }
 

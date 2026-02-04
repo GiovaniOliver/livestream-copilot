@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Badge, Button, Card } from "@/components/ui";
 import { ClipQueueItemCard, type ClipQueueItem } from "./ClipQueueItemCard";
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from "@/lib/config";
 
 interface ClipQueueDashboardProps {
   sessionId: string;
@@ -40,9 +41,8 @@ export function ClipQueueDashboard({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const apiBase = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
-  // WebSocket runs on a separate port (default: 3124 for dev, configured via NEXT_PUBLIC_DESKTOP_WS_URL)
-  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3124";
+  const apiBase = API_CONFIG.desktopApiUrl;
+  const wsBase = API_CONFIG.desktopWsUrl;
 
   // Fetch queue items
   const fetchItems = useCallback(async () => {

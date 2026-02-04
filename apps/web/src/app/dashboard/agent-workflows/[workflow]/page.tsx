@@ -38,6 +38,7 @@ import {
   clearWorkflowConfig,
   validateWorkflowConfig,
 } from "@/lib/workflow-config";
+import { API_CONFIG } from '@/lib/config';
 
 interface WorkflowPageProps {
   params: Promise<{ workflow: string }>;
@@ -1402,7 +1403,7 @@ function TriggersTab({ workflowPath }: { workflowPath: string }) {
   const [newPhrase, setNewPhrase] = useState("");
 
   // Desktop companion API base URL
-  const apiBase = process.env.NEXT_PUBLIC_DESKTOP_API_URL || "http://localhost:3123";
+  const apiBase = API_CONFIG.desktopApiUrl;
 
   // Load trigger config
   useEffect(() => {

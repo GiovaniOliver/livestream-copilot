@@ -397,6 +397,8 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRegenerateOptions, setShowRegenerateOptions] = useState(false);
+  const [regenerateInstructions, setRegenerateInstructions] = useState("");
 
   const platformConfig = PLATFORM_CONFIG[output.platform];
 
@@ -490,23 +492,109 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
   }, [output.id, onDelete, isDeleting]);
 
   // Handle regenerate content
-  const handleRegenerate = useCallback(async () => {
+  const handleRegenerate = useCallback(async (instructions?: string) => {
     if (isRegenerating) return;
 
     setIsRegenerating(true);
     try {
-      // TODO: Implement regenerate API endpoint
-      // For now, show a message that this feature is coming soon
-      // await regenerateOutput(output.id);
+      // Import regenerateOutput dynamically to avoid circular dependencies
+      const { regenerateOutput } = await import("@/lib/api/outputs");
 
-      // Placeholder: show alert for now
-      alert("Regenerate feature coming soon! This will use AI to create a new version of this post.");
+      // Call API to regenerate content with AI
+      const regeneratedOutput = await regenerateOutput(output.id, {
+        instructions: instructions || undefined,
+      });
+
+      // Update parent component with new output
+      await onUpdate(output.id, {
+        text: regeneratedOutput.text,
+        title: regeneratedOutput.title || undefined,
+      });
+
+      // Close options modal and clear instructions
+      setShowRegenerateOptions(false);
+      setRegenerateInstructions("");
+
+      logger.info("Output regenerated successfully", {
+        outputId: output.id,
+        previousLength: output.text.length,
+        newLength: regeneratedOutput.text.length,
+        hadInstructions: !!instructions,
+      });
     } catch (err) {
       logger.error("Failed to regenerate:", err);
+      // Show user-friendly error message
+      alert("Failed to regenerate content. Please try again.");
     } finally {
       setIsRegenerating(false);
     }
-  }, [isRegenerating]);
+  }, [output.id, output.text.length, onUpdate, isRegenerating]);
+
+  // Regenerate options modal
+  if (showRegenerateOptions) {
+    return (
+      <div className="rounded-xl border border-purple/50 bg-surface p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-purple">
+            <SparklesIcon className="h-4 w-4" />
+          </span>
+          <span className="text-xs font-medium text-text-muted">
+            Regenerate with AI - Advanced Options
+          </span>
+        </div>
+
+        {/* Instructions input */}
+        <label className="mb-2 block text-xs text-text-muted">
+          Custom Instructions (Optional)
+        </label>
+        <textarea
+          value={regenerateInstructions}
+          onChange={(e) => setRegenerateInstructions(e.target.value)}
+          placeholder="e.g., Make it more casual, Add emojis, Focus on benefits..."
+          rows={3}
+          maxLength={1000}
+          className="mb-2 w-full resize-none rounded-lg border border-stroke bg-bg-2 px-3 py-2 text-sm text-text placeholder:text-text-dim focus:border-purple focus:outline-none focus:ring-1 focus:ring-purple"
+        />
+        <div className="mb-3 flex justify-between text-xs text-text-dim">
+          <span>Provide specific instructions for how to modify the content</span>
+          <span>{regenerateInstructions.length}/1000</span>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setShowRegenerateOptions(false);
+              setRegenerateInstructions("");
+            }}
+            disabled={isRegenerating}
+            className="rounded-lg px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-surface-hover disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => handleRegenerate(regenerateInstructions || undefined)}
+            disabled={isRegenerating}
+            className="flex items-center gap-1.5 rounded-lg bg-purple px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-purple/90 disabled:opacity-50"
+          >
+            {isRegenerating ? (
+              <>
+                <LoadingSpinner className="h-3 w-3" />
+                Regenerating...
+              </>
+            ) : (
+              <>
+                <SparklesIcon className="h-3 w-3" />
+                Regenerate
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isEditing) {
     return (
@@ -641,13 +729,19 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
             <PencilIcon className="h-4 w-4" />
           </button>
 
-          {/* Regenerate button */}
+          {/* Regenerate button - shows options on shift+click, quick regenerate otherwise */}
           <button
             type="button"
-            onClick={handleRegenerate}
+            onClick={(e) => {
+              if (e.shiftKey) {
+                setShowRegenerateOptions(true);
+              } else {
+                handleRegenerate();
+              }
+            }}
             disabled={isRegenerating}
             className="rounded p-1 text-purple transition-colors hover:bg-purple/10 disabled:opacity-50"
-            title="Regenerate with AI"
+            title="Regenerate with AI (Shift+Click for options)"
           >
             {isRegenerating ? (
               <LoadingSpinner className="h-4 w-4" />

@@ -4,9 +4,10 @@
 
 import type { EventEnvelope } from "@livestream-copilot/shared";
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from "@/lib/config";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3124";
-const isDev = process.env.NODE_ENV === "development";
+const WS_URL = API_CONFIG.wsUrl;
+const isDev = API_CONFIG.enableLogging;
 
 /**
  * WebSocket connection states

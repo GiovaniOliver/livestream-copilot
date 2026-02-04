@@ -105,11 +105,10 @@ export type CaptureMode = (typeof CAPTURE_MODES)[keyof typeof CAPTURE_MODES];
 
 /**
  * API configuration
+ * Re-exported from centralized config module
+ * @deprecated Use `import { API_CONFIG } from '@/lib/config'` instead
  */
-export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123",
-  WS_URL: process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:3123",
-} as const;
+export { API_CONFIG } from "./config";
 
 /**
  * API routes

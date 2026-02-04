@@ -3,6 +3,7 @@
  *
  * Video/audio capture screen with camera preview and recording controls.
  * Supports video, audio-only, and A/V modes with quality settings.
+ * Includes mobile recording upload to desktop companion with offline support.
  */
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -13,12 +14,22 @@ import {
   StyleSheet,
   Animated,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { CameraView, CameraType } from "expo-camera";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../App";
 import { useCaptureStore, type CaptureMode } from "../stores/captureStore";
 import { useCaptureRecording } from "../services/useCaptureRecording";
+import {
+  uploadRecording,
+  saveRecordingLocally,
+  queueForRetry,
+  isNetworkAvailable,
+  setupNetworkListener,
+  type UploadProgress,
+} from "../services/recordingUpload";
 import Screen from "../components/Screen";
 import Card from "../components/Card";
 import { colors } from "../theme";
@@ -30,6 +41,9 @@ export default function CaptureScreen({ route, navigation }: Props) {
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [showSettings, setShowSettings] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
 
   const {
@@ -52,14 +66,99 @@ export default function CaptureScreen({ route, navigation }: Props) {
     isRecording,
     isPreparing,
   } = useCaptureRecording({
-    onRecordingComplete: (uri) => {
+    onRecordingComplete: async (uri) => {
       console.log("Recording saved:", uri);
-      // TODO: Upload to companion or save locally
+      await handleRecordingComplete(uri);
     },
     onError: (err) => {
       console.error("Recording error:", err);
+      Alert.alert("Recording Error", err);
     },
   });
+
+  // Set up network listener for automatic retry
+  useEffect(() => {
+    const unsubscribe = setupNetworkListener(
+      baseUrl,
+      undefined, // TODO: Add auth token when auth is implemented
+      (result) => {
+        if (result.succeeded > 0) {
+          Alert.alert(
+            "Upload Complete",
+            `Successfully uploaded ${result.succeeded} recording(s). ${result.remaining} remaining in queue.`
+          );
+        }
+      }
+    );
+
+    return unsubscribe;
+  }, [baseUrl]);
+
+  // Handle recording completion (upload or save locally)
+  const handleRecordingComplete = async (videoUri: string) => {
+    try {
+      // Check network availability
+      const networkAvailable = await isNetworkAvailable();
+
+      if (networkAvailable && sessionId) {
+        // Upload to companion
+        setUploading(true);
+        setUploadProgress(0);
+
+        const result = await uploadRecording(
+          videoUri,
+          sessionId,
+          baseUrl,
+          undefined, // TODO: Add auth token when auth is implemented
+          mode,
+          (progress: UploadProgress) => {
+            setUploadProgress(progress.percent);
+          }
+        );
+
+        setUploading(false);
+
+        if (result.success) {
+          Alert.alert("Success", "Recording uploaded successfully");
+        } else {
+          throw new Error(result.error || "Upload failed");
+        }
+      } else if (sessionId) {
+        // No network - queue for retry
+        await queueForRetry(videoUri, sessionId, mode);
+        Alert.alert(
+          "Offline",
+          "Recording queued for upload when connection is restored"
+        );
+      } else {
+        // No session ID - save locally
+        await saveRecordingLocally(videoUri);
+        Alert.alert("Saved", "Recording saved locally");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploading(false);
+
+      // Try to queue for retry
+      try {
+        if (sessionId) {
+          await queueForRetry(videoUri, sessionId, mode);
+          Alert.alert(
+            "Upload Failed",
+            "Recording queued for retry when connection is restored"
+          );
+        } else {
+          await saveRecordingLocally(videoUri);
+          Alert.alert(
+            "Upload Failed",
+            "Recording saved locally for manual upload"
+          );
+        }
+      } catch (saveError) {
+        Alert.alert("Error", "Failed to save recording");
+      }
+    }
+  };
 
   // Request permissions on mount
   useEffect(() => {
@@ -369,6 +468,27 @@ export default function CaptureScreen({ route, navigation }: Props) {
         </View>
       )}
 
+      {/* Upload Progress */}
+      {uploading && (
+        <View style={styles.uploadOverlay}>
+          <View style={styles.uploadContainer}>
+            <Text style={styles.uploadText}>Uploading...</Text>
+            <Text style={styles.uploadPercentText}>
+              {Math.round(uploadProgress)}%
+            </Text>
+            <View style={styles.progressBarContainer}>
+              <View
+                style={[
+                  styles.progressBar,
+                  { width: `${uploadProgress}%` },
+                ]}
+              />
+            </View>
+            <ActivityIndicator size="large" color={colors.teal} />
+          </View>
+        </View>
+      )}
+
       {/* Error Display */}
       {error && (
         <View style={styles.errorBanner}>
@@ -604,6 +724,48 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontWeight: "700",
     fontSize: 14,
+  },
+  uploadOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.8)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  uploadContainer: {
+    backgroundColor: colors.bg1,
+    padding: 30,
+    borderRadius: 16,
+    alignItems: "center",
+    minWidth: 250,
+  },
+  uploadText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.text,
+    marginBottom: 8,
+  },
+  uploadPercentText: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: colors.teal,
+    marginBottom: 16,
+  },
+  progressBarContainer: {
+    width: "100%",
+    height: 8,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 4,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: colors.teal,
+    borderRadius: 4,
   },
   errorBanner: {
     position: "absolute",

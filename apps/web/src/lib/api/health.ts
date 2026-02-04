@@ -12,6 +12,7 @@ import {
   pingResponseSchema,
   type HealthStatus,
 } from "./schemas";
+import { API_CONFIG } from '@/lib/config';
 
 /**
  * Component health information
@@ -154,7 +155,7 @@ export async function checkConnection(timeout = 5000): Promise<{
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3123"}/api/health/ping`,
+      `${API_CONFIG.baseUrl}/api/health/ping`,
       { signal: controller.signal }
     );
 

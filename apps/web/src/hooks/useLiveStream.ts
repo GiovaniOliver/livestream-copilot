@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { API_CONFIG } from '@/lib/config';
 
 // ============================================================
 // Types
@@ -61,7 +62,7 @@ export interface UseLiveStreamReturn {
 // Constants
 // ============================================================
 
-const DEFAULT_API_BASE = "http://localhost:3123";
+const DEFAULT_API_BASE = API_CONFIG.baseUrl;
 const POLL_INTERVAL_MS = 5000;
 
 // ============================================================

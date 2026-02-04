@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from '@/lib/config';
 
 // Gesture categories that MediaPipe can detect
 export type GestureCategory =
@@ -296,7 +297,7 @@ export function useMediaPipeWithBackend(
   options: Omit<UseMediaPipeGesturesOptions, "onGestureDetected">
 ) {
   const wsRef = useRef<WebSocket | null>(null);
-  const wsBase = process.env.NEXT_PUBLIC_DESKTOP_WS_URL || "ws://localhost:3124";
+  const wsBase = API_CONFIG.desktopWsUrl;
 
   // Connect to WebSocket
   useEffect(() => {

@@ -28,6 +28,7 @@ import { useAuth } from "@/lib/contexts/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import { type Session, formatDuration } from "@/lib/stores/sessions";
 import { WORKFLOW_TYPES, CAPTURE_MODES, type WorkflowType, type CaptureMode } from "@/lib/constants";
+import { API_CONFIG } from '@/lib/config';
 import { logger } from "@/lib/logger";
 
 export interface UseSessionsReturn {
@@ -318,7 +319,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
    */
   useEffect(() => {
     if (autoConnect) {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3124";
+      const wsUrl = API_CONFIG.wsUrl;
       connect();
 
       return () => {

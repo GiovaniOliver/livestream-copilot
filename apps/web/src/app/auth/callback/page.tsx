@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { logger } from "@/lib/logger";
+import { API_CONFIG } from '@/lib/config';
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function OAuthCallbackPage() {
         localStorage.setItem('fluxboard_token_expiry', expiryTime.toString());
 
         // Fetch and store user data
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3123'}/api/v1/auth/me`, {
+        const response = await fetch(`${API_CONFIG.baseUrl}/api/v1/auth/me`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
