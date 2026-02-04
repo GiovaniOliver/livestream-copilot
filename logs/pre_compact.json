@@ -326,5 +326,93 @@
     "hook_event_name": "PreCompact",
     "trigger": "auto",
     "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "manual",
+    "custom_instructions": ""
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "639c3157-bd6d-42f3-a570-b736327b07b6",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\639c3157-bd6d-42f3-a570-b736327b07b6.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "2da7e594-5ec5-4552-9042-b09fcaf09cdd",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2da7e594-5ec5-4552-9042-b09fcaf09cdd.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "2da7e594-5ec5-4552-9042-b09fcaf09cdd",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\2da7e594-5ec5-4552-9042-b09fcaf09cdd.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "cd0f3653-63d8-4050-b798-0c2d7101041e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\cd0f3653-63d8-4050-b798-0c2d7101041e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
+  },
+  {
+    "session_id": "cd0f3653-63d8-4050-b798-0c2d7101041e",
+    "transcript_path": "C:\\Users\\Oliver Productions\\.claude\\projects\\C--Users-Oliver-Productions-Desktop-1-SMG-BUSINESS-0b--SMG-Main-Brands-Dev-livestream-copilot\\cd0f3653-63d8-4050-b798-0c2d7101041e.jsonl",
+    "cwd": "C:\\Users\\Oliver Productions\\Desktop\\1.SMG-BUSINESS\\0b.)SMG-Main Brands Dev\\livestream-copilot",
+    "hook_event_name": "PreCompact",
+    "trigger": "auto",
+    "custom_instructions": null
   }
 ]
