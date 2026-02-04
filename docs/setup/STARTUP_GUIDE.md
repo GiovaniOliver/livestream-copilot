@@ -316,7 +316,7 @@ curl -X POST http://localhost:3123/session/start \
 
 ## Getting Help
 
-- **Session Summary**: `SESSION_SUMMARY.md` - Complete feature documentation
+- **Session Summary**: [SESSION_SUMMARY.md](../development/SESSION_SUMMARY.md) - Complete feature documentation
 - **API Documentation**: `apps/desktop-companion/*.md` - API guides
 - **Component Docs**: `apps/web/src/components/*/README.md` - UI components
 - **Test Scripts**: `apps/desktop-companion/tests/` - Automated tests
@@ -340,4 +340,4 @@ Before deploying to production:
 
 **Happy streaming! 🎥✨**
 
-For detailed feature documentation, see [SESSION_SUMMARY.md](./SESSION_SUMMARY.md)
+For detailed feature documentation, see [SESSION_SUMMARY.md](../development/SESSION_SUMMARY.md)

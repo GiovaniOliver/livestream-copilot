@@ -18,8 +18,8 @@ Capture outputs are standardized as timestamped artifacts:
 The session engine is a workflow-agnostic pipeline that:
 
 1. Ingests capture artifacts + audio transcript segments
-2. Normalizes all inputs into an event stream (see `docs/EVENT_SCHEMAS.md`)
-3. Runs workflow-specific “agent transforms” to produce outputs
+2. Normalizes all inputs into an event stream (see [`EVENT_SCHEMAS.md`](../api/EVENT_SCHEMAS.md))
+3. Runs workflow-specific "agent transforms" to produce outputs
 4. Emits outputs for dashboards and exports
 
 ### 3) Agent Orchestration (Claude Code)
