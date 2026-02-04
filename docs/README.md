@@ -56,6 +56,32 @@ Development status, session reports, and task tracking.
 - **[FINAL_SESSION_REPORT.md](./development/FINAL_SESSION_REPORT.md)** - Final session report
 - **[TASK_CHECKLIST.md](./development/TASK_CHECKLIST.md)** - Development task checklist
 
+### 📱 [Apps](./apps/)
+App-specific documentation for each application in the monorepo.
+
+#### [Desktop Companion](./apps/desktop-companion/)
+Backend API and desktop application documentation.
+
+- **[HIBP_INTEGRATION.md](./apps/desktop-companion/HIBP_INTEGRATION.md)** - Have I Been Pwned integration
+- **[IMPLEMENTATION_SUMMARY_SOC-397.md](./apps/desktop-companion/IMPLEMENTATION_SUMMARY_SOC-397.md)** - SOC-397 feature implementation
+- **[PASSWORD_RESET.md](./apps/desktop-companion/PASSWORD_RESET.md)** - Password reset functionality
+- **[PASSWORD_RESET_CHECKLIST.md](./apps/desktop-companion/PASSWORD_RESET_CHECKLIST.md)** - Password reset checklist
+- **[RATE_LIMITING_QUICK_REFERENCE.md](./apps/desktop-companion/RATE_LIMITING_QUICK_REFERENCE.md)** - Rate limiting guide
+- **[rate-limiting-examples.md](./apps/desktop-companion/rate-limiting-examples.md)** - Rate limiting code examples
+- **[SECURITY_REVIEW_SOC-397.md](./apps/desktop-companion/SECURITY_REVIEW_SOC-397.md)** - Security review for SOC-397
+- **[SOC-398_IMPLEMENTATION.md](./apps/desktop-companion/SOC-398_IMPLEMENTATION.md)** - SOC-398 implementation
+- **[SOC-401_IMPLEMENTATION_SUMMARY.md](./apps/desktop-companion/SOC-401_IMPLEMENTATION_SUMMARY.md)** - SOC-401 implementation summary
+
+#### [Web App](./apps/web/)
+Next.js web dashboard documentation.
+
+- **[AUTH_IMPLEMENTATION_SUMMARY.md](./apps/web/AUTH_IMPLEMENTATION_SUMMARY.md)** - Authentication implementation
+- **[AUTH_QUICKSTART.md](./apps/web/AUTH_QUICKSTART.md)** - Auth quick start guide
+- **[AUTH_README.md](./apps/web/AUTH_README.md)** - Authentication overview
+- **[CENTRALIZED_CONFIG_SUMMARY.md](./apps/web/CENTRALIZED_CONFIG_SUMMARY.md)** - Centralized configuration system
+- **[CONFIG_USAGE.md](./apps/web/CONFIG_USAGE.md)** - Configuration usage guide
+- **[MIGRATION_STATUS.md](./apps/web/MIGRATION_STATUS.md)** - Migration status and progress
+
 ## 🎯 Quick Navigation
 
 ### I want to...
