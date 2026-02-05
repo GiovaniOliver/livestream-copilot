@@ -117,7 +117,7 @@ jobs:
           NEXT_PUBLIC_WS_URL: ws://localhost:3124
 
       - name: Cache build artifacts
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             apps/desktop-companion/dist
