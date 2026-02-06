@@ -15,6 +15,7 @@
 
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Platform } from 'react-native';
+import { authLogger } from './logger';
 
 // =============================================================================
 // TYPES
@@ -88,7 +89,7 @@ export async function checkBiometricCapabilities(): Promise<BiometricCapabilitie
         : 'none',
     };
   } catch (error) {
-    console.error('[BiometricAuth] Capability check failed:', error);
+    authLogger.error( Capability check failed:', error);
     return {
       isAvailable: false,
       isEnrolled: false,
@@ -200,7 +201,7 @@ export async function authenticateWithBiometrics(
       error: result.error || 'Authentication failed',
     };
   } catch (error) {
-    console.error('[BiometricAuth] Authentication failed:', error);
+    authLogger.error( Authentication failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Authentication failed',
@@ -226,9 +227,9 @@ export async function promptBiometricEnrollment(): Promise<void> {
     if (Platform.OS === 'android') {
       // This requires Android API 30+ and proper permissions
       // On older versions or iOS, direct the user to Settings manually
-      console.log('[BiometricAuth] Directing user to enroll biometrics');
+      authLogger.info( Directing user to enroll biometrics');
     }
   } catch (error) {
-    console.error('[BiometricAuth] Failed to prompt enrollment:', error);
+    authLogger.error( Failed to prompt enrollment:', error);
   }
 }

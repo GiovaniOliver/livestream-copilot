@@ -14,6 +14,7 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { storeLogger } from './logger';
 
 // =============================================================================
 // TYPES
@@ -59,7 +60,7 @@ export async function setSecureItem(
       await AsyncStorage.setItem(key, value);
     }
   } catch (error) {
-    console.error(`[SecureStorage] Failed to set ${key}:`, error);
+    storeLogger.error( Failed to set ${key}:`, error);
     throw new Error(`Failed to save ${key}`);
   }
 }
@@ -81,7 +82,7 @@ export async function getSecureItem(
       return await AsyncStorage.getItem(key);
     }
   } catch (error) {
-    console.error(`[SecureStorage] Failed to get ${key}:`, error);
+    storeLogger.error( Failed to get ${key}:`, error);
     return null;
   }
 }
@@ -102,7 +103,7 @@ export async function deleteSecureItem(
       await AsyncStorage.removeItem(key);
     }
   } catch (error) {
-    console.error(`[SecureStorage] Failed to delete ${key}:`, error);
+    storeLogger.error( Failed to delete ${key}:`, error);
     throw new Error(`Failed to delete ${key}`);
   }
 }
@@ -145,12 +146,12 @@ export async function migrateToSecureStorage(
     if (value) {
       await setSecureItem(secureKey, value);
       await AsyncStorage.removeItem(legacyKey);
-      console.log(`[SecureStorage] Migrated ${legacyKey} to ${secureKey}`);
+      storeLogger.info( Migrated ${legacyKey} to ${secureKey}`);
       return true;
     }
     return false;
   } catch (error) {
-    console.error(`[SecureStorage] Migration failed for ${legacyKey}:`, error);
+    storeLogger.error( Migration failed for ${legacyKey}:`, error);
     return false;
   }
 }

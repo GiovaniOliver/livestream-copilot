@@ -77,11 +77,10 @@ describe("Password Reset Service", () => {
 
       expect(tokens).toHaveLength(1);
       expect(tokens[0].email).toBe(testEmail);
-      expect(tokens[0].used).toBe(false);
       expect(tokens[0].expiresAt).toBeInstanceOf(Date);
       expect(tokens[0].expiresAt.getTime()).toBeGreaterThan(Date.now());
-      expect(tokens[0].token).toBeDefined();
-      expect(tokens[0].token.length).toBeGreaterThan(0);
+      expect(tokens[0].tokenHash).toBeDefined();
+      expect(tokens[0].tokenHash.length).toBeGreaterThan(0);
     });
 
     it("should invalidate old tokens when requesting new one", async () => {
@@ -159,9 +158,9 @@ describe("Password Reset Service", () => {
       });
 
       // Stored token should be a hash (hex string, 64 chars for SHA-256)
-      expect(tokens[0].token).toMatch(/^[a-f0-9]{64}$/);
+      expect(tokens[0].tokenHash).toMatch(/^[a-f0-9]{64}$/);
       // Should not match the format of a plaintext token
-      expect(tokens[0].token).not.toBe(plainToken);
+      expect(tokens[0].tokenHash).not.toBe(plainToken);
     });
 
     it("should set appropriate expiration time (15 minutes)", async () => {
@@ -194,9 +193,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -215,9 +213,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -246,9 +243,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: expiredDate,
-          used: false,
         },
       });
 
@@ -257,18 +253,9 @@ describe("Password Reset Service", () => {
       ).rejects.toThrow(AuthError);
     });
 
-    it("should reject already used token", async () => {
-      // Create used token
-      const { token: resetToken, hash: resetHash } = generateVerificationToken();
-      await prisma.passwordResetToken.create({
-        data: {
-          userId: testUserId,
-          email: testEmail,
-          token: resetHash,
-          expiresAt: getPasswordResetTokenExpiry(),
-          used: true, // Already used
-        },
-      });
+    it("should reject token for non-existent token (already used/deleted)", async () => {
+      // Try to use a token that doesn't exist in the database (simulating an already used/deleted token)
+      const { token: resetToken } = generateVerificationToken();
 
       await expect(
         authService.resetPassword(resetToken, newPassword)
@@ -281,9 +268,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -296,31 +282,29 @@ describe("Password Reset Service", () => {
 
       // Token should still exist (not consumed by failed attempt)
       const tokens = await prisma.passwordResetToken.findMany({
-        where: { userId: testUserId, used: false },
+        where: { userId: testUserId },
       });
       expect(tokens).toHaveLength(1);
     });
 
-    it("should mark token as used after successful reset", async () => {
+    it("should delete token after successful reset", async () => {
       const { token: resetToken, hash: resetHash } = generateVerificationToken();
       await prisma.passwordResetToken.create({
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
       await authService.resetPassword(resetToken, newPassword);
 
-      // Token should be marked as used
+      // Token should be deleted after successful reset
       const tokens = await prisma.passwordResetToken.findMany({
         where: { userId: testUserId },
       });
-      expect(tokens).toHaveLength(1);
-      expect(tokens[0].used).toBe(true);
+      expect(tokens).toHaveLength(0);
     });
 
     it("should not allow reusing the same token", async () => {
@@ -329,9 +313,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -362,9 +345,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -382,34 +364,31 @@ describe("Password Reset Service", () => {
       ).rejects.toThrow(AuthError);
     });
 
-    it("should clean up used tokens after successful reset", async () => {
-      // Create multiple tokens (old expired, old used, current)
+    it("should clean up all tokens after successful reset", async () => {
+      // Create multiple tokens (old expired, old valid, current)
       const { token: currentToken, hash: currentHash } = generateVerificationToken();
       const { hash: expiredHash } = generateVerificationToken();
-      const { hash: usedHash } = generateVerificationToken();
+      const { hash: oldHash } = generateVerificationToken();
 
       await prisma.passwordResetToken.createMany({
         data: [
           {
             userId: testUserId,
             email: testEmail,
-            token: expiredHash,
+            tokenHash: expiredHash,
             expiresAt: new Date(Date.now() - 60 * 1000), // Expired
-            used: false,
           },
           {
             userId: testUserId,
             email: testEmail,
-            token: usedHash,
+            tokenHash: oldHash,
             expiresAt: getPasswordResetTokenExpiry(),
-            used: true, // Already used
           },
           {
             userId: testUserId,
             email: testEmail,
-            token: currentHash,
+            tokenHash: currentHash,
             expiresAt: getPasswordResetTokenExpiry(),
-            used: false,
           },
         ],
       });
@@ -438,9 +417,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: validHash,
+          tokenHash: validHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 
@@ -508,9 +486,8 @@ describe("Password Reset Service", () => {
         data: {
           userId: testUserId,
           email: testEmail,
-          token: resetHash,
+          tokenHash: resetHash,
           expiresAt: getPasswordResetTokenExpiry(),
-          used: false,
         },
       });
 

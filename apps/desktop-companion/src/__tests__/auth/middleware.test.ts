@@ -54,9 +54,13 @@ describe("Authentication Middleware", () => {
       headers: {},
       params: {},
       body: {},
-      ip: "127.0.0.1",
       socket: { remoteAddress: "127.0.0.1" } as any,
-    };
+    } as any;
+    Object.defineProperty(mockRequest, 'ip', {
+      value: "127.0.0.1",
+      writable: true,
+      configurable: true
+    });
 
     mockResponse = {
       status: statusMock,
@@ -502,7 +506,11 @@ describe("Authentication Middleware", () => {
 
   describe("extractClientInfo", () => {
     it("should extract IP from request", () => {
-      mockRequest.ip = "192.168.1.1";
+      Object.defineProperty(mockRequest, 'ip', {
+        value: "192.168.1.1",
+        writable: true,
+        configurable: true
+      });
 
       extractClientInfo(
         mockRequest as Request,
@@ -516,7 +524,11 @@ describe("Authentication Middleware", () => {
 
     it("should extract IP from X-Forwarded-For header", () => {
       mockRequest.headers = { "x-forwarded-for": "203.0.113.1, 198.51.100.1" };
-      mockRequest.ip = "127.0.0.1";
+      Object.defineProperty(mockRequest, 'ip', {
+        value: "127.0.0.1",
+        writable: true,
+        configurable: true
+      });
 
       extractClientInfo(
         mockRequest as Request,

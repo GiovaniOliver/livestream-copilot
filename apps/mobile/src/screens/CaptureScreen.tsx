@@ -33,6 +33,7 @@ import {
 import Screen from "../components/Screen";
 import Card from "../components/Card";
 import { colors } from "../theme";
+import { captureLogger } from "../services/logger";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
 
@@ -67,11 +68,11 @@ export default function CaptureScreen({ route, navigation }: Props) {
     isPreparing,
   } = useCaptureRecording({
     onRecordingComplete: async (uri) => {
-      console.log("Recording saved:", uri);
+      captureLogger.info("Recording saved:", uri);
       await handleRecordingComplete(uri);
     },
     onError: (err) => {
-      console.error("Recording error:", err);
+      captureLogger.error("Recording error:", err);
       Alert.alert("Recording Error", err);
     },
   });
@@ -136,7 +137,7 @@ export default function CaptureScreen({ route, navigation }: Props) {
         Alert.alert("Saved", "Recording saved locally");
       }
     } catch (error) {
-      console.error("Upload error:", error);
+      captureLogger.error("Upload error:", error);
       setUploading(false);
 
       // Try to queue for retry

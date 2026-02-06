@@ -20,6 +20,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { clipStart, clipEnd, markMoment } from "../services/companionApi";
 import { colors } from "../theme";
+import { apiLogger } from "../services/logger";
 
 interface Props {
   baseUrl: string;
@@ -119,7 +120,7 @@ export default function FloatingClipButton({
       await markMoment(baseUrl);
       onMomentMarked?.();
     } catch (err) {
-      console.warn("Failed to mark moment:", err);
+      apiLogger.warn("Failed to mark moment:", err);
     }
   }, [baseUrl, onMomentMarked]);
 
@@ -143,7 +144,7 @@ export default function FloatingClipButton({
         onClipStarted?.();
       }
     } catch (err) {
-      console.warn("Failed to toggle clip:", err);
+      apiLogger.warn("Failed to toggle clip:", err);
     }
   }, [baseUrl, isRecording, onClipStarted, onClipEnded]);
 

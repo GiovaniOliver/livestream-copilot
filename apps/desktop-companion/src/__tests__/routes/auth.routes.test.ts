@@ -467,7 +467,7 @@ describe("Auth API Routes", () => {
     });
 
     it("should return current user when authenticated", async () => {
-      const mockUserData = {
+      const mockUserData = { passwordHash: null, 
         id: mockUser.id,
         email: mockUser.email,
         emailVerified: true,

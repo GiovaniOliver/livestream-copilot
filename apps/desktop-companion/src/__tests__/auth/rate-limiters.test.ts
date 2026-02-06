@@ -32,6 +32,15 @@ describe("Authentication Rate Limiters", () => {
   let setHeaderMock: ReturnType<typeof vi.fn>;
   let getHeaderMock: ReturnType<typeof vi.fn>;
 
+  // Helper function to set IP on mockRequest (workaround for read-only property)
+  const setMockRequestIp = (req: Partial<Request>, ip: string | undefined) => {
+    Object.defineProperty(req, 'ip', {
+      value: ip,
+      writable: true,
+      configurable: true
+    });
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -43,10 +52,10 @@ describe("Authentication Rate Limiters", () => {
     mockRequest = {
       headers: {},
       body: {},
-      ip: "192.168.1.1",
       socket: { remoteAddress: "192.168.1.1" } as any,
       path: "/api/v1/auth/test",
-    };
+    } as any;
+    setMockRequestIp(mockRequest, "192.168.1.1");
 
     mockResponse = {
       status: statusMock,
@@ -81,7 +90,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should use IP and email combination for rate limit key", async () => {
       mockRequest.body = { email: "test@example.com" };
-      mockRequest.ip = "192.168.1.1";
+      setMockRequestIp(mockRequest, "192.168.1.1");
 
       // This tests that different emails from same IP are tracked separately
       await loginLimiter(
@@ -146,7 +155,7 @@ describe("Authentication Rate Limiters", () => {
     });
 
     it("should use IP-only for rate limit key", async () => {
-      mockRequest.ip = "192.168.1.100";
+      setMockRequestIp(mockRequest,"192.168.1.100";
 
       await registerLimiter(
         mockRequest as Request,
@@ -159,7 +168,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should handle X-Forwarded-For header", async () => {
       mockRequest.headers = { "x-forwarded-for": "203.0.113.1, 198.51.100.1" };
-      mockRequest.ip = "127.0.0.1";
+      setMockRequestIp(mockRequest,"127.0.0.1";
 
       await registerLimiter(
         mockRequest as Request,
@@ -185,7 +194,7 @@ describe("Authentication Rate Limiters", () => {
     });
 
     it("should use IP-only for rate limit key", async () => {
-      mockRequest.ip = "10.0.0.1";
+      setMockRequestIp(mockRequest,"10.0.0.1";
 
       await passwordResetLimiter(
         mockRequest as Request,
@@ -262,7 +271,7 @@ describe("Authentication Rate Limiters", () => {
     });
 
     it("should use IP-only for rate limit key", async () => {
-      mockRequest.ip = "172.16.0.1";
+      setMockRequestIp(mockRequest,"172.16.0.1";
 
       await generalAuthLimiter(
         mockRequest as Request,
@@ -334,7 +343,7 @@ describe("Authentication Rate Limiters", () => {
 
   describe("IP extraction", () => {
     it("should extract IP from request.ip", async () => {
-      mockRequest.ip = "203.0.113.50";
+      setMockRequestIp(mockRequest,"203.0.113.50";
       mockRequest.headers = {};
 
       await generalAuthLimiter(
@@ -348,7 +357,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should extract IP from X-Forwarded-For header", async () => {
       mockRequest.headers = { "x-forwarded-for": "203.0.113.1, 198.51.100.1, 192.168.1.1" };
-      mockRequest.ip = "127.0.0.1";
+      setMockRequestIp(mockRequest,"127.0.0.1";
 
       await generalAuthLimiter(
         mockRequest as Request,
@@ -361,7 +370,7 @@ describe("Authentication Rate Limiters", () => {
     });
 
     it("should fall back to socket.remoteAddress if no IP", async () => {
-      mockRequest.ip = undefined;
+      setMockRequestIp(mockRequest,undefined;
       mockRequest.headers = {};
       mockRequest.socket = { remoteAddress: "192.168.1.200" } as any;
 
@@ -375,7 +384,7 @@ describe("Authentication Rate Limiters", () => {
     });
 
     it("should use 'unknown' if no IP source available", async () => {
-      mockRequest.ip = undefined;
+      setMockRequestIp(mockRequest,undefined;
       mockRequest.headers = {};
       mockRequest.socket = { remoteAddress: undefined } as any;
 
@@ -426,7 +435,7 @@ describe("Authentication Rate Limiters", () => {
   describe("Attack scenario prevention", () => {
     it("should prevent credential stuffing by combining IP and email", async () => {
       // Attacker trying multiple passwords for same email from same IP
-      mockRequest.ip = "203.0.113.10";
+      setMockRequestIp(mockRequest,"203.0.113.10";
       mockRequest.body = { email: "target@example.com" };
 
       // All attempts from same IP:email combo count toward same limit
@@ -442,7 +451,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should prevent distributed attacks by tracking per-email", async () => {
       // Attacker using multiple IPs but same target email
-      mockRequest.ip = "203.0.113.20";
+      setMockRequestIp(mockRequest,"203.0.113.20";
       mockRequest.body = { email: "target@example.com" };
 
       await loginLimiter(
@@ -452,7 +461,7 @@ describe("Authentication Rate Limiters", () => {
       );
 
       // Change IP but same email - new key but still rate limited per IP:email
-      mockRequest.ip = "203.0.113.21";
+      setMockRequestIp(mockRequest,"203.0.113.21";
 
       await loginLimiter(
         mockRequest as Request,
@@ -466,7 +475,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should prevent account enumeration via registration", async () => {
       // Attacker trying to find valid emails by mass registration attempts
-      mockRequest.ip = "198.51.100.50";
+      setMockRequestIp(mockRequest,"198.51.100.50";
       mockRequest.body = { email: "probe1@example.com" };
 
       await registerLimiter(
@@ -482,7 +491,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should prevent email bombing via password reset", async () => {
       // Attacker trying to flood victim's inbox with reset emails
-      mockRequest.ip = "198.51.100.60";
+      setMockRequestIp(mockRequest,"198.51.100.60";
       mockRequest.body = { email: "victim@example.com" };
 
       await passwordResetLimiter(
@@ -497,7 +506,7 @@ describe("Authentication Rate Limiters", () => {
 
     it("should prevent token enumeration via refresh endpoint", async () => {
       // Attacker trying to validate stolen refresh tokens
-      mockRequest.ip = "198.51.100.70";
+      setMockRequestIp(mockRequest,"198.51.100.70";
       mockRequest.body = { refreshToken: "potentially-stolen-token" };
 
       await refreshTokenLimiter(

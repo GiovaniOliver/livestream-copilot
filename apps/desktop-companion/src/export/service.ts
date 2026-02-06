@@ -22,6 +22,7 @@ import { formatForPlatform, splitIntoThread, optimizeHashtags } from './formatte
 import { convertVideo, optimizeForPlatform, batchConvertVideo } from './video-converter.js';
 import * as ClipService from '../db/services/clip.service.js';
 import * as ExportDBService from '../db/services/export.service.js';
+import { logger } from '../logger/index.js';
 
 /**
  * Export service error
@@ -341,7 +342,7 @@ async function createExportZip(
     // Handle warnings
     archive.on('warning', (err) => {
       if (err.code === 'ENOENT') {
-        console.warn('[export/service] ZIP warning:', err);
+        logger.warn('[export/service] ZIP warning:', err);
       } else {
         reject(err);
       }
@@ -367,7 +368,7 @@ async function createExportZip(
           name: item.filename || path.basename(item.path),
         });
       } else {
-        console.warn(`[export/service] File not found: ${item.path}`);
+        logger.warn(`[export/service] File not found: ${item.path}`);
       }
     }
 
@@ -384,7 +385,7 @@ async function createExportZip(
     // Finalize archive
     output.on('close', () => {
       const finalSize = archive.pointer();
-      console.log(`[export/service] ZIP created: ${outputPath} (${finalSize} bytes)`);
+      logger.info(`[export/service] ZIP created: ${outputPath} (${finalSize} bytes)`);
       resolve(outputPath);
     });
 
@@ -406,7 +407,7 @@ export async function streamZipToResponse(
   const archive = archiver('zip', { zlib: { level: 9 } });
 
   archive.on('error', (err) => {
-    console.error('[export/service] ZIP error:', err);
+    logger.error('[export/service] ZIP error:', err);
     if (!res.headersSent) {
       res.status(500).end();
     }
@@ -541,12 +542,12 @@ export async function exportBatch(
 
       // Create ZIP archive
       await createExportZip(exportItems, zipPath, zipMetadata, (progress) => {
-        console.log(
+        logger.info(
           `[export/service] ZIP progress: ${progress.totalFiles}/${exportItems.length} files, ${progress.processedBytes} bytes`
         );
       });
     } catch (zipErr: any) {
-      console.error('[export/service] ZIP creation failed:', zipErr);
+      logger.error('[export/service] ZIP creation failed:', zipErr);
       // Don't fail the entire batch if ZIP fails
     }
   }
@@ -594,7 +595,7 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
           try {
             await fs.promises.unlink(exportRecord.filePath);
           } catch (err) {
-            console.warn(
+            logger.warn(
               `[export/service] Failed to delete file: ${exportRecord.filePath}`,
               err
             );
@@ -605,7 +606,7 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
           try {
             await fs.promises.unlink(exportRecord.thumbnailPath);
           } catch (err) {
-            console.warn(
+            logger.warn(
               `[export/service] Failed to delete thumbnail: ${exportRecord.thumbnailPath}`,
               err
             );
@@ -618,10 +619,10 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
       }
     }
 
-    console.log(`[export/service] Cleaned up ${cleanedCount} old exports`);
+    logger.info(`[export/service] Cleaned up ${cleanedCount} old exports`);
     return cleanedCount;
   } catch (err) {
-    console.error('[export/service] Cleanup failed:', err);
+    logger.error('[export/service] Cleanup failed:', err);
     return cleanedCount;
   }
 }
@@ -681,7 +682,7 @@ export async function deleteExport(userId: string, exportId: string): Promise<vo
     try {
       fs.unlinkSync(exportRecord.filePath);
     } catch (err) {
-      console.warn(`Failed to delete export file: ${exportRecord.filePath}`, err);
+      logger.warn(`Failed to delete export file: ${exportRecord.filePath}`, err);
     }
   }
 
@@ -690,7 +691,7 @@ export async function deleteExport(userId: string, exportId: string): Promise<vo
     try {
       fs.unlinkSync(exportRecord.thumbnailPath);
     } catch (err) {
-      console.warn(`Failed to delete thumbnail: ${exportRecord.thumbnailPath}`, err);
+      logger.warn(`Failed to delete thumbnail: ${exportRecord.thumbnailPath}`, err);
     }
   }
 

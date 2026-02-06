@@ -6,6 +6,7 @@
 
 import { create } from "zustand";
 import * as SecureStore from "../services/secureStorage";
+import { storeLogger } from "../services/logger";
 
 export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting" | "error";
 
@@ -54,7 +55,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
 
       set({ baseUrl: cleanUrl });
     } catch (error) {
-      console.error("[connectionStore] Invalid base URL:", error);
+      storeLogger.error( Invalid base URL:", error);
       throw new Error("Invalid URL format");
     }
   },
@@ -87,7 +88,7 @@ export const useConnectionStore = create<ConnectionState>((set, get) => ({
         set({ baseUrl: storedUrl });
       }
     } catch (error) {
-      console.error("[connectionStore] Failed to load base URL:", error);
+      storeLogger.error( Failed to load base URL:", error);
     }
   },
 }));

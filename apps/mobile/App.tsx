@@ -22,6 +22,9 @@ import VideoSourceScreen from "./src/screens/VideoSourceScreen";
 import { useAuthStore } from "./src/stores/authStore";
 import { useConnectionStore } from "./src/stores/connectionStore";
 
+// Logger
+import logger from "./src/services/logger";
+
 // Theme
 import { colors } from "./src/theme";
 
@@ -208,7 +211,7 @@ export default function App() {
           await validateSession(baseUrl);
         }
       } catch (error) {
-        console.error("[App] Initialization error:", error);
+        logger.error("Initialization error:", error);
       } finally {
         setIsReady(true);
       }
@@ -226,7 +229,7 @@ export default function App() {
         // Validate session (check timeout and refresh token if needed)
         const isValid = await validateSession(baseUrl);
         if (!isValid) {
-          console.log("[App] Session validation failed, user will be logged out");
+          logger.info("Session validation failed, user will be logged out");
         }
       }
     });

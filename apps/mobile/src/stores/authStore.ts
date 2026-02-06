@@ -15,6 +15,7 @@ import { create } from "zustand";
 import * as SecureStore from "../services/secureStorage";
 import * as BiometricAuth from "../services/biometricAuth";
 import NetInfo from "@react-native-community/netinfo";
+import { authLogger } from "../services/logger";
 
 // =============================================================================
 // TYPES
@@ -149,7 +150,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         lastActivityAt: Date.now(),
       });
     } catch (error) {
-      console.error("[authStore] Failed to persist tokens:", error);
+      authLogger.error( Failed to persist tokens:", error);
       throw new Error("Failed to save authentication tokens");
     }
   },
@@ -159,7 +160,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await SecureStore.setSecureItem("auth.user", JSON.stringify(user));
       set({ user });
     } catch (error) {
-      console.error("[authStore] Failed to persist user:", error);
+      authLogger.error( Failed to persist user:", error);
     }
   },
 
@@ -326,7 +327,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (!response.ok || !data.success) {
         // Refresh token is invalid - logout
-        console.log("[authStore] Refresh token invalid, logging out");
+        authLogger.info( Refresh token invalid, logging out");
         await get().logout(baseUrl);
         return false;
       }
@@ -342,7 +343,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return true;
     } catch (error) {
-      console.error("[authStore] Token refresh failed:", error);
+      authLogger.error( Token refresh failed:", error);
       return false;
     }
   },
@@ -379,7 +380,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isLoading: false });
       }
     } catch (error) {
-      console.error("[authStore] Failed to load stored auth:", error);
+      authLogger.error( Failed to load stored auth:", error);
       set({ isLoading: false });
     }
   },
@@ -409,7 +410,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Token is valid, but we need to fetch user info
       // This should be done by the caller after getting the callback
     } catch (error) {
-      console.error("[authStore] OAuth callback handling failed:", error);
+      authLogger.error( OAuth callback handling failed:", error);
       throw error;
     }
   },
@@ -424,7 +425,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       return [];
     } catch (error) {
-      console.error("[authStore] Failed to get OAuth providers:", error);
+      authLogger.error( Failed to get OAuth providers:", error);
       return [];
     }
   },
@@ -440,7 +441,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         biometricAvailable: capabilities.isAvailable,
       });
     } catch (error) {
-      console.error("[authStore] Failed to check biometric availability:", error);
+      authLogger.error( Failed to check biometric availability:", error);
       set({ biometricAvailable: false });
     }
   },
@@ -470,7 +471,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ biometricEnabled: true });
       return true;
     } catch (error) {
-      console.error("[authStore] Failed to enable biometric:", error);
+      authLogger.error( Failed to enable biometric:", error);
       return false;
     }
   },
@@ -480,7 +481,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await SecureStore.setSecureItem("auth.biometricEnabled", "false");
       set({ biometricEnabled: false });
     } catch (error) {
-      console.error("[authStore] Failed to disable biometric:", error);
+      authLogger.error( Failed to disable biometric:", error);
     }
   },
 
@@ -504,7 +505,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       return result.success;
     } catch (error) {
-      console.error("[authStore] Biometric authentication failed:", error);
+      authLogger.error( Biometric authentication failed:", error);
       return false;
     }
   },
@@ -554,7 +555,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const shouldRefresh = timeUntilExpiry < TOKEN_REFRESH_BUFFER_SECONDS * 1000;
 
       if (shouldRefresh) {
-        console.log("[authStore] Token expiring soon, refreshing...");
+        authLogger.info( Token expiring soon, refreshing...");
         return await get().refreshAccessToken(baseUrl);
       }
     }

@@ -9,6 +9,7 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { Platform } from "react-native";
+import { uploadLogger } from "./logger";
 
 const UPLOAD_QUEUE_KEY = "@uploadQueue";
 const SAVED_RECORDINGS_KEY = "@savedRecordings";
@@ -267,7 +268,7 @@ export async function retryQueuedUploads(
         try {
           await saveRecordingLocally(item.videoUri, item.sessionId);
         } catch (saveError) {
-          console.error("Failed to save recording locally:", saveError);
+          uploadLogger.error("Failed to save recording locally:", saveError);
         }
       }
     }

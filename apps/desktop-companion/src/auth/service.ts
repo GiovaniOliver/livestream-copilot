@@ -43,6 +43,7 @@ import {
   getPasswordResetTokenExpiry,
   type AccessTokenPayload,
 } from "./utils.js";
+import { logger } from "../logger/index.js";
 
 // =============================================================================
 // TYPES
@@ -266,7 +267,7 @@ async function logAuditEvent(
     });
   } catch (error) {
     // Log audit failures but don't fail the operation
-    console.error("[auth] Failed to create audit log:", error);
+    logger.error("[auth] Failed to create audit log:", error);
   }
 }
 
@@ -366,9 +367,9 @@ export const authService = {
     // If email sending fails, log but don't fail registration
     try {
       await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
-      console.log(`[auth] Verification email sent to ${normalizedEmail}`);
+      logger.info(`[auth] Verification email sent to ${normalizedEmail}`);
     } catch (error) {
-      console.error(
+      logger.error(
         `[auth] Failed to send verification email to ${normalizedEmail}:`,
         error instanceof Error ? error.message : String(error)
       );
@@ -493,7 +494,7 @@ export const authService = {
         where: { id: user.id },
         data: { passwordHash: newHash },
       });
-      console.log(`[auth] Password rehashed for user ${user.id}`);
+      logger.info(`[auth] Password rehashed for user ${user.id}`);
     }
 
     // Generate tokens
@@ -772,11 +773,11 @@ export const authService = {
       })
       .then((result) => {
         if (result.count > 0) {
-          console.log(`[auth] Cleaned up ${result.count} expired verification tokens`);
+          logger.info(`[auth] Cleaned up ${result.count} expired verification tokens`);
         }
       })
       .catch((error) => {
-        console.error("[auth] Failed to clean up expired tokens:", error);
+        logger.error("[auth] Failed to clean up expired tokens:", error);
       });
 
     // Check each token with constant-time comparison
@@ -820,14 +821,14 @@ export const authService = {
             email: user.email,
           });
 
-          console.log(`[auth] Email verified successfully for user ${user.id}`);
+          logger.info(`[auth] Email verified successfully for user ${user.id}`);
 
           return { user: sanitizeUser(user) };
         }
       } catch (error) {
         // If bcrypt.compare fails, continue to next token
         // This could happen with corrupted data
-        console.error("[auth] Token comparison error:", error);
+        logger.error("[auth] Token comparison error:", error);
         continue;
       }
     }
@@ -900,9 +901,9 @@ export const authService = {
     // If email sending fails, log but don't throw (user can request another resend)
     try {
       await emailService.sendVerificationEmail(normalizedEmail, verificationToken);
-      console.log(`[auth] Verification email resent to ${normalizedEmail}`);
+      logger.info(`[auth] Verification email resent to ${normalizedEmail}`);
     } catch (error) {
-      console.error(
+      logger.error(
         `[auth] Failed to resend verification email to ${normalizedEmail}:`,
         error instanceof Error ? error.message : String(error)
       );
@@ -982,7 +983,7 @@ export const authService = {
       await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
     } catch (error) {
       // Log email error but don't fail the request (silent success for enumeration protection)
-      console.error("[auth] Failed to send password reset email:", error);
+      logger.error("[auth] Failed to send password reset email:", error);
       // In production, you might want to queue this for retry
     }
 
@@ -1123,7 +1124,7 @@ export const authService = {
     } catch (error) {
       // Log email error but don't fail the request
       // User's password was already changed successfully
-      console.error("[auth] Failed to send password changed email:", error);
+      logger.error("[auth] Failed to send password changed email:", error);
       // In production, you might want to queue this for retry
     }
   },

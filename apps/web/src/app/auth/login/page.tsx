@@ -182,12 +182,12 @@ export default function LoginPage() {
             <span className="ml-2 text-sm text-neutral-300">Remember me</span>
           </label>
 
-          <Link
+          {<Link
             href="/auth/forgot-password"
             className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
           >
             Forgot password?
-          </Link>
+          </Link>}
         </div>
 
         <Button
@@ -204,12 +204,12 @@ export default function LoginPage() {
       <div className="mt-6 text-center">
         <p className="text-sm text-neutral-400">
           Don't have an account?{' '}
-          <Link
+          {<Link
             href="/auth/register"
             className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
           >
             Sign up
-          </Link>
+          </Link>}
         </p>
       </div>
     </AuthLayout>

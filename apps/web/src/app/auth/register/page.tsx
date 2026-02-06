@@ -301,13 +301,13 @@ export default function RegisterPage() {
             />
             <span className="ml-2 text-sm text-neutral-300">
               I agree to the{' '}
-              <Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">
+              {<Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">
                 Terms of Service
-              </Link>{' '}
+              </Link>}{' '}
               and{' '}
-              <Link href="/privacy" className="text-primary-400 hover:text-primary-300 underline">
+              {<Link href="/privacy" className="text-primary-400 hover:text-primary-300 underline">
                 Privacy Policy
-              </Link>
+              </Link>}
             </span>
           </label>
           {errors.terms && (
@@ -329,12 +329,12 @@ export default function RegisterPage() {
       <div className="mt-6 text-center">
         <p className="text-sm text-neutral-400">
           Already have an account?{' '}
-          <Link
+          {<Link
             href="/auth/login"
             className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
           >
             Sign in
-          </Link>
+          </Link>}
         </p>
       </div>
     </AuthLayout>

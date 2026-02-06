@@ -12,6 +12,7 @@
 
 import { Router, type Request, type Response } from "express";
 import { z, ZodError } from "zod";
+import rateLimit from "express-rate-limit";
 import {
   listSessions,
   getSessionById,
@@ -23,6 +24,7 @@ import {
 } from "../db/services/session.service.js";
 import { listOutputs } from "../db/services/output.service.js";
 import { authenticateToken, type AuthenticatedRequest } from "../auth/middleware.js";
+import { logger } from "../logger/index.js";
 
 // =============================================================================
 // ACTIVE SESSION STATE
@@ -79,12 +81,52 @@ function isSessionTrulyActive(sessionId: string, endedAt: Date | null): boolean 
 }
 
 // =============================================================================
+// RATE LIMITERS
+// =============================================================================
+
+/**
+ * Rate limiter for session list endpoint - prevents data scraping
+ * - 30 requests per minute per IP
+ * - Protects against DoS and bulk data extraction
+ */
+const sessionListRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute window
+  max: 30, // 30 requests per window
+  message: "Too many session list requests. Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
+  skipFailedRequests: false,
+});
+
+/**
+ * Rate limiter for individual session access
+ * - 100 requests per minute per IP
+ * - More permissive than list endpoint
+ */
+const sessionReadRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: "Too many session requests. Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
 
+/**
+ * UUID validation regex
+ * Validates standard UUID v4 format used by Prisma
+ */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const sessionIdSchema = z.string().regex(UUID_REGEX, "Invalid session ID format");
+
 const listSessionsSchema = z.object({
-  workflow: z.string().optional(),
-  captureMode: z.string().optional(),
+  workflow: z.string().max(100).optional(),
+  captureMode: z.string().max(50).optional(),
   active: z
     .string()
     .optional()
@@ -99,9 +141,16 @@ const listSessionsSchema = z.object({
   orderDir: z.enum(["asc", "desc"]).default("desc"),
 });
 
+const getSessionOutputsSchema = z.object({
+  category: z.string().max(50).optional(),
+  status: z.enum(["draft", "approved", "published", "archived"]).optional(),
+  limit: z.coerce.number().int().positive().max(100).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 const updateSessionSchema = z.object({
   title: z.string().max(200).optional(),
-  participants: z.array(z.string()).optional(),
+  participants: z.array(z.string().max(100)).max(50).optional(),
 });
 
 // =============================================================================
@@ -139,6 +188,12 @@ function handleValidationError(res: Response, error: ZodError): void {
 /**
  * GET /api/sessions
  * List all sessions with optional filtering.
+ *
+ * Security features:
+ * - Rate limited to prevent data scraping (30 req/min)
+ * - Input validation with max lengths
+ * - Secure error handling without stack trace exposure
+ * - Pagination enforced with reasonable limits
  */
 async function listSessionsHandler(req: Request, res: Response): Promise<void> {
   try {
@@ -185,7 +240,7 @@ async function listSessionsHandler(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error("[api/sessions] Error listing sessions:", error);
+    logger.error({ err: error }, "[api/sessions] Error listing sessions");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list sessions.");
   }
 }
@@ -193,10 +248,24 @@ async function listSessionsHandler(req: Request, res: Response): Promise<void> {
 /**
  * GET /api/sessions/:id
  * Get a single session by ID with optional related data.
+ *
+ * Security features:
+ * - UUID format validation before database query
+ * - Rate limited to prevent abuse
+ * - Secure error handling
+ * - Input sanitization
  */
 async function getSessionHandler(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
+
+    // Validate session ID format
+    const idValidation = sessionIdSchema.safeParse(id);
+    if (!idValidation.success) {
+      sendError(res, 400, "INVALID_SESSION_ID", "Invalid session ID format.");
+      return;
+    }
+
     const includeRelations = req.query.include === "relations";
 
     let session;
@@ -232,18 +301,41 @@ async function getSessionHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { session: transformedSession });
   } catch (error) {
-    console.error("[api/sessions] Error getting session:", error);
+    logger.error({ err: error, sessionId: req.params.id }, "[api/sessions] Error getting session");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get session.");
   }
 }
 
 /**
  * GET /api/sessions/:id/outputs
- * Get all outputs for a specific session.
+ * Get all outputs for a specific session with filtering and pagination.
+ *
+ * Security features:
+ * - UUID format validation
+ * - Input validation with safe defaults
+ * - Rate limiting
+ * - Pagination enforced
+ * - Category and status filtering with validation
  */
 async function getSessionOutputsHandler(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
+
+    // Validate session ID format
+    const idValidation = sessionIdSchema.safeParse(id);
+    if (!idValidation.success) {
+      sendError(res, 400, "INVALID_SESSION_ID", "Invalid session ID format.");
+      return;
+    }
+
+    // Validate query parameters
+    const validationResult = getSessionOutputsSchema.safeParse(req.query);
+    if (!validationResult.success) {
+      handleValidationError(res, validationResult.error);
+      return;
+    }
+
+    const { category, status, limit, offset } = validationResult.data;
 
     // Check if session exists first
     const session = await getSessionById(id);
@@ -252,10 +344,42 @@ async function getSessionOutputsHandler(req: Request, res: Response): Promise<vo
       return;
     }
 
-    const outputs = await listOutputs({ sessionId: id });
-    sendSuccess(res, { outputs });
+    // Get outputs with filtering
+    const outputs = await listOutputs({
+      sessionId: id,
+      category,
+      status: status as "draft" | "approved" | "published" | "archived" | undefined,
+      limit,
+      offset,
+    });
+
+    // Transform outputs for API response
+    const transformedOutputs = outputs.map((output) => ({
+      id: output.id,
+      sessionId: output.sessionId,
+      category: output.category,
+      title: output.title,
+      text: output.text,
+      refs: output.refs,
+      meta: output.meta as Record<string, unknown> | null,
+      status: output.status,
+      createdAt: output.createdAt.toISOString(),
+      updatedAt: output.updatedAt.toISOString(),
+    }));
+
+    sendSuccess(res, {
+      outputs: transformedOutputs,
+      pagination: {
+        limit,
+        offset,
+        total: transformedOutputs.length,
+      },
+    });
   } catch (error) {
-    console.error("[api/sessions] Error getting session outputs:", error);
+    logger.error(
+      { err: error, sessionId: req.params.id },
+      "[api/sessions] Error getting session outputs"
+    );
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get session outputs.");
   }
 }
@@ -263,10 +387,23 @@ async function getSessionOutputsHandler(req: Request, res: Response): Promise<vo
 /**
  * PATCH /api/sessions/:id
  * Update session metadata.
+ *
+ * Security features:
+ * - Requires authentication
+ * - UUID format validation
+ * - Input sanitization with max lengths
+ * - Existence check before update
  */
 async function updateSessionHandler(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
+
+    // Validate session ID format
+    const idValidation = sessionIdSchema.safeParse(id);
+    if (!idValidation.success) {
+      sendError(res, 400, "INVALID_SESSION_ID", "Invalid session ID format.");
+      return;
+    }
 
     const validationResult = updateSessionSchema.safeParse(req.body);
     if (!validationResult.success) {
@@ -283,6 +420,11 @@ async function updateSessionHandler(req: Request, res: Response): Promise<void> 
 
     const updatedSession = await updateSession(id, validationResult.data);
 
+    logger.info(
+      { sessionId: id, updates: Object.keys(validationResult.data) },
+      "[api/sessions] Session updated"
+    );
+
     sendSuccess(res, {
       session: {
         id: updatedSession.id,
@@ -298,7 +440,7 @@ async function updateSessionHandler(req: Request, res: Response): Promise<void> 
       },
     });
   } catch (error) {
-    console.error("[api/sessions] Error updating session:", error);
+    logger.error({ err: error, sessionId: req.params.id }, "[api/sessions] Error updating session");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to update session.");
   }
 }
@@ -308,10 +450,23 @@ async function updateSessionHandler(req: Request, res: Response): Promise<void> 
  * End a session by ID (mark as ended in database).
  * This allows ending sessions that are showing as "live" in the database
  * even if they're not the current in-memory session.
+ *
+ * Security features:
+ * - Requires authentication
+ * - UUID format validation
+ * - Idempotency check (already ended)
+ * - Audit logging
  */
 async function endSessionByIdHandler(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
+
+    // Validate session ID format
+    const idValidation = sessionIdSchema.safeParse(id);
+    if (!idValidation.success) {
+      sendError(res, 400, "INVALID_SESSION_ID", "Invalid session ID format.");
+      return;
+    }
 
     // Check if session exists
     const existing = await getSessionById(id);
@@ -345,6 +500,8 @@ async function endSessionByIdHandler(req: Request, res: Response): Promise<void>
       }
     }
 
+    logger.info({ sessionId: id, durationMs }, "[api/sessions] Session ended");
+
     sendSuccess(res, {
       session: {
         id: updatedSession.id,
@@ -362,7 +519,7 @@ async function endSessionByIdHandler(req: Request, res: Response): Promise<void>
       message: "Session ended successfully.",
     });
   } catch (error) {
-    console.error("[api/sessions] Error ending session:", error);
+    logger.error({ err: error, sessionId: req.params.id }, "[api/sessions] Error ending session");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to end session.");
   }
 }
@@ -370,10 +527,24 @@ async function endSessionByIdHandler(req: Request, res: Response): Promise<void>
 /**
  * DELETE /api/sessions/:id
  * Delete a session and all related data.
+ *
+ * Security features:
+ * - Requires authentication
+ * - UUID format validation
+ * - Active session protection
+ * - Audit logging for deletion
+ * - Cascading deletion handled by database constraints
  */
 async function deleteSessionHandler(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
+
+    // Validate session ID format
+    const idValidation = sessionIdSchema.safeParse(id);
+    if (!idValidation.success) {
+      sendError(res, 400, "INVALID_SESSION_ID", "Invalid session ID format.");
+      return;
+    }
 
     // Check if session exists
     const existing = await getSessionById(id);
@@ -395,9 +566,14 @@ async function deleteSessionHandler(req: Request, res: Response): Promise<void> 
 
     await deleteSession(id);
 
+    logger.info(
+      { sessionId: id, workflow: existing.workflow },
+      "[api/sessions] Session deleted"
+    );
+
     sendSuccess(res, { message: "Session deleted successfully." });
   } catch (error) {
-    console.error("[api/sessions] Error deleting session:", error);
+    logger.error({ err: error, sessionId: req.params.id }, "[api/sessions] Error deleting session");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to delete session.");
   }
 }
@@ -406,13 +582,27 @@ async function deleteSessionHandler(req: Request, res: Response): Promise<void> 
 // ROUTER SETUP
 // =============================================================================
 
+/**
+ * Creates the sessions router with all endpoints.
+ *
+ * Security considerations:
+ * - Read endpoints have rate limiting but no auth (for development/demo)
+ * - In production, consider adding authentication to read endpoints
+ * - Write endpoints always require authentication
+ * - All endpoints have input validation and sanitization
+ * - UUID format validation prevents injection attacks
+ * - Rate limiting prevents DoS and data scraping
+ *
+ * TODO: Enable authentication on read endpoints for production deployment
+ */
 export function createSessionsRouter(): Router {
   const router = Router();
 
-  // Read endpoints - no auth for development
-  router.get("/", listSessionsHandler);
-  router.get("/:id", getSessionHandler);
-  router.get("/:id/outputs", getSessionOutputsHandler);
+  // Read endpoints - rate limited, no auth for development
+  // SECURITY: In production, add authenticateToken middleware
+  router.get("/", sessionListRateLimiter, listSessionsHandler);
+  router.get("/:id", sessionReadRateLimiter, getSessionHandler);
+  router.get("/:id/outputs", sessionReadRateLimiter, getSessionOutputsHandler);
 
   // Write endpoints require authentication
   router.patch("/:id", authenticateToken, updateSessionHandler);

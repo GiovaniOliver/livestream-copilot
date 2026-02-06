@@ -93,12 +93,17 @@ afterEach(() => {
 export function createMockSession(overrides = {}) {
   return {
     id: "test-session-id",
+    userId: null,
+    organizationId: null,
     workflow: "streamer",
     captureMode: "av",
     title: "Test Session",
+    description: null,
     participants: ["Host"],
+    status: "draft",
     startedAt: new Date(),
     endedAt: null,
+    workflowConfig: {},
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

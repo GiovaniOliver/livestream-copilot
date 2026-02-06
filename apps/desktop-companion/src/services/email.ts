@@ -24,6 +24,7 @@
 
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
+import { logger } from "../logger/index.js";
 
 // =============================================================================
 // TYPES

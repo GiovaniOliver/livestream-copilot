@@ -33,6 +33,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useConnectionStore } from "../stores/connectionStore";
 import { colors } from "../theme";
 import * as BiometricAuth from "../services/biometricAuth";
+import { authLogger } from "../services/logger";
 
 // OAuth provider configuration
 const OAUTH_PROVIDERS = [
@@ -160,7 +161,7 @@ export default function LoginScreen({ onRegisterPress }: LoginScreenProps) {
         // User is authenticated via biometric, tokens should already be loaded
       }
     } catch (err) {
-      console.error("[LoginScreen] Biometric login failed:", err);
+      authLogger.error( Biometric login failed:", err);
     }
   }, [biometricEnabled, biometricAvailable, authenticateWithBiometric]);
 
@@ -196,7 +197,7 @@ export default function LoginScreen({ onRegisterPress }: LoginScreenProps) {
           }
         } else if (result.type === "cancel") {
           // User cancelled OAuth
-          console.log("[LoginScreen] OAuth cancelled by user");
+          authLogger.info( OAuth cancelled by user");
         }
       } catch (err) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -204,7 +205,7 @@ export default function LoginScreen({ onRegisterPress }: LoginScreenProps) {
           "OAuth Error",
           `Failed to sign in with ${provider}. Please try again.`
         );
-        console.error("[LoginScreen] OAuth error:", err);
+        authLogger.error( OAuth error:", err);
       }
     },
     [baseUrl, rememberMe]
