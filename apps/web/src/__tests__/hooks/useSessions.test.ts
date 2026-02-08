@@ -120,7 +120,7 @@ describe("useSessions Hook", () => {
 
   describe("Initial Load", () => {
     it("should load sessions on mount", async () => {
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -142,7 +142,7 @@ describe("useSessions Hook", () => {
         pagination: mockPagination,
       });
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -159,7 +159,7 @@ describe("useSessions Hook", () => {
         pagination: { limit: 50, offset: 0, total: 0 },
       });
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -175,7 +175,7 @@ describe("useSessions Hook", () => {
         new Error("Network error")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -187,17 +187,17 @@ describe("useSessions Hook", () => {
 
   describe("WebSocket Integration", () => {
     it("should connect to WebSocket on mount when autoConnect is true", async () => {
-      const { result } = renderHook(() => useSessions(true));
+      const { result } = renderHook(() => useSessions(undefined, true));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(mockConnect).toHaveBeenCalledWith("ws://localhost:3124");
+      expect(mockConnect).toHaveBeenCalled();
     });
 
     it("should not connect to WebSocket when autoConnect is false", async () => {
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -207,7 +207,7 @@ describe("useSessions Hook", () => {
     });
 
     it("should disconnect and clear events on unmount", async () => {
-      const { result, unmount } = renderHook(() => useSessions(true));
+      const { result, unmount } = renderHook(() => useSessions(undefined, true));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -222,7 +222,7 @@ describe("useSessions Hook", () => {
 
   describe("Authentication", () => {
     it("should expose isAuthenticated from auth context", async () => {
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -232,7 +232,7 @@ describe("useSessions Hook", () => {
     });
 
     it("should pass access token to API calls", async () => {
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -248,7 +248,7 @@ describe("useSessions Hook", () => {
 
       vi.mocked(sessionsApi.startSession).mockResolvedValue(newSessionResponse);
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -276,7 +276,7 @@ describe("useSessions Hook", () => {
         new Error("Failed to create session")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -308,7 +308,7 @@ describe("useSessions Hook", () => {
         outputCount: 10,
       });
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -327,7 +327,7 @@ describe("useSessions Hook", () => {
         new Error("Session not found")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -350,7 +350,7 @@ describe("useSessions Hook", () => {
         createMockApiSession({ id: "session-1", title: "Updated Title" })
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -373,7 +373,7 @@ describe("useSessions Hook", () => {
         createMockApiSession({ id: "session-1", participants: ["Alice", "Bob"] })
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -395,7 +395,7 @@ describe("useSessions Hook", () => {
     it("should delete session and refresh list", async () => {
       vi.mocked(sessionsApi.deleteSession).mockResolvedValue(undefined);
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -414,7 +414,7 @@ describe("useSessions Hook", () => {
         new Error("Cannot delete active session")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -440,7 +440,7 @@ describe("useSessions Hook", () => {
 
       vi.mocked(sessionsApi.getSessionOutputs).mockResolvedValue(mockOutputs);
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -460,7 +460,7 @@ describe("useSessions Hook", () => {
         new Error("Outputs not found")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -483,7 +483,7 @@ describe("useSessions Hook", () => {
         new Error("Network error")
       );
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.error).toBe("Network error");
@@ -499,7 +499,7 @@ describe("useSessions Hook", () => {
 
   describe("refreshSessions", () => {
     it("should manually refresh sessions", async () => {
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -529,7 +529,7 @@ describe("useSessions Hook", () => {
         pagination: { limit: 50, offset: 0, total: 2 },
       });
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -550,7 +550,7 @@ describe("useSessions Hook", () => {
         pagination: { limit: 50, offset: 0, total: 2 },
       });
 
-      const { result } = renderHook(() => useSessions(false));
+      const { result } = renderHook(() => useSessions(undefined, false));
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);

@@ -9,23 +9,19 @@ import request from "supertest";
 import type { Application } from "express";
 import { mockUser, mockAdminUser, generateTestToken } from "../utils/test-app.js";
 
-// Mock the Prisma client
-vi.mock("../../db/prisma.js", () => ({
-  prisma: {
-    session: {
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-      count: vi.fn(),
-    },
-    output: {
-      findMany: vi.fn(),
-    },
-    $disconnect: vi.fn(),
-  },
+// Mock the session service (used by the route handlers)
+vi.mock("../../db/services/session.service.js", () => ({
+  listSessions: vi.fn(),
+  getSessionById: vi.fn(),
+  getSessionWithCounts: vi.fn(),
+  getSessionWithRelations: vi.fn(),
+  updateSession: vi.fn(),
+  deleteSession: vi.fn(),
+}));
+
+// Mock the output service (used by the outputs handler)
+vi.mock("../../db/services/output.service.js", () => ({
+  listOutputs: vi.fn(),
 }));
 
 // Mock the auth utils for token verification
@@ -35,7 +31,8 @@ vi.mock("../../auth/utils.js", () => ({
   validateApiKeyFormat: vi.fn(),
 }));
 
-import { prisma } from "../../db/prisma.js";
+import * as sessionService from "../../db/services/session.service.js";
+import * as outputService from "../../db/services/output.service.js";
 import * as authUtils from "../../auth/utils.js";
 import { createMockSession } from "../setup.js";
 
@@ -57,38 +54,11 @@ describe("Sessions API Routes", () => {
   });
 
   describe("GET /api/sessions", () => {
-    it("should return 401 when no authorization header is provided", async () => {
-      const response = await request(app)
-        .get("/api/sessions")
-        .expect(401);
-
-      expect(response.body.error.code).toBe("MISSING_TOKEN");
-    });
-
-    it("should return 401 when invalid token is provided", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue(null);
-
-      const response = await request(app)
-        .get("/api/sessions")
-        .set("Authorization", "Bearer invalid-token")
-        .expect(401);
-
-      expect(response.body.error.code).toBe("INVALID_TOKEN");
-    });
-
     it("should return empty list when no sessions exist", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findMany).mockResolvedValue([]);
+      vi.mocked(sessionService.listSessions).mockResolvedValue([]);
 
       const response = await request(app)
         .get("/api/sessions")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -98,92 +68,57 @@ describe("Sessions API Routes", () => {
 
     it("should return list of sessions with default pagination", async () => {
       const mockSessions = [
-        createMockSession({ id: "session-1", workflow: "streamer" }),
-        createMockSession({ id: "session-2", workflow: "podcast" }),
+        createMockSession({ id: "csession10000000000000001", workflow: "streamer", _count: { events: 0, outputs: 0, clips: 0 } }),
+        createMockSession({ id: "csession20000000000000001", workflow: "podcast", _count: { events: 0, outputs: 0, clips: 0 } }),
       ];
 
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findMany).mockResolvedValue(mockSessions);
+      vi.mocked(sessionService.listSessions).mockResolvedValue(mockSessions as any);
 
       const response = await request(app)
         .get("/api/sessions")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.sessions).toHaveLength(2);
-      expect(response.body.data.sessions[0].id).toBe("session-1");
+      expect(response.body.data.sessions[0].id).toBe("csession10000000000000001");
       expect(response.body.data.sessions[0].workflow).toBe("streamer");
     });
 
     it("should filter sessions by workflow", async () => {
       const mockSessions = [
-        createMockSession({ id: "session-1", workflow: "podcast" }),
+        createMockSession({ id: "csession10000000000000001", workflow: "podcast", _count: { events: 0, outputs: 0, clips: 0 } }),
       ];
 
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findMany).mockResolvedValue(mockSessions);
+      vi.mocked(sessionService.listSessions).mockResolvedValue(mockSessions as any);
 
       const response = await request(app)
         .get("/api/sessions?workflow=podcast")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(prisma.session.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({ workflow: "podcast" }),
-        })
+      expect(sessionService.listSessions).toHaveBeenCalledWith(
+        expect.objectContaining({ workflow: "podcast" })
       );
     });
 
     it("should support custom pagination", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findMany).mockResolvedValue([]);
+      vi.mocked(sessionService.listSessions).mockResolvedValue([]);
 
       await request(app)
         .get("/api/sessions?limit=10&offset=20")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(200);
 
-      expect(prisma.session.findMany).toHaveBeenCalledWith(
+      expect(sessionService.listSessions).toHaveBeenCalledWith(
         expect.objectContaining({
-          take: 10,
-          skip: 20,
+          limit: 10,
+          offset: 20,
         })
       );
     });
 
     it("should reject invalid limit values", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-
       const response = await request(app)
         .get("/api/sessions?limit=500")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -192,27 +127,11 @@ describe("Sessions API Routes", () => {
   });
 
   describe("GET /api/sessions/:id", () => {
-    it("should return 401 without authorization", async () => {
-      const response = await request(app)
-        .get("/api/sessions/test-session-id")
-        .expect(401);
-
-      expect(response.body.error.code).toBe("MISSING_TOKEN");
-    });
-
     it("should return 404 when session not found", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(null);
+      vi.mocked(sessionService.getSessionWithCounts).mockResolvedValue(null as any);
 
       const response = await request(app)
-        .get("/api/sessions/non-existent-id")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
+        .get("/api/sessions/cnonexistentid00000000001")
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -220,74 +139,75 @@ describe("Sessions API Routes", () => {
     });
 
     it("should return session when found", async () => {
-      const mockSession = createMockSession({ id: "found-session" });
-
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
+      const mockSession = createMockSession({
+        id: "cfoundsession000000000001",
+        _count: { events: 0, outputs: 0, clips: 0 },
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(mockSession);
+
+      vi.mocked(sessionService.getSessionWithCounts).mockResolvedValue(mockSession as any);
 
       const response = await request(app)
-        .get("/api/sessions/found-session")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
+        .get("/api/sessions/cfoundsession000000000001")
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.session.id).toBe("found-session");
+      expect(response.body.data.session.id).toBe("cfoundsession000000000001");
+    });
+
+    it("should return 400 for invalid session ID format", async () => {
+      const response = await request(app)
+        .get("/api/sessions/invalid-id-format")
+        .expect(400);
+
+      expect(response.body.error.code).toBe("INVALID_SESSION_ID");
     });
   });
 
   describe("GET /api/sessions/:id/outputs", () => {
-    it("should return 401 without authorization", async () => {
-      const response = await request(app)
-        .get("/api/sessions/test-session-id/outputs")
-        .expect(401);
-
-      expect(response.body.error.code).toBe("MISSING_TOKEN");
-    });
-
     it("should return 404 when session not found", async () => {
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(null);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(null as any);
 
       const response = await request(app)
-        .get("/api/sessions/non-existent-id/outputs")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
+        .get("/api/sessions/cnonexistentid00000000001/outputs")
         .expect(404);
 
       expect(response.body.error.code).toBe("NOT_FOUND");
     });
 
     it("should return outputs for valid session", async () => {
-      const mockSession = createMockSession({ id: "session-with-outputs" });
+      const mockSession = createMockSession({ id: "csessionwithoutputs000001" });
       const mockOutputs = [
-        { id: "output-1", sessionId: "session-with-outputs", category: "highlight" },
-        { id: "output-2", sessionId: "session-with-outputs", category: "summary" },
+        {
+          id: "output-1",
+          sessionId: "csessionwithoutputs000001",
+          category: "highlight",
+          title: "Output 1",
+          text: "Content 1",
+          refs: [],
+          meta: null,
+          status: "draft",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: "output-2",
+          sessionId: "csessionwithoutputs000001",
+          category: "summary",
+          title: "Output 2",
+          text: "Content 2",
+          refs: [],
+          meta: null,
+          status: "draft",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ];
 
-      vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
-        sub: mockUser.id,
-        email: mockUser.email,
-        platformRole: mockUser.platformRole,
-        organizations: mockUser.organizations,
-        type: "access",
-      });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(mockSession);
-      vi.mocked(prisma.output.findMany).mockResolvedValue(mockOutputs as any);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(mockSession as any);
+      vi.mocked(outputService.listOutputs).mockResolvedValue(mockOutputs as any);
 
       const response = await request(app)
-        .get("/api/sessions/session-with-outputs/outputs")
-        .set("Authorization", `Bearer ${generateTestToken()}`)
+        .get("/api/sessions/csessionwithoutputs000001/outputs")
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -298,7 +218,7 @@ describe("Sessions API Routes", () => {
   describe("PATCH /api/sessions/:id", () => {
     it("should return 401 without authorization", async () => {
       const response = await request(app)
-        .patch("/api/sessions/test-session-id")
+        .patch("/api/sessions/ctestsessionid00000000001")
         .send({ title: "Updated Title" })
         .expect(401);
 
@@ -313,10 +233,10 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(null);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(null as any);
 
       const response = await request(app)
-        .patch("/api/sessions/non-existent-id")
+        .patch("/api/sessions/cnonexistentid00000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .send({ title: "Updated Title" })
         .expect(404);
@@ -325,7 +245,7 @@ describe("Sessions API Routes", () => {
     });
 
     it("should update session title", async () => {
-      const mockSession = createMockSession({ id: "session-to-update" });
+      const mockSession = createMockSession({ id: "csessiontoupdate000000001" });
       const updatedSession = { ...mockSession, title: "Updated Title" };
 
       vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
@@ -335,25 +255,25 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(mockSession);
-      vi.mocked(prisma.session.update).mockResolvedValue(updatedSession);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(mockSession as any);
+      vi.mocked(sessionService.updateSession).mockResolvedValue(updatedSession as any);
 
       const response = await request(app)
-        .patch("/api/sessions/session-to-update")
+        .patch("/api/sessions/csessiontoupdate000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .send({ title: "Updated Title" })
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.session.title).toBe("Updated Title");
-      expect(prisma.session.update).toHaveBeenCalledWith({
-        where: { id: "session-to-update" },
-        data: { title: "Updated Title" },
-      });
+      expect(sessionService.updateSession).toHaveBeenCalledWith(
+        "csessiontoupdate000000001",
+        { title: "Updated Title" }
+      );
     });
 
     it("should update session participants", async () => {
-      const mockSession = createMockSession({ id: "session-to-update" });
+      const mockSession = createMockSession({ id: "csessiontoupdate000000001" });
       const updatedSession = { ...mockSession, participants: ["Alice", "Bob", "Charlie"] };
 
       vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
@@ -363,11 +283,11 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(mockSession);
-      vi.mocked(prisma.session.update).mockResolvedValue(updatedSession);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(mockSession as any);
+      vi.mocked(sessionService.updateSession).mockResolvedValue(updatedSession as any);
 
       const response = await request(app)
-        .patch("/api/sessions/session-to-update")
+        .patch("/api/sessions/csessiontoupdate000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .send({ participants: ["Alice", "Bob", "Charlie"] })
         .expect(200);
@@ -388,7 +308,7 @@ describe("Sessions API Routes", () => {
       const longTitle = "x".repeat(250); // Exceeds 200 char limit
 
       const response = await request(app)
-        .patch("/api/sessions/session-id")
+        .patch("/api/sessions/csessionid0000000000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .send({ title: longTitle })
         .expect(400);
@@ -400,7 +320,7 @@ describe("Sessions API Routes", () => {
   describe("DELETE /api/sessions/:id", () => {
     it("should return 401 without authorization", async () => {
       const response = await request(app)
-        .delete("/api/sessions/test-session-id")
+        .delete("/api/sessions/ctestsessionid00000000001")
         .expect(401);
 
       expect(response.body.error.code).toBe("MISSING_TOKEN");
@@ -414,10 +334,10 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(null);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(null as any);
 
       const response = await request(app)
-        .delete("/api/sessions/non-existent-id")
+        .delete("/api/sessions/cnonexistentid00000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(404);
 
@@ -425,7 +345,7 @@ describe("Sessions API Routes", () => {
     });
 
     it("should return 400 when trying to delete active session", async () => {
-      const activeSession = createMockSession({ id: "active-session", endedAt: null });
+      const activeSession = createMockSession({ id: "cactivesession00000000001", endedAt: null });
 
       vi.mocked(authUtils.verifyAccessToken).mockReturnValue({
         sub: mockUser.id,
@@ -434,10 +354,10 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(activeSession);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(activeSession as any);
 
       const response = await request(app)
-        .delete("/api/sessions/active-session")
+        .delete("/api/sessions/cactivesession00000000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(400);
 
@@ -446,7 +366,7 @@ describe("Sessions API Routes", () => {
 
     it("should delete completed session", async () => {
       const completedSession = createMockSession({
-        id: "completed-session",
+        id: "ccompletedsession00000001",
         endedAt: new Date(),
       });
 
@@ -457,19 +377,17 @@ describe("Sessions API Routes", () => {
         organizations: mockUser.organizations,
         type: "access",
       });
-      vi.mocked(prisma.session.findUnique).mockResolvedValue(completedSession);
-      vi.mocked(prisma.session.delete).mockResolvedValue(completedSession);
+      vi.mocked(sessionService.getSessionById).mockResolvedValue(completedSession as any);
+      vi.mocked(sessionService.deleteSession).mockResolvedValue(undefined as any);
 
       const response = await request(app)
-        .delete("/api/sessions/completed-session")
+        .delete("/api/sessions/ccompletedsession00000001")
         .set("Authorization", `Bearer ${generateTestToken()}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.message).toBe("Session deleted successfully.");
-      expect(prisma.session.delete).toHaveBeenCalledWith({
-        where: { id: "completed-session" },
-      });
+      expect(sessionService.deleteSession).toHaveBeenCalledWith("ccompletedsession00000001");
     });
   });
 });

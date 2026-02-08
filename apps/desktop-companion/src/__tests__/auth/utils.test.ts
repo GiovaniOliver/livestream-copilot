@@ -31,14 +31,20 @@ vi.mock("hibp", () => ({
   pwnedPassword: vi.fn(),
 }));
 
-// Mock console.warn to avoid cluttering test output
-const originalWarn = console.warn;
-beforeEach(() => {
-  console.warn = vi.fn();
-});
+// Mock the logger module (use vi.hoisted to avoid hoisting issues)
+const { mockLoggerWarn } = vi.hoisted(() => ({
+  mockLoggerWarn: vi.fn(),
+}));
+vi.mock("../../logger/index.js", () => ({
+  logger: {
+    info: vi.fn(),
+    warn: mockLoggerWarn,
+    error: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
 
-afterEach(() => {
-  console.warn = originalWarn;
+beforeEach(() => {
   vi.clearAllMocks();
 });
 
@@ -246,12 +252,12 @@ describe("validatePasswordStrength", () => {
 
       // Should still validate other requirements but not fail due to HIBP error
       expect(result.valid).toBe(true);
-      expect(console.warn).toHaveBeenCalledWith(
-        "[auth] HIBP API check failed:",
+      expect(mockLoggerWarn).toHaveBeenCalledWith(
         expect.objectContaining({
           error: "Network error",
           timestamp: expect.any(String),
-        })
+        }),
+        "[auth] HIBP API check failed"
       );
     });
 
@@ -264,7 +270,7 @@ describe("validatePasswordStrength", () => {
       const result = await validatePasswordStrength("SecureP@ssw0rd123");
 
       expect(result.valid).toBe(true);
-      expect(console.warn).toHaveBeenCalled();
+      expect(mockLoggerWarn).toHaveBeenCalled();
     });
 
     it("should continue validation if HIBP is unavailable", async () => {

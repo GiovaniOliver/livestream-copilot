@@ -14,6 +14,43 @@ const testSchema = z.object({
 
 type TestData = z.infer<typeof testSchema>;
 
+/**
+ * Creates a mock fetch that respects the AbortController signal.
+ * When the signal fires abort, the promise rejects with an AbortError
+ * (matching real fetch behavior).
+ */
+function createAbortAwareFetchMock() {
+  return vi.fn((_url: string | URL | Request, init?: RequestInit) =>
+    new Promise((_resolve, reject) => {
+      const signal = init?.signal;
+      if (signal) {
+        const onAbort = () => {
+          const error = new Error("The operation was aborted");
+          error.name = "AbortError";
+          reject(error);
+        };
+        if (signal.aborted) {
+          onAbort();
+          return;
+        }
+        signal.addEventListener("abort", onAbort);
+      }
+      // Otherwise never resolves (simulates slow server)
+    })
+  );
+}
+
+/**
+ * Helper to safely capture a rejected promise's error value
+ * while preventing unhandled rejection warnings.
+ */
+function captureRejection<T>(promise: Promise<T>): Promise<unknown> {
+  return promise.then(
+    () => { throw new Error("Expected promise to reject"); },
+    (e) => e
+  );
+}
+
 describe("API Client - Timeout Handling", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -28,15 +65,9 @@ describe("API Client - Timeout Handling", () => {
     it("should use default timeout of 30 seconds", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      // Mock a slow response that never resolves
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.get<TestData>("/test");
+      const errorPromise = captureRejection(apiClient.get<TestData>("/test"));
 
       // Fast-forward time to just before timeout
       await vi.advanceTimersByTimeAsync(29999);
@@ -47,8 +78,9 @@ describe("API Client - Timeout Handling", () => {
       expect(abortSpy).toHaveBeenCalled();
 
       // Wait for promise to reject
-      await expect(requestPromise).rejects.toThrow(ApiError);
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({
         status: 0,
         statusText: "Request Timeout",
         body: { message: "Request timed out after 30000ms" },
@@ -85,20 +117,18 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for GET requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.get<TestData>("/test", { timeout: 5000 });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", { timeout: 5000, params: {} })
+      );
 
       // Fast-forward to custom timeout
       await vi.advanceTimersByTimeAsync(5000);
       expect(abortSpy).toHaveBeenCalled();
 
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toMatchObject({
         body: { message: "Request timed out after 5000ms" },
       });
     });
@@ -106,23 +136,17 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for POST requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.post<TestData>(
-        "/test",
-        { data: "test" },
-        { timeout: 1000 }
+      const errorPromise = captureRejection(
+        apiClient.post<TestData>("/test", { data: "test" }, { timeout: 1000 })
       );
 
       await vi.advanceTimersByTimeAsync(1000);
       expect(abortSpy).toHaveBeenCalled();
 
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toMatchObject({
         body: { message: "Request timed out after 1000ms" },
       });
     });
@@ -130,77 +154,65 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for PUT requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.put<TestData>(
-        "/test",
-        { data: "test" },
-        { timeout: 2000 }
+      const errorPromise = captureRejection(
+        apiClient.put<TestData>("/test", { data: "test" }, { timeout: 2000 })
       );
 
       await vi.advanceTimersByTimeAsync(2000);
       expect(abortSpy).toHaveBeenCalled();
+
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
     });
 
     it("should respect custom timeout value for PATCH requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.patch<TestData>(
-        "/test",
-        { data: "test" },
-        { timeout: 3000 }
+      const errorPromise = captureRejection(
+        apiClient.patch<TestData>("/test", { data: "test" }, { timeout: 3000 })
       );
 
       await vi.advanceTimersByTimeAsync(3000);
       expect(abortSpy).toHaveBeenCalled();
+
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
     });
 
     it("should respect custom timeout value for DELETE requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.delete<TestData>("/test", { timeout: 4000 });
+      const errorPromise = captureRejection(
+        apiClient.delete<TestData>("/test", { timeout: 4000 })
+      );
 
       await vi.advanceTimersByTimeAsync(4000);
       expect(abortSpy).toHaveBeenCalled();
+
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
     });
   });
 
   describe("Timeout with schema validation", () => {
     it("should timeout even when using schema validation", async () => {
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.get<TestData>("/test", testSchema, {
-        timeout: 1000,
-      });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", testSchema, { timeout: 1000 })
+      );
 
       await vi.advanceTimersByTimeAsync(1000);
 
-      await expect(requestPromise).rejects.toThrow(ApiError);
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({
         statusText: "Request Timeout",
       });
     });
@@ -252,7 +264,7 @@ describe("API Client - Timeout Handling", () => {
         });
       });
 
-      await apiClient.get<TestData>("/test", { timeout: 5000 });
+      await apiClient.get<TestData>("/test", { timeout: 5000, params: {} });
 
       expect(capturedSignal).toBeDefined();
       expect(capturedSignal).toBeInstanceOf(AbortSignal);
@@ -261,62 +273,61 @@ describe("API Client - Timeout Handling", () => {
     it("should abort signal when timeout is reached", async () => {
       let capturedSignal: AbortSignal | undefined;
 
-      global.fetch = vi.fn((url, options) => {
-        capturedSignal = options?.signal as AbortSignal;
-        return new Promise(() => {
-          // Never resolves
+      global.fetch = vi.fn((_url, init) => {
+        capturedSignal = init?.signal as AbortSignal;
+        return new Promise((_resolve, reject) => {
+          if (capturedSignal) {
+            capturedSignal.addEventListener("abort", () => {
+              const error = new Error("The operation was aborted");
+              error.name = "AbortError";
+              reject(error);
+            });
+          }
         });
       });
 
-      const requestPromise = apiClient.get<TestData>("/test", { timeout: 1000 });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", { timeout: 1000, params: {} })
+      );
 
       await vi.advanceTimersByTimeAsync(1000);
 
       expect(capturedSignal?.aborted).toBe(true);
-      await expect(requestPromise).rejects.toThrow(ApiError);
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
     });
   });
 
   describe("Timeout error handling", () => {
     it("should throw ApiError with status 0 for timeout", async () => {
-      global.fetch = vi.fn(
-        () =>
-          new Promise((_, reject) => {
-            const error = new Error("The operation was aborted");
-            error.name = "AbortError";
-            setTimeout(() => reject(error), 100);
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.get<TestData>("/test", { timeout: 1000 });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", { timeout: 1000, params: {} })
+      );
 
       await vi.advanceTimersByTimeAsync(1000);
 
-      await expect(requestPromise).rejects.toThrow(ApiError);
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({
         status: 0,
         statusText: "Request Timeout",
       });
     });
 
     it("should include timeout duration in error message", async () => {
-      global.fetch = vi.fn(
-        () =>
-          new Promise((_, reject) => {
-            const error = new Error("The operation was aborted");
-            error.name = "AbortError";
-            setTimeout(() => reject(error), 100);
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
       const customTimeout = 12345;
-      const requestPromise = apiClient.get<TestData>("/test", {
-        timeout: customTimeout,
-      });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", { timeout: customTimeout, params: {} })
+      );
 
       await vi.advanceTimersByTimeAsync(customTimeout);
 
-      await expect(requestPromise).rejects.toMatchObject({
+      const error = await errorPromise;
+      expect(error).toMatchObject({
         body: { message: `Request timed out after ${customTimeout}ms` },
       });
     });
@@ -335,17 +346,17 @@ describe("API Client - Timeout Handling", () => {
     it("should handle timeout of 0 (immediate timeout)", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
-        () =>
-          new Promise(() => {
-            // Never resolves
-          })
-      );
+      global.fetch = createAbortAwareFetchMock();
 
-      const requestPromise = apiClient.get<TestData>("/test", { timeout: 0 });
+      const errorPromise = captureRejection(
+        apiClient.get<TestData>("/test", { timeout: 0, params: {} })
+      );
 
       await vi.advanceTimersByTimeAsync(0);
       expect(abortSpy).toHaveBeenCalled();
+
+      const error = await errorPromise;
+      expect(error).toBeInstanceOf(ApiError);
     });
 
     it("should handle very long timeout values", async () => {
@@ -358,6 +369,7 @@ describe("API Client - Timeout Handling", () => {
 
       const result = await apiClient.get<TestData>("/test", {
         timeout: 999999999,
+        params: {},
       });
 
       expect(result).toEqual({ id: "1", name: "Test" });
@@ -380,7 +392,7 @@ describe("API Client - Timeout Handling", () => {
           })
       );
 
-      const requestPromise = apiClient.get<TestData>("/test", { timeout: 5000 });
+      const requestPromise = apiClient.get<TestData>("/test", { timeout: 5000, params: {} });
 
       await vi.advanceTimersByTimeAsync(4999);
       expect(abortSpy).not.toHaveBeenCalled();

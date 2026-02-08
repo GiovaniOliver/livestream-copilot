@@ -24,12 +24,12 @@ vi.mock("../../auth/service.js", () => ({
     getUserWithOrgs: vi.fn(),
   },
   AuthError: class AuthError extends Error {
-    statusCode: number;
     code: string;
-    constructor(message: string, statusCode: number, code: string) {
+    statusCode: number;
+    constructor(message: string, code: string, statusCode: number = 400) {
       super(message);
-      this.statusCode = statusCode;
       this.code = code;
+      this.statusCode = statusCode;
     }
   },
 }));
@@ -39,6 +39,18 @@ vi.mock("../../auth/utils.js", () => ({
   verifyAccessToken: vi.fn(),
   hashApiKey: vi.fn(),
   validateApiKeyFormat: vi.fn(),
+}));
+
+// Mock rate limiters to disable rate limiting in tests
+const noopMiddleware = (_req: any, _res: any, next: any) => next();
+vi.mock("../../auth/rate-limiters.js", () => ({
+  loginLimiter: noopMiddleware,
+  registerLimiter: noopMiddleware,
+  passwordResetLimiter: noopMiddleware,
+  resendVerificationLimiter: noopMiddleware,
+  verifyEmailLimiter: noopMiddleware,
+  refreshTokenLimiter: noopMiddleware,
+  generalAuthLimiter: noopMiddleware,
 }));
 
 import { authService, AuthError } from "../../auth/service.js";
@@ -64,6 +76,12 @@ describe("Auth API Routes", () => {
     it("should register a new user with valid data", async () => {
       const mockResult = {
         user: {
+          emailVerified: false,
+          avatarUrl: null,
+          platformRole: "USER" as const,
+          status: "PENDING_VERIFICATION" as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           id: "new-user-id",
           email: "newuser@example.com",
           name: "New User",
@@ -120,7 +138,7 @@ describe("Auth API Routes", () => {
 
     it("should handle duplicate email error", async () => {
       vi.mocked(authService.register).mockRejectedValue(
-        new AuthError("Email already in use", 409, "EMAIL_EXISTS")
+        new AuthError("Email already in use", "EMAIL_EXISTS", 409)
       );
 
       const response = await request(app)
@@ -148,12 +166,35 @@ describe("Auth API Routes", () => {
           emailVerified: true,
           name: "Test User",
           avatarUrl: null,
-          platformRole: "USER",
-          status: "active",
+          platformRole: "USER" as const,
+          status: "ACTIVE" as const,
+          passwordHash: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           memberships: [
             {
-              organization: { id: "org-1", name: "Test Org" },
-              role: "MEMBER",
+              id: "member-1",
+              organizationId: "org-1",
+              userId: "user-id",
+              role: "MEMBER" as const,
+              invitedBy: null,
+              inviteEmail: null,
+              inviteToken: null,
+              inviteExpiresAt: null,
+              joinedAt: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              organization: {
+                id: "org-1",
+                name: "Test Org",
+                slug: "test-org",
+                description: null,
+                avatarUrl: null,
+                ownerId: "owner-id",
+                settings: {},
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
             },
           ],
         },
@@ -178,7 +219,7 @@ describe("Auth API Routes", () => {
 
     it("should reject login with invalid credentials", async () => {
       vi.mocked(authService.login).mockRejectedValue(
-        new AuthError("Invalid email or password", 401, "INVALID_CREDENTIALS")
+        new AuthError("Invalid email or password", "INVALID_CREDENTIALS", 401)
       );
 
       const response = await request(app)
@@ -241,7 +282,7 @@ describe("Auth API Routes", () => {
 
     it("should reject refresh with invalid token", async () => {
       vi.mocked(authService.refreshAccessToken).mockRejectedValue(
-        new AuthError("Invalid refresh token", 401, "INVALID_REFRESH_TOKEN")
+        new AuthError("Invalid refresh token", "INVALID_REFRESH_TOKEN", 401)
       );
 
       const response = await request(app)
@@ -329,7 +370,17 @@ describe("Auth API Routes", () => {
   describe("POST /api/v1/auth/verify-email", () => {
     it("should verify email with valid token", async () => {
       const mockResult = {
-        user: { id: "user-id", email: "test@example.com", emailVerified: true },
+        user: {
+          id: "user-id",
+          email: "test@example.com",
+          emailVerified: true,
+          name: "Test User",
+          avatarUrl: null,
+          platformRole: "USER" as const,
+          status: "ACTIVE" as const,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       };
 
       vi.mocked(authService.verifyEmail).mockResolvedValue(mockResult);
@@ -347,7 +398,7 @@ describe("Auth API Routes", () => {
 
     it("should reject invalid verification token", async () => {
       vi.mocked(authService.verifyEmail).mockRejectedValue(
-        new AuthError("Invalid or expired token", 400, "INVALID_TOKEN")
+        new AuthError("Invalid or expired token", "INVALID_TOKEN", 400)
       );
 
       const response = await request(app)
@@ -428,7 +479,7 @@ describe("Auth API Routes", () => {
 
     it("should reject reset with invalid token", async () => {
       vi.mocked(authService.resetPassword).mockRejectedValue(
-        new AuthError("Invalid or expired reset token", 400, "INVALID_RESET_TOKEN")
+        new AuthError("Invalid or expired reset token", "INVALID_RESET_TOKEN", 400)
       );
 
       const response = await request(app)
@@ -467,21 +518,41 @@ describe("Auth API Routes", () => {
     });
 
     it("should return current user when authenticated", async () => {
-      const mockUserData = { passwordHash: null, 
+      const mockUserData = {
         id: mockUser.id,
         email: mockUser.email,
         emailVerified: true,
         name: "Test User",
         avatarUrl: null,
-        platformRole: "USER",
-        status: "active",
+        platformRole: "USER" as const,
+        status: "ACTIVE" as const,
+        passwordHash: null,
         createdAt: new Date(),
         updatedAt: new Date(),
         memberships: [
           {
-            organization: { id: "org-1", name: "Test Org", slug: "test-org" },
-            role: "MEMBER",
+            id: "member-1",
+            organizationId: "org-1",
+            userId: mockUser.id,
+            role: "MEMBER" as const,
+            invitedBy: null,
+            inviteEmail: null,
+            inviteToken: null,
+            inviteExpiresAt: null,
+            joinedAt: new Date(),
             createdAt: new Date(),
+            updatedAt: new Date(),
+            organization: {
+              id: "org-1",
+              name: "Test Org",
+              slug: "test-org",
+              description: null,
+              avatarUrl: null,
+              ownerId: "owner-id",
+              settings: {},
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
           },
         ],
       };
