@@ -14,11 +14,64 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import request from "supertest";
 import express, { type Express } from "express";
 import { createAuthRouter } from "../../auth/routes.js";
+import {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  resendVerificationLimiter,
+  verifyEmailLimiter,
+  refreshTokenLimiter,
+  generalAuthLimiter,
+} from "../../auth/rate-limiters.js";
+
+/**
+ * Reset all rate limiter keys for the test IP addresses.
+ * Supertest uses loopback addresses, so we reset all possible variants.
+ */
+function resetAllRateLimiterKeys(): void {
+  const testIps = ["::1", "::ffff:127.0.0.1", "127.0.0.1", "unknown"];
+  const testEmails = [
+    "test@example.com",
+    "user1@example.com",
+    "user2@example.com",
+    "newuser@example.com",
+    "user@example.com",
+    "unknown",
+  ];
+
+  for (const ip of testIps) {
+    // General auth limiter key
+    generalAuthLimiter.resetKey(`auth:${ip}`);
+
+    // Registration limiter key
+    registerLimiter.resetKey(`register:${ip}`);
+
+    // Password reset limiter key
+    passwordResetLimiter.resetKey(`password-reset:${ip}`);
+
+    // Resend verification limiter key
+    resendVerificationLimiter.resetKey(`resend-verification:${ip}`);
+
+    // Verify email limiter key
+    verifyEmailLimiter.resetKey(`verify-email:${ip}`);
+
+    // Refresh token limiter key
+    refreshTokenLimiter.resetKey(`refresh:${ip}`);
+
+    // Login limiter keys (IP + email combinations)
+    for (const email of testEmails) {
+      loginLimiter.resetKey(`login:${ip}:${email}`);
+    }
+  }
+}
 
 describe("Rate Limiter Integration Tests", () => {
   let app: Express;
 
   beforeEach(() => {
+    // Reset all rate limiter state before each test to prevent bleeding
+    resetAllRateLimiterKeys();
+
     // Create a fresh Express app for each test
     app = express();
     app.use(express.json());
@@ -26,8 +79,8 @@ describe("Rate Limiter Integration Tests", () => {
   });
 
   afterEach(() => {
-    // Small delay to prevent rate limit state bleeding between tests
-    return new Promise((resolve) => setTimeout(resolve, 100));
+    // Reset rate limiter state after each test as well
+    resetAllRateLimiterKeys();
   });
 
   describe("Login Rate Limiting", () => {

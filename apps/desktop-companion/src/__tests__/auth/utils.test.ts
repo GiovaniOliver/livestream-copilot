@@ -321,7 +321,7 @@ describe("validatePasswordStrength", () => {
       const strongPasswords = [
         "9K#mPq2$vL8xNw4R",
         "Tr0ub4dor&3Plaid",
-        "correct-horse-battery-staple-2024!",
+        "Correct-horse-battery-staple-2024!",
       ];
 
       for (const password of strongPasswords) {

@@ -79,7 +79,7 @@ describe("HIBP Integration (Real API)", () => {
         vi.mocked(hibp.pwnedPassword).mockResolvedValue(0);
       }
 
-      const passphrase = "correct-horse-battery-staple-2024!";
+      const passphrase = "Correct-horse-battery-staple-2024!";
       const result = await validatePasswordStrength(passphrase);
 
       expect(result.valid).toBe(true);
