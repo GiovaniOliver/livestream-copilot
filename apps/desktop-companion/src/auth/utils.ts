@@ -24,6 +24,7 @@ import crypto from "node:crypto";
 import { pwnedPassword } from "hibp";
 import { validateEnv } from "../config/env.js";
 
+import { logger } from '../logger/index.js';
 // JsonWebTokenError and TokenExpiredError are accessed via jwt namespace
 // since jsonwebtoken is a CommonJS module
 const { JsonWebTokenError, TokenExpiredError } = jwt;
@@ -222,7 +223,7 @@ export async function verifyPassword(
  * @example
  * const result = await validatePasswordStrength('weak');
  * if (!result.valid) {
- *   console.log(result.errors); // ['Password must be at least 12 characters', ...]
+ *   logger.info(result.errors); // ['Password must be at least 12 characters', ...]
  * }
  */
 export async function validatePasswordStrength(
@@ -290,10 +291,10 @@ export async function validatePasswordStrength(
     // HIBP API failure should not block user registration
     // Log the error for monitoring but continue with other validations
     // This provides defense in depth - if HIBP is down, other checks still apply
-    console.warn("[auth] HIBP API check failed:", {
+    logger.warn({
       error: error instanceof Error ? error.message : String(error),
       timestamp: new Date().toISOString(),
-    });
+    }, "[auth] HIBP API check failed");
 
     // In production, you might want to emit a metric/alert here
     // to monitor HIBP API availability
@@ -439,7 +440,7 @@ export function generateRefreshToken(
  * @example
  * const payload = verifyAccessToken(token);
  * if (payload) {
- *   console.log(`User ${payload.sub} authenticated`);
+ *   logger.info(`User ${payload.sub} authenticated`);
  * } else {
  *   // Token invalid, expired, or wrong type
  * }

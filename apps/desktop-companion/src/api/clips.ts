@@ -22,6 +22,7 @@ import {
 } from "../db/services/clip.service.js";
 import { getSessionById } from "../db/services/session.service.js";
 import { authenticateToken } from "../auth/middleware.js";
+import { apiLogger } from "../logger/index.js";
 
 // =============================================================================
 // VALIDATION SCHEMAS
@@ -138,7 +139,7 @@ async function listSessionClipsHandler(req: Request, res: Response): Promise<voi
       },
     });
   } catch (error) {
-    console.error("[api/clips] Error listing session clips:", error);
+    apiLogger.error({ err: error }, "[api/clips] Error listing session clips");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list clips.");
   }
 }
@@ -170,7 +171,7 @@ async function getClipHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { clip: transformClip(clipWithDuration) });
   } catch (error) {
-    console.error("[api/clips] Error getting clip:", error);
+    apiLogger.error({ err: error }, "[api/clips] Error getting clip");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get clip.");
   }
 }
@@ -206,7 +207,7 @@ async function deleteClipHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: "Clip deleted successfully." });
   } catch (error) {
-    console.error("[api/clips] Error deleting clip:", error);
+    apiLogger.error({ err: error }, "[api/clips] Error deleting clip");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to delete clip.");
   }
 }

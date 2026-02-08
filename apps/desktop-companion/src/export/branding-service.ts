@@ -25,6 +25,7 @@ import { getPositionCoordinates } from './branding-types.js';
 import { probeVideo } from '../ffmpeg/probe.js';
 import { generateThumbnail } from '../ffmpeg/thumbnail.js';
 
+import { logger } from '../logger/index.js';
 /**
  * Branding service error
  */
@@ -341,11 +342,11 @@ async function applyBrandingOverlays(
     // Run conversion
     command
       .on('start', (cmd) => {
-        console.log('[BrandingService] FFmpeg command:', cmd);
+        logger.info({ cmd }, '[BrandingService] FFmpeg command');
       })
       .on('progress', (progress) => {
         if (progress.percent) {
-          console.log(`[BrandingService] Progress: ${Math.round(progress.percent)}%`);
+          logger.info(`[BrandingService] Progress: ${Math.round(progress.percent)}%`);
         }
       })
       .on('error', (err) => {
@@ -359,12 +360,9 @@ async function applyBrandingOverlays(
           const thumbPath = outputPath.replace(/\.[^.]+$/, '_thumb.jpg');
           let thumbnailPath: string | undefined;
           try {
-            thumbnailPath = await generateThumbnail(outputPath, thumbPath, {
-              timestamp: duration / 2,
-              size: '1280x720',
-            });
+            thumbnailPath = await generateThumbnail(outputPath, thumbPath, duration / 2);
           } catch (err) {
-            console.warn('[BrandingService] Failed to generate thumbnail:', err);
+            logger.warn({ err }, '[BrandingService] Failed to generate thumbnail');
           }
 
           resolve({
@@ -526,12 +524,9 @@ async function concatenateSegments(
           const thumbPath = outputPath.replace(/\.[^.]+$/, '_thumb.jpg');
           let thumbnailPath: string | undefined;
           try {
-            thumbnailPath = await generateThumbnail(outputPath, thumbPath, {
-              timestamp: metadata.duration / 2,
-              size: '1280x720',
-            });
+            thumbnailPath = await generateThumbnail(outputPath, thumbPath, metadata.duration / 2);
           } catch (err) {
-            console.warn('[BrandingService] Failed to generate thumbnail:', err);
+            logger.warn({ err }, '[BrandingService] Failed to generate thumbnail');
           }
 
           resolve({

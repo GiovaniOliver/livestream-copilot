@@ -16,6 +16,7 @@ import { config } from "../config/index.js";
 import type { EventEnvelope } from "@livestream-copilot/shared";
 import type { ClipQueueItem } from "../db/services/clip-queue.service.js";
 
+import { logger } from '../logger/index.js';
 /**
  * Processing options
  */
@@ -61,7 +62,7 @@ export class ClipQueueProcessor {
     if (this.isRunning) return;
 
     this.isRunning = true;
-    console.log(
+    logger.info(
       `[clip-processor] Started (concurrency: ${this.options.concurrency}, polling: ${this.options.pollingInterval}ms)`
     );
 
@@ -79,7 +80,7 @@ export class ClipQueueProcessor {
       this.pollTimeout = null;
     }
 
-    console.log("[clip-processor] Stopped");
+    logger.info("[clip-processor] Stopped");
   }
 
   /**
@@ -101,11 +102,11 @@ export class ClipQueueProcessor {
       if (item) {
         // Process in background
         this.processItem(item).catch((error) => {
-          console.error("[clip-processor] Error processing item:", error);
+          logger.error({ err: error }, "[clip-processor] Error processing item");
         });
       }
     } catch (error) {
-      console.error("[clip-processor] Error polling:", error);
+      logger.error({ err: error }, "[clip-processor] Error polling");
     }
 
     this.scheduleNextPoll();
@@ -127,7 +128,7 @@ export class ClipQueueProcessor {
     this.processingCount++;
 
     try {
-      console.log(`[clip-processor] Processing item ${item.id} (${item.triggerType}: ${item.triggerSource})`);
+      logger.info(`[clip-processor] Processing item ${item.id} (${item.triggerType}: ${item.triggerSource})`);
 
       // Mark as processing
       await ClipQueueService.startProcessing(item.id);
@@ -186,7 +187,7 @@ export class ClipQueueProcessor {
         result.thumbnailPath
       );
 
-      console.log(
+      logger.info(
         `[clip-processor] Completed item ${item.id} -> clip ${clip.id} (${result.clipPath})`
       );
 
@@ -194,7 +195,7 @@ export class ClipQueueProcessor {
       this.emitClipCreated(item.sessionId, clip.id, artifactId, result);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      console.error(`[clip-processor] Failed to process item ${item.id}:`, error);
+      logger.error({ err: error }, `[clip-processor] Failed to process item ${item.id}`);
 
       // Mark as failed
       const failedItem = await ClipQueueService.failProcessing(item.id, errorMessage);
@@ -255,15 +256,15 @@ export class ClipQueueProcessor {
       type: "CLIP_QUEUE_UPDATED",
       payload: {
         queueItemId: queueItem.id,
-        status: queueItem.status.toLowerCase(),
-        triggerType: queueItem.triggerType.toLowerCase(),
-        triggerSource: queueItem.triggerSource,
+        status: queueItem.status.toLowerCase() as "pending" | "recording" | "processing" | "completed" | "failed",
+        triggerType: queueItem.triggerType.toLowerCase() as "audio" | "visual" | "manual",
+        triggerSource: queueItem.triggerSource ?? undefined,
         t0: queueItem.t0,
-        t1: queueItem.t1,
-        clipId: queueItem.clipId,
-        thumbnailPath: queueItem.thumbnailPath,
-        title: queueItem.title,
-        errorMessage: queueItem.errorMessage,
+        t1: queueItem.t1 ?? undefined,
+        clipId: queueItem.clipId ?? undefined,
+        thumbnailPath: queueItem.thumbnailPath ?? undefined,
+        title: queueItem.title ?? undefined,
+        errorMessage: queueItem.errorMessage ?? undefined,
       },
     };
 
@@ -287,14 +288,14 @@ export class ClipQueueProcessor {
       payload: {
         artifactId,
         path: result.clipPath,
-        t0: result.trimmedStartTime,
-        t1: result.trimmedStartTime + result.duration,
+        t0: result.trimmedStartTime ?? 0,
+        t1: (result.trimmedStartTime ?? 0) + result.duration,
         thumbnailArtifactId: result.thumbnailArtifactId,
       },
     };
 
     this.broadcast(event);
-    console.log(`[clip-processor] Emitted ARTIFACT_CLIP_CREATED for ${artifactId}`);
+    logger.info(`[clip-processor] Emitted ARTIFACT_CLIP_CREATED for ${artifactId}`);
   }
 
   /**

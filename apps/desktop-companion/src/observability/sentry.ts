@@ -15,6 +15,7 @@
 import * as Sentry from "@sentry/node";
 import type { Express, Request, Response, NextFunction } from "express";
 
+import { logger } from '../logger/index.js';
 let initialized = false;
 
 interface SentryConfig {
@@ -34,7 +35,7 @@ export function initSentry(config: SentryConfig): boolean {
   }
 
   if (!config.dsn) {
-    console.log("[sentry] Sentry DSN not configured - error tracking disabled");
+    logger.info("[sentry] Sentry DSN not configured - error tracking disabled");
     return false;
   }
 
@@ -63,16 +64,16 @@ export function initSentry(config: SentryConfig): boolean {
 
       // Integrations
       integrations: [
-        Sentry.httpIntegration({ tracing: true }),
+        Sentry.httpIntegration(),
         Sentry.expressIntegration(),
       ],
     });
 
     initialized = true;
-    console.log(`[sentry] Initialized (env: ${config.environment})`);
+    logger.info(`[sentry] Initialized (env: ${config.environment})`);
     return true;
   } catch (error) {
-    console.error("[sentry] Failed to initialize:", error);
+    logger.error({ err: error }, "[sentry] Failed to initialize");
     return false;
   }
 }
@@ -133,7 +134,7 @@ export function captureException(
   context?: Record<string, unknown>
 ): string | undefined {
   if (!initialized) {
-    console.error("[sentry] Not initialized, logging error:", error);
+    logger.error({ err: error }, "[sentry] Not initialized, logging error");
     return undefined;
   }
 

@@ -1,3 +1,5 @@
+import { ffmpegLogger } from '../logger/index.js';
+
 /**
  * FFmpeg module for clip trimming pipeline.
  * SOC-262: Implements clip trimming from OBS replay buffer.
@@ -28,8 +30,8 @@
  *   artifactId: 'clip-uuid',
  * });
  *
- * console.log('Clip saved to:', result.clipPath);
- * console.log('Thumbnail at:', result.thumbnailPath);
+ * ffmpegLogger.info('Clip saved to:', result.clipPath);
+ * ffmpegLogger.info('Thumbnail at:', result.thumbnailPath);
  * ```
  */
 

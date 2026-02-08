@@ -14,6 +14,7 @@
 import Stripe from "stripe";
 import { config } from "../config/index.js";
 import { prisma } from "../db/index.js";
+import { logger } from "../logger/index.js";
 
 // Import types from generated prisma
 type SubscriptionTier = "FREE" | "STARTER" | "PRO" | "ENTERPRISE";
@@ -352,7 +353,7 @@ class BillingService {
     if (!organizationId) return;
 
     // Subscription will be updated via subscription.created/updated webhook
-    console.log(`[billing] Checkout completed for org ${organizationId}`);
+    logger.info(`[billing] Checkout completed for org ${organizationId}`);
   }
 
   /**
@@ -394,7 +395,7 @@ class BillingService {
       },
     });
 
-    console.log(
+    logger.info(
       `[billing] Subscription updated for org ${organizationId}: ${tier} (${status})`
     );
   }
@@ -418,7 +419,7 @@ class BillingService {
       },
     });
 
-    console.log(`[billing] Subscription canceled for org ${organizationId}`);
+    logger.info(`[billing] Subscription canceled for org ${organizationId}`);
   }
 
   /**
@@ -447,7 +448,7 @@ class BillingService {
       });
     }
 
-    console.log(`[billing] Payment succeeded for customer ${customerId}`);
+    logger.info(`[billing] Payment succeeded for customer ${customerId}`);
   }
 
   /**
@@ -466,7 +467,7 @@ class BillingService {
       data: { status: "PAST_DUE" },
     });
 
-    console.log(`[billing] Payment failed for customer ${customerId}`);
+    logger.info(`[billing] Payment failed for customer ${customerId}`);
   }
 
   /**

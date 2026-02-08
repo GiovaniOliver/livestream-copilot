@@ -10,6 +10,7 @@
  */
 
 import { PrismaClient } from "../generated/prisma/client.js";
+import { logger } from "../logger/index.js";
 
 // Declare global variable for Prisma client in development
 // This prevents creating multiple instances during hot-reloading
@@ -59,7 +60,7 @@ export async function checkDatabaseHealth(): Promise<boolean> {
     await prisma.$queryRaw`SELECT 1`;
     return true;
   } catch (error) {
-    console.error("[db] Health check failed:", error);
+    logger.error({ err: error }, "[db] Health check failed");
     return false;
   }
 }

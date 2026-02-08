@@ -267,7 +267,7 @@ async function logAuditEvent(
     });
   } catch (error) {
     // Log audit failures but don't fail the operation
-    logger.error("[auth] Failed to create audit log:", error);
+    logger.error({ err: error }, "[auth] Failed to create audit log");
   }
 }
 
@@ -370,8 +370,8 @@ export const authService = {
       logger.info(`[auth] Verification email sent to ${normalizedEmail}`);
     } catch (error) {
       logger.error(
-        `[auth] Failed to send verification email to ${normalizedEmail}:`,
-        error instanceof Error ? error.message : String(error)
+        { err: error instanceof Error ? error.message : String(error) },
+        `[auth] Failed to send verification email to ${normalizedEmail}`
       );
       // Don't throw - user is created, they can request resend later
     }
@@ -777,7 +777,7 @@ export const authService = {
         }
       })
       .catch((error) => {
-        logger.error("[auth] Failed to clean up expired tokens:", error);
+        logger.error({ err: error }, "[auth] Failed to clean up expired tokens");
       });
 
     // Check each token with constant-time comparison
@@ -828,7 +828,7 @@ export const authService = {
       } catch (error) {
         // If bcrypt.compare fails, continue to next token
         // This could happen with corrupted data
-        logger.error("[auth] Token comparison error:", error);
+        logger.error({ err: error }, "[auth] Token comparison error");
         continue;
       }
     }
@@ -860,16 +860,16 @@ export const authService = {
 
     // Silent success if user not found (prevents enumeration)
     if (!user) {
-      console.log(
-        `[auth] Resend verification requested for unknown email: ${normalizedEmail}`
+      logger.info(
+        `Resend verification requested for unknown email: ${normalizedEmail}`
       );
       return;
     }
 
     // Silent success if already verified
     if (user.emailVerified) {
-      console.log(
-        `[auth] Resend verification requested for already verified email: ${normalizedEmail}`
+      logger.info(
+        `Resend verification requested for already verified email: ${normalizedEmail}`
       );
       return;
     }
@@ -904,8 +904,8 @@ export const authService = {
       logger.info(`[auth] Verification email resent to ${normalizedEmail}`);
     } catch (error) {
       logger.error(
-        `[auth] Failed to resend verification email to ${normalizedEmail}:`,
-        error instanceof Error ? error.message : String(error)
+        { err: error instanceof Error ? error.message : String(error) },
+        `[auth] Failed to resend verification email to ${normalizedEmail}`
       );
       // Don't throw - token is stored, user can try again
     }
@@ -983,7 +983,7 @@ export const authService = {
       await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
     } catch (error) {
       // Log email error but don't fail the request (silent success for enumeration protection)
-      logger.error("[auth] Failed to send password reset email:", error);
+      logger.error({ err: error }, "[auth] Failed to send password reset email");
       // In production, you might want to queue this for retry
     }
 
@@ -1124,7 +1124,7 @@ export const authService = {
     } catch (error) {
       // Log email error but don't fail the request
       // User's password was already changed successfully
-      logger.error("[auth] Failed to send password changed email:", error);
+      logger.error({ err: error }, "[auth] Failed to send password changed email");
       // In production, you might want to queue this for retry
     }
   },

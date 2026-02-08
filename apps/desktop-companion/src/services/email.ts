@@ -66,7 +66,7 @@ function getEmailConfig(): EmailConfig | null {
 
   // If any required config is missing, email is not configured
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS || !SMTP_FROM || !APP_URL) {
-    console.warn(
+    logger.warn(
       "[email] Email service not configured. Set SMTP environment variables to enable email."
     );
     return null;
@@ -115,9 +115,9 @@ class EmailService {
         requireTLS: !this.config.secure, // Use STARTTLS if not using secure
       });
 
-      console.log("[email] Email service initialized successfully");
+      logger.info("[email] Email service initialized successfully");
     } else {
-      console.warn("[email] Email service disabled - configuration missing");
+      logger.warn("[email] Email service disabled - configuration missing");
     }
   }
 
@@ -145,10 +145,10 @@ class EmailService {
    */
   async sendPasswordResetEmail(to: string, token: string): Promise<void> {
     if (!this.isConfigured() || !this.config) {
-      console.log(
+      logger.info(
         `[email] Would send password reset email to ${to} with token ${token}`
       );
-      console.log(
+      logger.info(
         `[email] Email service not configured - email not sent (development mode)`
       );
       return;
@@ -234,9 +234,9 @@ This is an automated message. Please do not reply to this email.
         html,
       });
 
-      console.log(`[email] Password reset email sent to ${to}`);
+      logger.info(`[email] Password reset email sent to ${to}`);
     } catch (error) {
-      console.error(`[email] Failed to send password reset email to ${to}:`, error);
+      logger.error({ err: error }, `[email] Failed to send password reset email to ${to}`);
       throw new Error("Failed to send password reset email");
     }
   }
@@ -255,8 +255,8 @@ This is an automated message. Please do not reply to this email.
    */
   async sendPasswordChangedEmail(to: string): Promise<void> {
     if (!this.isConfigured() || !this.config) {
-      console.log(`[email] Would send password changed email to ${to}`);
-      console.log(
+      logger.info(`[email] Would send password changed email to ${to}`);
+      logger.info(
         `[email] Email service not configured - email not sent (development mode)`
       );
       return;
@@ -341,11 +341,11 @@ This is an automated message. Please do not reply to this email.
         html,
       });
 
-      console.log(`[email] Password changed confirmation email sent to ${to}`);
+      logger.info(`[email] Password changed confirmation email sent to ${to}`);
     } catch (error) {
-      console.error(
-        `[email] Failed to send password changed email to ${to}:`,
-        error
+      logger.error(
+        { err: error },
+        `[email] Failed to send password changed email to ${to}`
       );
       throw new Error("Failed to send password changed confirmation email");
     }
@@ -360,10 +360,10 @@ This is an automated message. Please do not reply to this email.
    */
   async sendVerificationEmail(to: string, token: string): Promise<void> {
     if (!this.isConfigured() || !this.config) {
-      console.log(
+      logger.info(
         `[email] Would send verification email to ${to} with token ${token}`
       );
-      console.log(
+      logger.info(
         `[email] Email service not configured - email not sent (development mode)`
       );
       return;
@@ -443,9 +443,9 @@ This is an automated message. Please do not reply to this email.
         html,
       });
 
-      console.log(`[email] Verification email sent to ${to}`);
+      logger.info(`[email] Verification email sent to ${to}`);
     } catch (error) {
-      console.error(`[email] Failed to send verification email to ${to}:`, error);
+      logger.error({ err: error }, `[email] Failed to send verification email to ${to}`);
       throw new Error("Failed to send verification email");
     }
   }

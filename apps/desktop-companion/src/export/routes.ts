@@ -30,6 +30,7 @@ import type {
 import { SocialPlatform, ExportFormat, ExportStatus } from './types.js';
 import * as ExportDBService from '../db/services/export.service.js';
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -152,12 +153,12 @@ async function exportPostHandler(req: Request, res: Response): Promise<void> {
     const result = await exportService.exportPost(
       user.id,
       request,
-      user.organizationId
+      user.organizations[0]?.id
     );
 
     sendSuccess(res, result, 201);
   } catch (error: any) {
-    console.error('[export/routes] Export post error:', error);
+    logger.error({ err: error }, '[export/routes] Export post error');
 
     if (error.name === 'ExportError') {
       sendError(res, 400, error.code, error.message);
@@ -189,12 +190,12 @@ async function exportClipHandler(req: Request, res: Response): Promise<void> {
     const result = await exportService.exportClip(
       user.id,
       request,
-      user.organizationId
+      user.organizations[0]?.id
     );
 
     sendSuccess(res, result, 201);
   } catch (error: any) {
-    console.error('[export/routes] Export clip error:', error);
+    logger.error({ err: error }, '[export/routes] Export clip error');
 
     if (error.name === 'ExportError') {
       sendError(res, 400, error.code, error.message);
@@ -220,18 +221,18 @@ async function exportBatchHandler(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const request: ExportBatchRequest = validationResult.data;
+    const request = validationResult.data as ExportBatchRequest;
 
     // Export batch
     const result = await exportService.exportBatch(
       user.id,
       request,
-      user.organizationId
+      user.organizations[0]?.id
     );
 
     sendSuccess(res, result, 201);
   } catch (error: any) {
-    console.error('[export/routes] Export batch error:', error);
+    logger.error({ err: error }, '[export/routes] Export batch error');
 
     if (error.name === 'ExportError') {
       sendError(res, 400, error.code, error.message);
@@ -281,7 +282,7 @@ async function getExportStatusHandler(req: Request, res: Response): Promise<void
       metadata: exportJob.metadata,
     });
   } catch (error: any) {
-    console.error('[export/routes] Get status error:', error);
+    logger.error({ err: error }, '[export/routes] Get status error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -348,7 +349,7 @@ async function downloadExportHandler(req: Request, res: Response): Promise<void>
     const fileStream = createReadStream(exportJob.filePath);
 
     fileStream.on('error', (err) => {
-      console.error('[export/routes] File stream error:', err);
+      logger.error({ err }, '[export/routes] File stream error');
       if (!res.headersSent) {
         res.status(500).end();
       }
@@ -356,7 +357,7 @@ async function downloadExportHandler(req: Request, res: Response): Promise<void>
 
     fileStream.pipe(res);
   } catch (error: any) {
-    console.error('[export/routes] Download error:', error);
+    logger.error({ err: error }, '[export/routes] Download error');
     if (!res.headersSent) {
       sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
     }
@@ -383,7 +384,7 @@ async function getExportHistoryHandler(req: Request, res: Response): Promise<voi
       offset,
     });
   } catch (error: any) {
-    console.error('[export/routes] Get history error:', error);
+    logger.error({ err: error }, '[export/routes] Get history error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -400,7 +401,7 @@ async function getExportStatsHandler(req: Request, res: Response): Promise<void>
 
     sendSuccess(res, stats);
   } catch (error: any) {
-    console.error('[export/routes] Get stats error:', error);
+    logger.error({ err: error }, '[export/routes] Get stats error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -418,7 +419,7 @@ async function deleteExportHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: 'Export deleted successfully' });
   } catch (error: any) {
-    console.error('[export/routes] Delete export error:', error);
+    logger.error({ err: error }, '[export/routes] Delete export error');
 
     if (error.name === 'ExportError') {
       if (error.code === 'EXPORT_NOT_FOUND') {
@@ -458,7 +459,7 @@ async function previewPostHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { previews });
   } catch (error: any) {
-    console.error('[export/routes] Preview post error:', error);
+    logger.error({ err: error }, '[export/routes] Preview post error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }

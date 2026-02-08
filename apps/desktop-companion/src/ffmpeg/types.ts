@@ -59,6 +59,10 @@ export interface TrimClipResult {
   duration: number;
   /** Metadata of the output clip */
   metadata?: VideoMetadata;
+  /** Artifact ID for the generated thumbnail */
+  thumbnailArtifactId?: string;
+  /** Start time of the trimmed clip in seconds from session start */
+  trimmedStartTime?: number;
 }
 
 /**

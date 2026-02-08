@@ -20,6 +20,7 @@
 import rateLimit from "express-rate-limit";
 import type { Request } from "express";
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
@@ -55,7 +56,7 @@ function handleRateLimitExceeded(req: Request, res: any): void {
   const path = req.path;
 
   // Log rate limit violation for security monitoring
-  console.warn(
+  logger.warn(
     `[auth/rate-limit] Rate limit exceeded for ${path} from IP ${ip}`
   );
 

@@ -19,6 +19,7 @@ export interface VisualTrigger {
   label: string;
   imageId: string;
   threshold: number;
+  enabled: boolean;
 }
 
 export interface TriggerConfig {
@@ -242,6 +243,7 @@ export async function addVisualTrigger(
     label,
     imageId,
     threshold,
+    enabled: true,
   };
 
   const updatedTriggers = [...config.visualTriggers, newTrigger];

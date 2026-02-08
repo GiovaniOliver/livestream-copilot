@@ -21,11 +21,11 @@ export { BaseSocialClient } from './base-client.js';
 // CLIENT REGISTRY
 // =============================================================================
 
-const clientRegistry: Map<SocialPlatform, SocialPlatformClient> = new Map([
-  ['YOUTUBE', youtubeClient],
-  ['TWITTER', twitterClient],
-  ['TIKTOK', tiktokClient],
-  ['LINKEDIN', linkedinClient],
+const clientRegistry = new Map<SocialPlatform, SocialPlatformClient>([
+  ['YOUTUBE', youtubeClient as SocialPlatformClient],
+  ['TWITTER', twitterClient as SocialPlatformClient],
+  ['TIKTOK', tiktokClient as SocialPlatformClient],
+  ['LINKEDIN', linkedinClient as SocialPlatformClient],
 ]);
 
 /**

@@ -29,6 +29,7 @@ import {
 import { probeVideo, getVideoDuration } from './probe.js';
 import { generateThumbnailAtMidpoint } from './thumbnail.js';
 
+import { ffmpegLogger } from '../logger/index.js';
 /**
  * Configure ffmpeg path if provided via environment variable.
  */
@@ -155,16 +156,16 @@ async function trimVideo(
 
     command
       .on('start', (cmdLine) => {
-        console.log('[ffmpeg] Spawned command:', cmdLine);
+        ffmpegLogger.info({ cmdLine }, '[ffmpeg] Spawned command');
       })
       .on('progress', (progress) => {
         if (progress.percent) {
-          console.log(`[ffmpeg] Progress: ${Math.round(progress.percent)}%`);
+          ffmpegLogger.info(`[ffmpeg] Progress: ${Math.round(progress.percent)}%`);
         }
       })
       .on('error', (err, stdout, stderr) => {
-        console.error('[ffmpeg] Error:', err.message);
-        console.error('[ffmpeg] stderr:', stderr);
+        ffmpegLogger.error({ errMessage: err.message }, '[ffmpeg] Error');
+        ffmpegLogger.error({ stderr }, '[ffmpeg] stderr');
         reject(
           new FFmpegError(
             `Video trimming failed: ${err.message}`,
@@ -174,7 +175,7 @@ async function trimVideo(
         );
       })
       .on('end', () => {
-        console.log('[ffmpeg] Trimming complete:', outputPath);
+        ffmpegLogger.info({ outputPath }, '[ffmpeg] Trimming complete');
         resolve();
       })
       .run();
@@ -245,9 +246,9 @@ export async function trimClip(input: TrimClipInput): Promise<TrimClipResult> {
   }
 
   // Get actual buffer duration from the file
-  console.log('[ffmpeg] Probing replay buffer:', replayBufferPath);
+  ffmpegLogger.info({ replayBufferPath }, '[ffmpeg] Probing replay buffer');
   const bufferMetadata = await probeVideo(replayBufferPath);
-  console.log('[ffmpeg] Buffer duration:', bufferMetadata.duration, 'seconds');
+  ffmpegLogger.info({ duration: bufferMetadata.duration }, '[ffmpeg] Buffer duration (seconds)');
 
   // Calculate offsets within the buffer
   const offsets = calculateBufferOffsets({
@@ -259,7 +260,7 @@ export async function trimClip(input: TrimClipInput): Promise<TrimClipResult> {
     actualBufferDuration: bufferMetadata.duration,
   });
 
-  console.log('[ffmpeg] Calculated offsets:', offsets);
+  ffmpegLogger.info({ offsets }, '[ffmpeg] Calculated offsets');
 
   // Ensure output directories exist
   const clipsDir = path.join(sessionDir, 'clips');
@@ -286,12 +287,12 @@ export async function trimClip(input: TrimClipInput): Promise<TrimClipResult> {
   const profile = OUTPUT_PROFILES.archive; // Default to archive quality
 
   // Trim the video
-  console.log('[ffmpeg] Trimming clip:', {
+  ffmpegLogger.info({
     input: replayBufferPath,
     output: clipPath,
     startOffset: offsets.startOffset,
     duration: offsets.clipDuration,
-  });
+  }, '[ffmpeg] Trimming clip');
 
   await trimVideo(
     replayBufferPath,
@@ -302,7 +303,7 @@ export async function trimClip(input: TrimClipInput): Promise<TrimClipResult> {
   );
 
   // Generate thumbnail at midpoint
-  console.log('[ffmpeg] Generating thumbnail at midpoint');
+  ffmpegLogger.info('[ffmpeg] Generating thumbnail at midpoint');
   await generateThumbnailAtMidpoint(
     clipPath,
     thumbnailPath,

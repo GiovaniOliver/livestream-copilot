@@ -27,6 +27,7 @@
 import { Router, type Request, type Response } from "express";
 import { z, ZodError } from "zod";
 import { authService, AuthError } from "./service.js";
+import { logger } from '../logger/index.js';
 import {
   authenticateToken,
   type AuthenticatedRequest,
@@ -271,7 +272,7 @@ async function registerHandler(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    console.error("[auth/routes] Registration error:", error);
+    logger.error({ err: error }, "[auth/routes] Registration error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -331,7 +332,7 @@ async function loginHandler(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    console.error("[auth/routes] Login error:", error);
+    logger.error({ err: error }, "[auth/routes] Login error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -365,7 +366,7 @@ async function refreshHandler(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    console.error("[auth/routes] Token refresh error:", error);
+    logger.error({ err: error }, "[auth/routes] Token refresh error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -392,7 +393,7 @@ async function logoutHandler(req: Request, res: Response): Promise<void> {
     sendSuccess(res, { message: "Logged out successfully." });
   } catch (error) {
     // Log but don't expose error details
-    console.error("[auth/routes] Logout error:", error);
+    logger.error({ err: error }, "[auth/routes] Logout error");
     // Still return success to prevent enumeration
     sendSuccess(res, { message: "Logged out successfully." });
   }
@@ -412,7 +413,7 @@ async function logoutAllHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: "Logged out from all sessions." });
   } catch (error) {
-    console.error("[auth/routes] Logout all error:", error);
+    logger.error({ err: error }, "[auth/routes] Logout all error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -445,7 +446,7 @@ async function verifyEmailHandler(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    console.error("[auth/routes] Email verification error:", error);
+    logger.error({ err: error }, "[auth/routes] Email verification error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -478,7 +479,7 @@ async function resendVerificationHandler(
     });
   } catch (error) {
     // Log but return generic success to prevent enumeration
-    console.error("[auth/routes] Resend verification error:", error);
+    logger.error({ err: error }, "[auth/routes] Resend verification error");
     sendSuccess(res, {
       message:
         "If an account with this email exists and is not verified, a verification email has been sent.",
@@ -514,7 +515,7 @@ async function forgotPasswordHandler(
     });
   } catch (error) {
     // Log but return generic success to prevent enumeration
-    console.error("[auth/routes] Forgot password error:", error);
+    logger.error({ err: error }, "[auth/routes] Forgot password error");
     sendSuccess(res, {
       message:
         "If an account with this email exists, a password reset link has been sent.",
@@ -553,7 +554,7 @@ async function resetPasswordHandler(
       return;
     }
 
-    console.error("[auth/routes] Reset password error:", error);
+    logger.error({ err: error }, "[auth/routes] Reset password error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }
@@ -597,7 +598,7 @@ async function getMeHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { user: safeUser });
   } catch (error) {
-    console.error("[auth/routes] Get me error:", error);
+    logger.error({ err: error }, "[auth/routes] Get me error");
     sendError(res, 500, "INTERNAL_ERROR", "An unexpected error occurred.");
   }
 }

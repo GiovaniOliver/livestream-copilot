@@ -9,6 +9,7 @@ import { spawn, type ChildProcess } from "child_process";
 import path from "path";
 import { config } from "../config/index.js";
 
+import { logger } from '../logger/index.js';
 /**
  * Frame extraction options
  */
@@ -88,7 +89,7 @@ export class FrameExtractor {
         // FFmpeg outputs progress to stderr, we can ignore most of it
         const message = data.toString();
         if (message.includes("Error") || message.includes("error")) {
-          console.error("[frame-extractor] FFmpeg error:", message);
+          logger.error({ ffmpegMessage: message }, "[frame-extractor] FFmpeg error");
         }
       });
 
@@ -128,18 +129,18 @@ export class FrameExtractor {
     // Extract immediately, then at intervals
     this.extractFrame()
       .then(callback)
-      .catch((err) => console.error("[frame-extractor] Initial extraction failed:", err));
+      .catch((err) => logger.error({ err }, "[frame-extractor] Initial extraction failed"));
 
     this.intervalHandle = setInterval(async () => {
       try {
         const frame = await this.extractFrame();
         callback(frame);
       } catch (error) {
-        console.error("[frame-extractor] Periodic extraction failed:", error);
+        logger.error({ err: error }, "[frame-extractor] Periodic extraction failed");
       }
     }, intervalSec * 1000);
 
-    console.log(`[frame-extractor] Started periodic extraction every ${intervalSec}s`);
+    logger.info(`[frame-extractor] Started periodic extraction every ${intervalSec}s`);
   }
 
   /**
@@ -149,7 +150,7 @@ export class FrameExtractor {
     if (this.intervalHandle) {
       clearInterval(this.intervalHandle);
       this.intervalHandle = null;
-      console.log("[frame-extractor] Stopped periodic extraction");
+      logger.info("[frame-extractor] Stopped periodic extraction");
     }
   }
 }

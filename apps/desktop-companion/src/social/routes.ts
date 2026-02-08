@@ -20,6 +20,7 @@ import { SocialAPIError } from './types.js';
 import { SocialPlatform } from '../generated/prisma/enums.js';
 import { config } from '../config/index.js';
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -125,7 +126,7 @@ async function getPlatformsHandler(req: Request, res: Response): Promise<void> {
     const platforms = SocialService.getAvailablePlatforms();
     sendSuccess(res, { platforms });
   } catch (error: any) {
-    console.error('[social/routes] Get platforms error:', error);
+    logger.error('[social/routes] Get platforms error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get platforms');
   }
 }
@@ -159,7 +160,7 @@ async function connectHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, result);
   } catch (error: any) {
-    console.error('[social/routes] Connect error:', error);
+    logger.error('[social/routes] Connect error:', error);
 
     if (error instanceof SocialAPIError) {
       sendError(res, error.statusCode || 400, error.code, error.message);
@@ -207,7 +208,7 @@ async function callbackHandler(req: Request, res: Response): Promise<void> {
     )}`;
     res.redirect(successUrl);
   } catch (error: any) {
-    console.error('[social/routes] Callback error:', error);
+    logger.error('[social/routes] Callback error:', error);
 
     const errorMessage =
       error instanceof SocialAPIError
@@ -230,7 +231,7 @@ async function getConnectionsHandler(req: Request, res: Response): Promise<void>
     const connections = await SocialService.getConnections(user.id);
     sendSuccess(res, { connections });
   } catch (error: any) {
-    console.error('[social/routes] Get connections error:', error);
+    logger.error('[social/routes] Get connections error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get connections');
   }
 }
@@ -253,7 +254,7 @@ async function getConnectionHandler(req: Request, res: Response): Promise<void> 
 
     sendSuccess(res, { connection });
   } catch (error: any) {
-    console.error('[social/routes] Get connection error:', error);
+    logger.error('[social/routes] Get connection error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get connection');
   }
 }
@@ -276,7 +277,7 @@ async function disconnectHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: 'Account disconnected successfully' });
   } catch (error: any) {
-    console.error('[social/routes] Disconnect error:', error);
+    logger.error('[social/routes] Disconnect error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to disconnect account');
   }
 }
@@ -317,7 +318,7 @@ async function createPostHandler(req: Request, res: Response): Promise<void> {
       sendError(res, 400, 'POST_FAILED', result.error || 'Failed to create post');
     }
   } catch (error: any) {
-    console.error('[social/routes] Create post error:', error);
+    logger.error('[social/routes] Create post error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to create post');
   }
 }
@@ -370,7 +371,7 @@ async function createMultiPostHandler(req: Request, res: Response): Promise<void
       },
     });
   } catch (error: any) {
-    console.error('[social/routes] Create multi-post error:', error);
+    logger.error('[social/routes] Create multi-post error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to create posts');
   }
 }
@@ -400,7 +401,7 @@ async function getPostsHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, result);
   } catch (error: any) {
-    console.error('[social/routes] Get posts error:', error);
+    logger.error('[social/routes] Get posts error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'Failed to get posts');
   }
 }

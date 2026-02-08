@@ -29,6 +29,7 @@ import { authenticateToken } from "../auth/middleware.js";
 import { complete, isAIConfigured, getDefaultModel, getDefaultMaxTokens } from "../agents/client.js";
 import { logger } from "../logger/index.js";
 
+import { apiLogger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -197,7 +198,7 @@ async function listOutputsHandler(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error("[api/outputs] Error listing outputs:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error listing outputs");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list outputs.");
   }
 }
@@ -228,7 +229,7 @@ async function getOutputHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { output: transformedOutput });
   } catch (error) {
-    console.error("[api/outputs] Error getting output:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error getting output");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get output.");
   }
 }
@@ -261,7 +262,7 @@ async function updateOutputHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { output: transformOutput(updatedOutput) });
   } catch (error) {
-    console.error("[api/outputs] Error updating output:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error updating output");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to update output.");
   }
 }
@@ -291,7 +292,7 @@ async function updateOutputStatusHandler(req: Request, res: Response): Promise<v
 
     sendSuccess(res, { output: transformOutput(updatedOutput) });
   } catch (error) {
-    console.error("[api/outputs] Error updating output status:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error updating output status");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to update output status.");
   }
 }
@@ -315,7 +316,7 @@ async function deleteOutputHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: "Output deleted successfully." });
   } catch (error) {
-    console.error("[api/outputs] Error deleting output:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error deleting output");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to delete output.");
   }
 }
@@ -342,7 +343,7 @@ async function approveAllDraftsHandler(req: Request, res: Response): Promise<voi
       count,
     });
   } catch (error) {
-    console.error("[api/outputs] Error approving all drafts:", error);
+    apiLogger.error({ err: error }, "[api/outputs] Error approving all drafts");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to approve drafts.");
   }
 }

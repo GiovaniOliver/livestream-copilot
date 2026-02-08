@@ -125,7 +125,7 @@ export async function clearSecureStorage(): Promise<void> {
   try {
     await Promise.all(keys.map(key => deleteSecureItem(key)));
   } catch (error) {
-    console.error('[SecureStorage] Failed to clear storage:', error);
+    storeLogger.error('[SecureStorage] Failed to clear storage:', error);
     throw new Error('Failed to clear secure storage');
   }
 }

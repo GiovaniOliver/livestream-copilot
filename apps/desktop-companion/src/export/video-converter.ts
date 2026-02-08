@@ -14,6 +14,7 @@ import { PLATFORM_CONSTRAINTS } from './types.js';
 import { generateThumbnail } from '../ffmpeg/thumbnail.js';
 import { probeVideo } from '../ffmpeg/probe.js';
 
+import { logger } from '../logger/index.js';
 /**
  * Video conversion error
  */
@@ -204,11 +205,11 @@ export async function convertVideo(
     // Handle progress and completion
     command
       .on('start', (commandLine) => {
-        console.log('[VideoConverter] FFmpeg command:', commandLine);
+        logger.info({ commandLine }, '[VideoConverter] FFmpeg command');
       })
       .on('progress', (progress) => {
         if (progress.percent) {
-          console.log(`[VideoConverter] Progress: ${Math.round(progress.percent)}%`);
+          logger.info(`[VideoConverter] Progress: ${Math.round(progress.percent)}%`);
         }
       })
       .on('error', (err) => {
@@ -241,12 +242,9 @@ export async function convertVideo(
           if (shouldGenerateThumbnail && format !== 'GIF') {
             try {
               const thumbPath = thumbnailPath || outputPath.replace(/\.[^.]+$/, '_thumb.jpg');
-              generatedThumbnailPath = await generateThumbnail(outputPath, thumbPath, {
-                timestamp: metadata.duration / 2, // Middle of video
-                size: '1280x720',
-              });
+              generatedThumbnailPath = await generateThumbnail(outputPath, thumbPath, metadata.duration / 2);
             } catch (err) {
-              console.warn('[VideoConverter] Failed to generate thumbnail:', err);
+              logger.warn({ err }, '[VideoConverter] Failed to generate thumbnail');
             }
           }
 
@@ -386,7 +384,7 @@ export async function batchConvertVideo(
         ...result,
       });
     } catch (err) {
-      console.error(`[VideoConverter] Failed to convert to ${format}:`, err);
+      logger.error({ err }, `[VideoConverter] Failed to convert to ${format}`);
     }
   }
 

@@ -342,7 +342,7 @@ async function createExportZip(
     // Handle warnings
     archive.on('warning', (err) => {
       if (err.code === 'ENOENT') {
-        logger.warn('[export/service] ZIP warning:', err);
+        logger.warn({ err }, '[export/service] ZIP warning');
       } else {
         reject(err);
       }
@@ -407,7 +407,7 @@ export async function streamZipToResponse(
   const archive = archiver('zip', { zlib: { level: 9 } });
 
   archive.on('error', (err) => {
-    logger.error('[export/service] ZIP error:', err);
+    logger.error({ err }, '[export/service] ZIP error');
     if (!res.headersSent) {
       res.status(500).end();
     }
@@ -547,7 +547,7 @@ export async function exportBatch(
         );
       });
     } catch (zipErr: any) {
-      logger.error('[export/service] ZIP creation failed:', zipErr);
+      logger.error({ err: zipErr }, '[export/service] ZIP creation failed');
       // Don't fail the entire batch if ZIP fails
     }
   }
@@ -596,8 +596,8 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
             await fs.promises.unlink(exportRecord.filePath);
           } catch (err) {
             logger.warn(
-              `[export/service] Failed to delete file: ${exportRecord.filePath}`,
-              err
+              { err },
+              `[export/service] Failed to delete file: ${exportRecord.filePath}`
             );
           }
         }
@@ -607,8 +607,8 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
             await fs.promises.unlink(exportRecord.thumbnailPath);
           } catch (err) {
             logger.warn(
-              `[export/service] Failed to delete thumbnail: ${exportRecord.thumbnailPath}`,
-              err
+              { err },
+              `[export/service] Failed to delete thumbnail: ${exportRecord.thumbnailPath}`
             );
           }
         }
@@ -622,7 +622,7 @@ export async function cleanupOldExports(daysOld = 7): Promise<number> {
     logger.info(`[export/service] Cleaned up ${cleanedCount} old exports`);
     return cleanedCount;
   } catch (err) {
-    logger.error('[export/service] Cleanup failed:', err);
+    logger.error({ err }, '[export/service] Cleanup failed');
     return cleanedCount;
   }
 }
@@ -682,7 +682,7 @@ export async function deleteExport(userId: string, exportId: string): Promise<vo
     try {
       fs.unlinkSync(exportRecord.filePath);
     } catch (err) {
-      logger.warn(`Failed to delete export file: ${exportRecord.filePath}`, err);
+      logger.warn({ err }, `Failed to delete export file: ${exportRecord.filePath}`);
     }
   }
 
@@ -691,7 +691,7 @@ export async function deleteExport(userId: string, exportId: string): Promise<vo
     try {
       fs.unlinkSync(exportRecord.thumbnailPath);
     } catch (err) {
-      logger.warn(`Failed to delete thumbnail: ${exportRecord.thumbnailPath}`, err);
+      logger.warn({ err }, `Failed to delete thumbnail: ${exportRecord.thumbnailPath}`);
     }
   }
 

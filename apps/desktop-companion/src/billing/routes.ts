@@ -13,6 +13,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { billingService, PLANS } from "./service.js";
+import { logger } from '../logger/index.js';
 import {
   authenticateToken,
   requireOrgRole,
@@ -109,7 +110,7 @@ async function createCheckoutSessionHandler(
 
     sendSuccess(res, result);
   } catch (error) {
-    console.error("[billing/routes] Checkout session error:", error);
+    logger.error({ err: error }, "[billing/routes] Checkout session error");
     sendError(
       res,
       500,
@@ -153,7 +154,7 @@ async function createPortalSessionHandler(
 
     sendSuccess(res, result);
   } catch (error) {
-    console.error("[billing/routes] Portal session error:", error);
+    logger.error({ err: error }, "[billing/routes] Portal session error");
     sendError(
       res,
       500,
@@ -183,7 +184,7 @@ async function getSubscriptionHandler(
 
     sendSuccess(res, { subscription });
   } catch (error) {
-    console.error("[billing/routes] Get subscription error:", error);
+    logger.error({ err: error }, "[billing/routes] Get subscription error");
     sendError(
       res,
       500,
@@ -220,7 +221,7 @@ async function getUsageHandler(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error("[billing/routes] Get usage error:", error);
+    logger.error({ err: error }, "[billing/routes] Get usage error");
     sendError(res, 500, "USAGE_ERROR", "Failed to get usage info");
   }
 }
@@ -243,7 +244,7 @@ async function webhookHandler(req: Request, res: Response): Promise<void> {
 
     res.status(200).json({ received: true });
   } catch (error) {
-    console.error("[billing/routes] Webhook error:", error);
+    logger.error({ err: error }, "[billing/routes] Webhook error");
     sendError(
       res,
       400,

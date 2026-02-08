@@ -117,12 +117,13 @@ const sessionReadRateLimiter = rateLimit({
 // =============================================================================
 
 /**
- * UUID validation regex
- * Validates standard UUID v4 format used by Prisma
+ * CUID validation regex
+ * Validates CUID format used by Prisma (e.g., cmlbcgemg0000i7b80ufgh3ko)
+ * CUID format: c + alphanumeric characters
  */
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const CUID_REGEX = /^c[a-z0-9]{24,}$/;
 
-const sessionIdSchema = z.string().regex(UUID_REGEX, "Invalid session ID format");
+const sessionIdSchema = z.string().regex(CUID_REGEX, "Invalid session ID format");
 
 const listSessionsSchema = z.object({
   workflow: z.string().max(100).optional(),
@@ -250,7 +251,7 @@ async function listSessionsHandler(req: Request, res: Response): Promise<void> {
  * Get a single session by ID with optional related data.
  *
  * Security features:
- * - UUID format validation before database query
+ * - CUID format validation before database query
  * - Rate limited to prevent abuse
  * - Secure error handling
  * - Input sanitization
@@ -311,7 +312,7 @@ async function getSessionHandler(req: Request, res: Response): Promise<void> {
  * Get all outputs for a specific session with filtering and pagination.
  *
  * Security features:
- * - UUID format validation
+ * - CUID format validation
  * - Input validation with safe defaults
  * - Rate limiting
  * - Pagination enforced
@@ -390,7 +391,7 @@ async function getSessionOutputsHandler(req: Request, res: Response): Promise<vo
  *
  * Security features:
  * - Requires authentication
- * - UUID format validation
+ * - CUID format validation
  * - Input sanitization with max lengths
  * - Existence check before update
  */
@@ -453,7 +454,7 @@ async function updateSessionHandler(req: Request, res: Response): Promise<void> 
  *
  * Security features:
  * - Requires authentication
- * - UUID format validation
+ * - CUID format validation
  * - Idempotency check (already ended)
  * - Audit logging
  */
@@ -530,7 +531,7 @@ async function endSessionByIdHandler(req: Request, res: Response): Promise<void>
  *
  * Security features:
  * - Requires authentication
- * - UUID format validation
+ * - CUID format validation
  * - Active session protection
  * - Audit logging for deletion
  * - Cascading deletion handled by database constraints
@@ -590,7 +591,7 @@ async function deleteSessionHandler(req: Request, res: Response): Promise<void> 
  * - In production, consider adding authentication to read endpoints
  * - Write endpoints always require authentication
  * - All endpoints have input validation and sanitization
- * - UUID format validation prevents injection attacks
+ * - CUID format validation prevents injection attacks
  * - Rate limiting prevents DoS and data scraping
  *
  * TODO: Enable authentication on read endpoints for production deployment

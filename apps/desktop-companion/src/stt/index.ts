@@ -9,6 +9,7 @@ import type { WebSocketServer } from "ws";
 import { config } from "../config/index.js";
 import { DeepgramSTTProvider, createDeepgramProvider } from "./deepgram.js";
 import type { STTProvider, STTProviderFactory, DeepgramConfig, STTStartConfig } from "./types.js";
+import { sttLogger } from "../logger/index.js";
 
 // Re-export types
 export * from "./types.js";
@@ -41,7 +42,7 @@ export function getConfiguredProvider(): STTProviderName {
       return "whisper";
     default:
       // Default to Deepgram if not specified or invalid
-      console.warn(`[stt] Unknown provider "${provider}", defaulting to deepgram`);
+      sttLogger.warn(`[stt] Unknown provider "${provider}", defaulting to deepgram`);
       return "deepgram";
   }
 }
@@ -176,7 +177,7 @@ export class STTManager {
 
     // Stop existing provider if any
     if (this.provider) {
-      this.provider.stop().catch(console.error);
+      this.provider.stop().catch((err) => sttLogger.error("Error stopping provider:", err));
     }
 
     this.provider = createSTTProvider(this.wss, providerName, configs);

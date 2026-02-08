@@ -544,7 +544,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Check if session timed out
     if (get().checkSessionTimeout()) {
-      console.log("[authStore] Session timed out");
+      authLogger.info("[authStore] Session timed out");
       await get().logout(baseUrl);
       return false;
     }

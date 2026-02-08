@@ -12,6 +12,7 @@ import * as TriggerConfigService from "../db/services/trigger-config.service.js"
 import type { AudioTrigger } from "../db/services/trigger-config.service.js";
 import type { EventEnvelope } from "@livestream-copilot/shared";
 
+import { logger } from '../logger/index.js';
 /**
  * Phrase match result
  */
@@ -70,14 +71,14 @@ export class AudioTriggerService {
     await this.loadConfig();
 
     if (!this.enabled || this.triggers.length === 0) {
-      console.log(`[audio-trigger] Audio triggers disabled or no phrases configured for workflow "${workflow}"`);
+      logger.info(`[audio-trigger] Audio triggers disabled or no phrases configured for workflow "${workflow}"`);
       return;
     }
 
     // Subscribe to transcript events
     sttProvider.on(this.handleSTTEvent.bind(this));
 
-    console.log(`[audio-trigger] Started monitoring ${this.triggers.length} phrases for workflow "${workflow}"`);
+    logger.info(`[audio-trigger] Started monitoring ${this.triggers.length} phrases for workflow "${workflow}"`);
   }
 
   /**
@@ -88,7 +89,7 @@ export class AudioTriggerService {
     this.sessionId = null;
     this.workflow = null;
     this.lastTriggerTime.clear();
-    console.log("[audio-trigger] Stopped monitoring");
+    logger.info("[audio-trigger] Stopped monitoring");
   }
 
   /**
@@ -134,11 +135,11 @@ export class AudioTriggerService {
       this.cooldownMs = config.triggerCooldown * 1000;
       this.triggers = config.audioTriggers.filter((t) => t.enabled);
 
-      console.log(
+      logger.info(
         `[audio-trigger] Loaded config: enabled=${this.enabled}, cooldown=${config.triggerCooldown}s, phrases=${this.triggers.length}`
       );
     } catch (error) {
-      console.error("[audio-trigger] Failed to load config:", error);
+      logger.error({ err: error }, "[audio-trigger] Failed to load config");
       this.enabled = false;
       this.triggers = [];
     }
@@ -173,7 +174,7 @@ export class AudioTriggerService {
         const now = Date.now();
 
         if (now - lastTrigger < this.cooldownMs) {
-          console.log(
+          logger.info(
             `[audio-trigger] Phrase "${trigger.phrase}" detected but in cooldown (${Math.round((this.cooldownMs - (now - lastTrigger)) / 1000)}s remaining)`
           );
           continue;
@@ -182,7 +183,7 @@ export class AudioTriggerService {
         // Update last trigger time
         this.lastTriggerTime.set(trigger.id, now);
 
-        console.log(
+        logger.info(
           `[audio-trigger] Phrase detected: "${match.phrase}" at t=${match.t.toFixed(2)}s (confidence: ${(match.confidence * 100).toFixed(1)}%)`
         );
 
@@ -198,7 +199,7 @@ export class AudioTriggerService {
           try {
             callback(triggerEvent);
           } catch (error) {
-            console.error("[audio-trigger] Callback error:", error);
+            logger.error({ err: error }, "[audio-trigger] Callback error");
           }
         }
 
@@ -295,7 +296,7 @@ export class AudioTriggerService {
       }
     });
 
-    console.log(`[audio-trigger] Emitted AUTO_TRIGGER_DETECTED: "${triggerEvent.match.phrase}"`);
+    logger.info(`[audio-trigger] Emitted AUTO_TRIGGER_DETECTED: "${triggerEvent.match.phrase}"`);
   }
 }
 

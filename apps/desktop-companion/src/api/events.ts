@@ -21,6 +21,7 @@ import {
 import { getSessionById } from "../db/services/session.service.js";
 import { authenticateToken } from "../auth/middleware.js";
 
+import { apiLogger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -188,7 +189,7 @@ async function listEventsHandler(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error("[api/events] Error listing events:", error);
+    apiLogger.error({ err: error }, "[api/events] Error listing events");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list events.");
   }
 }
@@ -235,7 +236,7 @@ async function listMomentsHandler(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    console.error("[api/events] Error listing moments:", error);
+    apiLogger.error({ err: error }, "[api/events] Error listing moments");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list moments.");
   }
 }
@@ -256,7 +257,7 @@ async function getEventHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { event: transformEvent(event) });
   } catch (error) {
-    console.error("[api/events] Error getting event:", error);
+    apiLogger.error({ err: error }, "[api/events] Error getting event");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get event.");
   }
 }
@@ -301,7 +302,7 @@ async function createMomentHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { moment }, 201);
   } catch (error) {
-    console.error("[api/events] Error creating moment:", error);
+    apiLogger.error({ err: error }, "[api/events] Error creating moment");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to create moment.");
   }
 }
@@ -349,7 +350,7 @@ async function getSessionEventsHandler(req: Request, res: Response): Promise<voi
       },
     });
   } catch (error) {
-    console.error("[api/events] Error getting session events:", error);
+    apiLogger.error({ err: error }, "[api/events] Error getting session events");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get session events.");
   }
 }
@@ -390,7 +391,7 @@ async function getSessionMomentsHandler(req: Request, res: Response): Promise<vo
       },
     });
   } catch (error) {
-    console.error("[api/events] Error getting session moments:", error);
+    apiLogger.error({ err: error }, "[api/events] Error getting session moments");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get session moments.");
   }
 }
@@ -439,7 +440,7 @@ async function createSessionMomentHandler(req: Request, res: Response): Promise<
 
     sendSuccess(res, { moment }, 201);
   } catch (error) {
-    console.error("[api/events] Error creating session moment:", error);
+    apiLogger.error({ err: error }, "[api/events] Error creating session moment");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to create moment.");
   }
 }

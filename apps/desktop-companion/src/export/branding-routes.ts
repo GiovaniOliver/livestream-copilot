@@ -23,6 +23,7 @@ import * as ClipService from '../db/services/clip.service.js';
 import * as ExportDBService from '../db/services/export.service.js';
 import { ExportType } from './types.js';
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -220,7 +221,7 @@ async function brandedExportHandler(req: Request, res: Response): Promise<void> 
     // Create export record
     const exportRecord = await ExportDBService.createExport({
       userId: user.id,
-      organizationId: user.organizationId,
+      organizationId: user.organizations[0]?.id,
       sessionId: clip.sessionId,
       clipId: clip.id,
       type: ExportType.CLIP,
@@ -274,7 +275,7 @@ async function brandedExportHandler(req: Request, res: Response): Promise<void> 
       throw err;
     }
   } catch (error: any) {
-    console.error('[branding/routes] Branded export error:', error);
+    logger.error('[branding/routes] Branded export error:', error);
 
     if (error.name === 'BrandingError') {
       sendError(res, 400, error.code, error.message);
@@ -326,7 +327,7 @@ async function previewBrandingHandler(req: Request, res: Response): Promise<void
       message: 'Preview generated successfully',
     });
   } catch (error: any) {
-    console.error('[branding/routes] Preview error:', error);
+    logger.error('[branding/routes] Preview error:', error);
 
     if (error.name === 'BrandingError') {
       sendError(res, 400, error.code, error.message);
@@ -351,7 +352,7 @@ async function getPresetsHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { presets: userPresets });
   } catch (error: any) {
-    console.error('[branding/routes] Get presets error:', error);
+    logger.error('[branding/routes] Get presets error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -384,7 +385,7 @@ async function createPresetHandler(req: Request, res: Response): Promise<void> {
     const preset: BrandingPreset = {
       id: generateId(),
       userId: user.id,
-      organizationId: user.organizationId,
+      organizationId: user.organizations[0]?.id,
       name,
       config: { ...config, id: undefined },
       isDefault,
@@ -396,7 +397,7 @@ async function createPresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { preset }, 201);
   } catch (error: any) {
-    console.error('[branding/routes] Create preset error:', error);
+    logger.error('[branding/routes] Create preset error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -444,7 +445,7 @@ async function updatePresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { preset: updatedPreset });
   } catch (error: any) {
-    console.error('[branding/routes] Update preset error:', error);
+    logger.error('[branding/routes] Update preset error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -473,7 +474,7 @@ async function deletePresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: 'Preset deleted successfully' });
   } catch (error: any) {
-    console.error('[branding/routes] Delete preset error:', error);
+    logger.error('[branding/routes] Delete preset error:', error);
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }

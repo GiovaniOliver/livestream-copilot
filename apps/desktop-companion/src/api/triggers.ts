@@ -18,6 +18,7 @@ import path from "path";
 import fs from "fs/promises";
 import { config } from "../config/index.js";
 
+import { apiLogger } from '../logger/index.js';
 // Multer will be lazy-loaded when needed
 let _multer: typeof import("multer") | null = null;
 let _multerLoadAttempted = false;
@@ -28,7 +29,7 @@ async function getMulter() {
     try {
       _multer = await import("multer");
     } catch {
-      console.warn("[triggers] multer not available - file upload disabled");
+      apiLogger.warn("[triggers] multer not available - file upload disabled");
     }
   }
   return _multer?.default;
@@ -147,7 +148,7 @@ async function getTriggerConfigHandler(req: Request, res: Response): Promise<voi
       referenceImages,
     });
   } catch (error) {
-    console.error("[api/triggers] Error getting trigger config:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error getting trigger config");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get trigger configuration.");
   }
 }
@@ -173,7 +174,7 @@ async function updateTriggerConfigHandler(req: Request, res: Response): Promise<
 
     sendSuccess(res, { config });
   } catch (error) {
-    console.error("[api/triggers] Error updating trigger config:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error updating trigger config");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to update trigger configuration.");
   }
 }
@@ -197,7 +198,7 @@ async function addAudioTriggerHandler(req: Request, res: Response): Promise<void
 
     sendSuccess(res, { config }, 201);
   } catch (error) {
-    console.error("[api/triggers] Error adding audio trigger:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error adding audio trigger");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to add audio trigger.");
   }
 }
@@ -214,7 +215,7 @@ async function removeAudioTriggerHandler(req: Request, res: Response): Promise<v
 
     sendSuccess(res, { config });
   } catch (error) {
-    console.error("[api/triggers] Error removing audio trigger:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error removing audio trigger");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to remove audio trigger.");
   }
 }
@@ -237,7 +238,7 @@ async function toggleAudioTriggerHandler(req: Request, res: Response): Promise<v
 
     sendSuccess(res, { config });
   } catch (error) {
-    console.error("[api/triggers] Error toggling audio trigger:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error toggling audio trigger");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to toggle audio trigger.");
   }
 }
@@ -287,7 +288,7 @@ async function addVisualTriggerHandler(req: Request, res: Response): Promise<voi
     if (req.file) {
       await fs.unlink(req.file.path).catch(() => {});
     }
-    console.error("[api/triggers] Error adding visual trigger:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error adding visual trigger");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to add visual trigger.");
   }
 }
@@ -314,7 +315,7 @@ async function removeVisualTriggerHandler(req: Request, res: Response): Promise<
 
     sendSuccess(res, { config });
   } catch (error) {
-    console.error("[api/triggers] Error removing visual trigger:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error removing visual trigger");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to remove visual trigger.");
   }
 }
@@ -331,7 +332,7 @@ async function listVisualTriggersHandler(req: Request, res: Response): Promise<v
 
     sendSuccess(res, { referenceImages });
   } catch (error) {
-    console.error("[api/triggers] Error listing visual triggers:", error);
+    apiLogger.error({ err: error }, "[api/triggers] Error listing visual triggers");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list visual triggers.");
   }
 }

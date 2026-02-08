@@ -10,6 +10,7 @@ import { WebSocketServer } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import type { EventEnvelope } from "@livestream-copilot/shared";
 import { config } from "../config/index.js";
+import { sttLogger } from '../logger/index.js';
 import type {
   STTProvider,
   STTStartConfig,
@@ -63,7 +64,7 @@ export class DeepgramSTTProvider implements STTProvider {
     };
 
     if (!this.deepgramConfig.apiKey) {
-      console.warn("[stt:deepgram] No API key provided. Set DEEPGRAM_API_KEY environment variable.");
+      sttLogger.warn("[stt:deepgram] No API key provided. Set DEEPGRAM_API_KEY environment variable.");
     }
   }
 
@@ -78,7 +79,7 @@ export class DeepgramSTTProvider implements STTProvider {
       status,
       message,
     });
-    console.log(`[stt:deepgram] Status: ${status}${message ? ` - ${message}` : ""}`);
+    sttLogger.info(`[stt:deepgram] Status: ${status}${message ? ` - ${message}` : ""}`);
   }
 
   /**
@@ -86,7 +87,7 @@ export class DeepgramSTTProvider implements STTProvider {
    */
   async start(startConfig: STTStartConfig): Promise<void> {
     if (this._status === "connected" || this._status === "transcribing") {
-      console.warn("[stt:deepgram] Already connected. Call stop() first.");
+      sttLogger.warn("[stt:deepgram] Already connected. Call stop() first.");
       return;
     }
 
@@ -188,7 +189,7 @@ export class DeepgramSTTProvider implements STTProvider {
 
     // Connection opened
     this.liveClient.on(LiveTranscriptionEvents.Open, () => {
-      console.log("[stt:deepgram] Connection opened");
+      sttLogger.info("[stt:deepgram] Connection opened");
       this.emit({
         type: "connection_opened",
         timestamp: Date.now(),
@@ -202,7 +203,7 @@ export class DeepgramSTTProvider implements STTProvider {
 
     // Metadata received
     this.liveClient.on(LiveTranscriptionEvents.Metadata, (data: any) => {
-      console.log("[stt:deepgram] Metadata:", JSON.stringify(data).slice(0, 200));
+      sttLogger.info({ metadata: JSON.stringify(data).slice(0, 200) }, "[stt:deepgram] Metadata");
     });
 
     // Speech started
@@ -215,12 +216,12 @@ export class DeepgramSTTProvider implements STTProvider {
     // Utterance end
     this.liveClient.on(LiveTranscriptionEvents.UtteranceEnd, () => {
       // This signals the end of an utterance, useful for UI feedback
-      console.log("[stt:deepgram] Utterance ended");
+      sttLogger.info("[stt:deepgram] Utterance ended");
     });
 
     // Error handling
     this.liveClient.on(LiveTranscriptionEvents.Error, (error: Error) => {
-      console.error("[stt:deepgram] Error:", error);
+      sttLogger.error({ err: error }, "[stt:deepgram] Error");
       this.emit({
         type: "error",
         error: error.message,
@@ -230,7 +231,7 @@ export class DeepgramSTTProvider implements STTProvider {
 
     // Connection closed
     this.liveClient.on(LiveTranscriptionEvents.Close, () => {
-      console.log("[stt:deepgram] Connection closed");
+      sttLogger.info("[stt:deepgram] Connection closed");
       this.emit({
         type: "connection_closed",
         timestamp: Date.now(),
@@ -301,7 +302,7 @@ export class DeepgramSTTProvider implements STTProvider {
       }
 
     } catch (error) {
-      console.error("[stt:deepgram] Error processing transcript:", error);
+      sttLogger.error({ err: error }, "[stt:deepgram] Error processing transcript");
     }
   }
 
@@ -331,7 +332,7 @@ export class DeepgramSTTProvider implements STTProvider {
       }
     });
 
-    console.log(`[stt:deepgram] Emitted TRANSCRIPT_SEGMENT: "${segment.text.slice(0, 50)}..."`);
+    sttLogger.info(`[stt:deepgram] Emitted TRANSCRIPT_SEGMENT: "${segment.text.slice(0, 50)}..."`);
   }
 
   /**
@@ -361,13 +362,13 @@ export class DeepgramSTTProvider implements STTProvider {
       RECONNECT_DELAY_MAX_MS
     );
 
-    console.log(`[stt:deepgram] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+    sttLogger.info(`[stt:deepgram] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
 
     this.reconnectTimeout = setTimeout(async () => {
       try {
         await this.connect();
       } catch (error) {
-        console.error("[stt:deepgram] Reconnection failed:", error);
+        sttLogger.error({ err: error }, "[stt:deepgram] Reconnection failed");
       }
     }, delay);
   }
@@ -382,7 +383,7 @@ export class DeepgramSTTProvider implements STTProvider {
         try {
           this.liveClient.keepAlive();
         } catch (error) {
-          console.warn("[stt:deepgram] Keep-alive failed:", error);
+          sttLogger.warn({ err: error }, "[stt:deepgram] Keep-alive failed");
         }
       }
     }, 10000); // Send keep-alive every 10 seconds
@@ -418,7 +419,7 @@ export class DeepgramSTTProvider implements STTProvider {
       try {
         this.liveClient.requestClose();
       } catch (error) {
-        console.warn("[stt:deepgram] Error closing connection:", error);
+        sttLogger.warn({ err: error }, "[stt:deepgram] Error closing connection");
       }
       this.liveClient = null;
     }
@@ -429,7 +430,7 @@ export class DeepgramSTTProvider implements STTProvider {
     this.reconnectAttempts = 0;
 
     this.setStatus("idle");
-    console.log("[stt:deepgram] Stopped");
+    sttLogger.info("[stt:deepgram] Stopped");
   }
 
   /**
@@ -437,7 +438,7 @@ export class DeepgramSTTProvider implements STTProvider {
    */
   sendAudio(audioData: Buffer): void {
     if (!this.liveClient) {
-      console.warn("[stt:deepgram] Cannot send audio: not connected");
+      sttLogger.warn("[stt:deepgram] Cannot send audio: not connected");
       return;
     }
 
@@ -453,7 +454,7 @@ export class DeepgramSTTProvider implements STTProvider {
       );
       this.liveClient.send(arrayBuffer);
     } catch (error) {
-      console.error("[stt:deepgram] Error sending audio:", error);
+      sttLogger.error({ err: error }, "[stt:deepgram] Error sending audio");
     }
   }
 
@@ -479,7 +480,7 @@ export class DeepgramSTTProvider implements STTProvider {
       try {
         callback(event);
       } catch (error) {
-        console.error("[stt:deepgram] Error in event callback:", error);
+        sttLogger.error({ err: error }, "[stt:deepgram] Error in event callback");
       }
     });
   }

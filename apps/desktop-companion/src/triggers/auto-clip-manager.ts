@@ -17,6 +17,7 @@ import type {
 import type { EventEnvelope } from "@livestream-copilot/shared";
 import type { AudioTriggerEvent } from "./audio-trigger.service.js";
 
+import { logger } from '../logger/index.js';
 /**
  * Visual trigger event (from visual detection service)
  */
@@ -85,11 +86,11 @@ export class AutoClipManager {
         this.autoClipDuration = config.autoClipDuration;
       }
 
-      console.log(
+      logger.info(
         `[auto-clip] Initialized for workflow "${workflow}": enabled=${this.autoClipEnabled}, duration=${this.autoClipDuration}s`
       );
     } catch (error) {
-      console.error("[auto-clip] Failed to load config:", error);
+      logger.error({ err: error }, "[auto-clip] Failed to load config");
     }
   }
 
@@ -110,17 +111,17 @@ export class AutoClipManager {
 
     // Don't auto-clip if disabled
     if (!this.autoClipEnabled && type !== "manual") {
-      console.log(`[auto-clip] Auto-clip disabled, ignoring ${type} trigger`);
+      logger.info(`[auto-clip] Auto-clip disabled, ignoring ${type} trigger`);
       return null;
     }
 
     const sessionId = event.sessionId;
-    const t = event.t;
+    const t = 't' in event ? event.t : (event as AudioTriggerEvent).match.t;
 
     // Check if there's already an active clip for this session
     const existingClip = this.getActiveClipForSession(sessionId);
     if (existingClip) {
-      console.log(
+      logger.info(
         `[auto-clip] Session ${sessionId} already has an active clip, ignoring trigger`
       );
       return null;
@@ -157,7 +158,7 @@ export class AutoClipManager {
     try {
       const queueItem = await ClipQueueService.createClipQueueItem(queueItemInput);
 
-      console.log(
+      logger.info(
         `[auto-clip] Created clip queue item ${queueItem.id} (${type}: "${triggerSource}" at t=${t.toFixed(2)}s)`
       );
 
@@ -187,7 +188,7 @@ export class AutoClipManager {
 
       return queueItem;
     } catch (error) {
-      console.error("[auto-clip] Failed to create clip queue item:", error);
+      logger.error({ err: error }, "[auto-clip] Failed to create clip queue item");
       return null;
     }
   }
@@ -198,7 +199,7 @@ export class AutoClipManager {
   async endClip(queueItemId: string, t1?: number): Promise<ClipQueueItem | null> {
     const activeClip = this.activeClips.get(queueItemId);
     if (!activeClip) {
-      console.warn(`[auto-clip] No active clip with ID ${queueItemId}`);
+      logger.warn(`[auto-clip] No active clip with ID ${queueItemId}`);
       return null;
     }
 
@@ -214,7 +215,7 @@ export class AutoClipManager {
       // Update queue item
       const queueItem = await ClipQueueService.endRecording(queueItemId, endTime);
 
-      console.log(
+      logger.info(
         `[auto-clip] Ended clip ${queueItemId} at t1=${endTime.toFixed(2)}s (duration: ${(endTime - activeClip.t0).toFixed(2)}s)`
       );
 
@@ -233,7 +234,7 @@ export class AutoClipManager {
 
       return queueItem;
     } catch (error) {
-      console.error("[auto-clip] Failed to end clip:", error);
+      logger.error({ err: error }, "[auto-clip] Failed to end clip");
       return null;
     }
   }
@@ -256,12 +257,12 @@ export class AutoClipManager {
       // Delete queue item
       await ClipQueueService.deleteClipQueueItem(queueItemId);
 
-      console.log(`[auto-clip] Cancelled clip ${queueItemId}`);
+      logger.info(`[auto-clip] Cancelled clip ${queueItemId}`);
 
       // Remove from active clips
       this.activeClips.delete(queueItemId);
     } catch (error) {
-      console.error("[auto-clip] Failed to cancel clip:", error);
+      logger.error({ err: error }, "[auto-clip] Failed to cancel clip");
     }
   }
 
@@ -288,7 +289,7 @@ export class AutoClipManager {
    * Stop all active clips and clean up
    */
   async stopAll(): Promise<void> {
-    console.log(`[auto-clip] Stopping ${this.activeClips.size} active clips`);
+    logger.info(`[auto-clip] Stopping ${this.activeClips.size} active clips`);
 
     for (const [queueItemId, clip] of this.activeClips) {
       if (clip.endTimer) {
@@ -338,7 +339,7 @@ export class AutoClipManager {
     };
 
     this.broadcast(event);
-    console.log(`[auto-clip] Emitted CLIP_INTENT_START for ${triggerSource}`);
+    logger.info(`[auto-clip] Emitted CLIP_INTENT_START for ${triggerSource}`);
   }
 
   /**
@@ -367,7 +368,7 @@ export class AutoClipManager {
     };
 
     this.broadcast(event);
-    console.log(`[auto-clip] Emitted CLIP_INTENT_END at t=${t.toFixed(2)}s`);
+    logger.info(`[auto-clip] Emitted CLIP_INTENT_END at t=${t.toFixed(2)}s`);
   }
 
   /**
@@ -381,15 +382,15 @@ export class AutoClipManager {
       type: "CLIP_QUEUE_UPDATED",
       payload: {
         queueItemId: queueItem.id,
-        status: queueItem.status.toLowerCase(),
-        triggerType: queueItem.triggerType.toLowerCase(),
-        triggerSource: queueItem.triggerSource,
+        status: queueItem.status.toLowerCase() as "pending" | "recording" | "processing" | "completed" | "failed",
+        triggerType: queueItem.triggerType.toLowerCase() as "audio" | "visual" | "manual",
+        triggerSource: queueItem.triggerSource ?? undefined,
         t0: queueItem.t0,
-        t1: queueItem.t1,
-        clipId: queueItem.clipId,
-        thumbnailPath: queueItem.thumbnailPath,
-        title: queueItem.title,
-        errorMessage: queueItem.errorMessage,
+        t1: queueItem.t1 ?? undefined,
+        clipId: queueItem.clipId ?? undefined,
+        thumbnailPath: queueItem.thumbnailPath ?? undefined,
+        title: queueItem.title ?? undefined,
+        errorMessage: queueItem.errorMessage ?? undefined,
       },
     };
 

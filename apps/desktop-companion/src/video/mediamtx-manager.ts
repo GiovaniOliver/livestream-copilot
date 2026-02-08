@@ -9,7 +9,7 @@
  * const manager = MediaMTXManager.getInstance();
  * await manager.start();
  * const status = await manager.getStatus();
- * console.log('Stream active:', status.streamActive);
+ * logger.info('Stream active:', status.streamActive);
  * await manager.stop();
  * ```
  */
@@ -18,6 +18,7 @@ import { spawn, ChildProcess } from "child_process";
 import fs from "fs";
 import path from "path";
 import { createLogger } from "../logger/index.js";
+import { logger } from '../logger/index.js';
 import type {
   MediaMTXConfig,
   VideoStreamStatus,

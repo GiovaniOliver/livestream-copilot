@@ -27,6 +27,7 @@ import {
 } from "./utils.js";
 import { PlatformRole, OrgRole } from "../generated/prisma/enums.js";
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -455,7 +456,7 @@ export async function authenticateApiKey(
         data: { lastUsedAt: new Date() },
       })
       .catch((error) => {
-        console.error("[auth] Failed to update API key lastUsedAt:", error);
+        logger.error({ err: error }, "[auth] Failed to update API key lastUsedAt");
       });
 
     // Build organization list from user memberships
@@ -479,7 +480,7 @@ export async function authenticateApiKey(
     (req as AuthenticatedRequest).user = authenticatedUser;
     next();
   } catch (error) {
-    console.error("[auth] API key authentication error:", error);
+    logger.error({ err: error }, "[auth] API key authentication error");
     sendAuthError(
       res,
       500,

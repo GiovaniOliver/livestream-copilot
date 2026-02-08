@@ -28,6 +28,7 @@ import { config } from "../config/index.js";
 import { prisma } from "../db/index.js";
 import { generateAccessToken, generateRefreshToken, hashToken } from "./utils.js";
 
+import { logger } from '../logger/index.js';
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -128,7 +129,7 @@ async function initiateOAuthHandler(
     // Redirect to provider
     res.redirect(url);
   } catch (error) {
-    console.error("[auth/oauth] Initiate error:", error);
+    logger.error({ err: error }, "[auth/oauth] Initiate error");
     sendError(
       res,
       500,
@@ -152,7 +153,7 @@ async function handleOAuthCallbackHandler(
 
     // Check for errors from provider
     if (query.error) {
-      console.error(
+      logger.error(
         `[auth/oauth] Provider error: ${query.error} - ${query.error_description}`
       );
       // Redirect to frontend with error
@@ -329,7 +330,7 @@ async function handleOAuthCallbackHandler(
 
     res.redirect(callbackUrl.toString());
   } catch (error) {
-    console.error("[auth/oauth] Callback error:", error);
+    logger.error({ err: error }, "[auth/oauth] Callback error");
 
     // Redirect to frontend with error
     const frontendUrl = config.FRONTEND_URL || "http://localhost:3000";
@@ -394,7 +395,7 @@ async function linkOAuthAccountHandler(
 
     sendSuccess(res, { url, state });
   } catch (error) {
-    console.error("[auth/oauth] Link error:", error);
+    logger.error({ err: error }, "[auth/oauth] Link error");
     sendError(res, 500, "LINK_ERROR", "Failed to initiate account linking");
   }
 }
@@ -445,7 +446,7 @@ async function unlinkOAuthAccountHandler(
 
     sendSuccess(res, { message: `${provider} account unlinked` });
   } catch (error) {
-    console.error("[auth/oauth] Unlink error:", error);
+    logger.error({ err: error }, "[auth/oauth] Unlink error");
     sendError(res, 500, "UNLINK_ERROR", "Failed to unlink account");
   }
 }
@@ -472,7 +473,7 @@ async function getConnectionsHandler(
 
     sendSuccess(res, { connections });
   } catch (error) {
-    console.error("[auth/oauth] Get connections error:", error);
+    logger.error({ err: error }, "[auth/oauth] Get connections error");
     sendError(res, 500, "CONNECTION_ERROR", "Failed to get connections");
   }
 }

@@ -191,7 +191,7 @@ export class LinkedInClient extends BaseSocialClient {
   async uploadMedia(
     accessToken: string,
     media: PostMedia,
-    ownerUrn: string
+    ownerUrn?: string
   ): Promise<{ mediaId: string }> {
     // Step 1: Register upload
     const registerResponse = await this.apiRequest<{

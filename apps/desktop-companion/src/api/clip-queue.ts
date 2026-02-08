@@ -17,6 +17,7 @@ import * as ClipQueueService from "../db/services/clip-queue.service.js";
 import { getSessionById } from "../db/services/session.service.js";
 import { authenticateToken } from "../auth/middleware.js";
 
+import { apiLogger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
 // =============================================================================
@@ -151,7 +152,7 @@ async function listSessionClipQueueHandler(req: Request, res: Response): Promise
       },
     });
   } catch (error) {
-    console.error("[api/clip-queue] Error listing clip queue:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error listing clip queue");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list clip queue.");
   }
 }
@@ -177,7 +178,7 @@ async function getClipQueueItemHandler(req: Request, res: Response): Promise<voi
 
     sendSuccess(res, { item: transformQueueItem(itemWithDuration) });
   } catch (error) {
-    console.error("[api/clip-queue] Error getting clip queue item:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error getting clip queue item");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get clip queue item.");
   }
 }
@@ -212,7 +213,7 @@ async function updateClipQueueItemHandler(req: Request, res: Response): Promise<
 
     sendSuccess(res, { item: transformQueueItem(itemWithDuration) });
   } catch (error) {
-    console.error("[api/clip-queue] Error updating clip queue item:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error updating clip queue item");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to update clip queue item.");
   }
 }
@@ -242,7 +243,7 @@ async function deleteClipQueueItemHandler(req: Request, res: Response): Promise<
 
     sendSuccess(res, { message: "Clip queue item deleted." });
   } catch (error) {
-    console.error("[api/clip-queue] Error deleting clip queue item:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error deleting clip queue item");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to delete clip queue item.");
   }
 }
@@ -277,7 +278,7 @@ async function retryClipQueueItemHandler(req: Request, res: Response): Promise<v
 
     sendSuccess(res, { item: transformQueueItem(itemWithDuration) });
   } catch (error) {
-    console.error("[api/clip-queue] Error retrying clip queue item:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error retrying clip queue item");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to retry clip queue item.");
   }
 }
@@ -307,7 +308,7 @@ async function getClipQueueStatsHandler(req: Request, res: Response): Promise<vo
       },
     });
   } catch (error) {
-    console.error("[api/clip-queue] Error getting clip queue stats:", error);
+    apiLogger.error({ err: error }, "[api/clip-queue] Error getting clip queue stats");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to get clip queue stats.");
   }
 }

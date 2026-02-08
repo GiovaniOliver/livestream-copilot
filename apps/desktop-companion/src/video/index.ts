@@ -1,3 +1,5 @@
+import { logger } from '../logger/index.js';
+
 /**
  * Video Streaming Module
  *
@@ -18,7 +20,7 @@
  *
  * // Get status
  * const status = await manager.getStatus();
- * console.log('RTMP URL:', status.rtmpIngestUrl);
+ * logger.info('RTMP URL:', status.rtmpIngestUrl);
  *
  * // Mount router
  * app.use('/api/video', videoRouter);
