@@ -36,6 +36,7 @@ import { WebSocketServer } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
+import net from "net";
 import OBSWebSocket from "obs-websocket-js";
 import { config } from "./config/index.js";
 import { withOpikTrace } from "./observability/opik.js";
@@ -169,6 +170,25 @@ function ensureDir(p: string) {
 
 function nowMs() {
   return Date.now();
+}
+
+function isPortAvailable(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const tester = net
+      .createServer()
+      .once("error", (err: NodeJS.ErrnoException) => {
+        if (err.code === "EADDRINUSE") {
+          resolve(false);
+          return;
+        }
+        logger.warn({ err, port }, "Unexpected error while checking port availability");
+        resolve(false);
+      })
+      .once("listening", () => {
+        tester.close(() => resolve(true));
+      })
+      .listen(port, "0.0.0.0");
+  });
 }
 
 function sessionPath(...parts: string[]) {
@@ -712,7 +732,22 @@ async function main() {
 
   let wss: WebSocketServer;
   try {
+    const wsPortAvailable = await isPortAvailable(WS_PORT);
+    if (!wsPortAvailable) {
+      logger.error(
+        {
+          port: WS_PORT,
+          help: "Stop other desktop-companion instances or set WS_PORT to a free port.",
+        },
+        "WebSocket port already in use"
+      );
+      throw new Error(`WebSocket port ${WS_PORT} is already in use`);
+    }
+
     wss = new WebSocketServer({ port: WS_PORT });
+    wss.on("error", (err) => {
+      logger.error({ err, port: WS_PORT }, "WebSocket server error");
+    });
     wss.on("connection", (ws) => {
       logger.debug("New WebSocket client connected");
       ws.send(JSON.stringify({ type: "hello", ok: true }));
