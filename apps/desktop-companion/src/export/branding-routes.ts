@@ -275,7 +275,7 @@ async function brandedExportHandler(req: Request, res: Response): Promise<void> 
       throw err;
     }
   } catch (error: any) {
-    logger.error('[branding/routes] Branded export error:', error);
+    logger.error({ err: error }, '[branding/routes] Branded export error');
 
     if (error.name === 'BrandingError') {
       sendError(res, 400, error.code, error.message);
@@ -327,7 +327,7 @@ async function previewBrandingHandler(req: Request, res: Response): Promise<void
       message: 'Preview generated successfully',
     });
   } catch (error: any) {
-    logger.error('[branding/routes] Preview error:', error);
+    logger.error({ err: error }, '[branding/routes] Preview error');
 
     if (error.name === 'BrandingError') {
       sendError(res, 400, error.code, error.message);
@@ -352,7 +352,7 @@ async function getPresetsHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { presets: userPresets });
   } catch (error: any) {
-    logger.error('[branding/routes] Get presets error:', error);
+    logger.error({ err: error }, '[branding/routes] Get presets error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -397,7 +397,7 @@ async function createPresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { preset }, 201);
   } catch (error: any) {
-    logger.error('[branding/routes] Create preset error:', error);
+    logger.error({ err: error }, '[branding/routes] Create preset error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -445,7 +445,7 @@ async function updatePresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { preset: updatedPreset });
   } catch (error: any) {
-    logger.error('[branding/routes] Update preset error:', error);
+    logger.error({ err: error }, '[branding/routes] Update preset error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }
@@ -474,7 +474,7 @@ async function deletePresetHandler(req: Request, res: Response): Promise<void> {
 
     sendSuccess(res, { message: 'Preset deleted successfully' });
   } catch (error: any) {
-    logger.error('[branding/routes] Delete preset error:', error);
+    logger.error({ err: error }, '[branding/routes] Delete preset error');
     sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred.');
   }
 }

@@ -146,7 +146,7 @@ class EmailService {
   async sendPasswordResetEmail(to: string, token: string): Promise<void> {
     if (!this.isConfigured() || !this.config) {
       logger.info(
-        `[email] Would send password reset email to ${to} with token ${token}`
+        `[email] Would send password reset email to ${to} (token redacted)`
       );
       logger.info(
         `[email] Email service not configured - email not sent (development mode)`
@@ -361,7 +361,7 @@ This is an automated message. Please do not reply to this email.
   async sendVerificationEmail(to: string, token: string): Promise<void> {
     if (!this.isConfigured() || !this.config) {
       logger.info(
-        `[email] Would send verification email to ${to} with token ${token}`
+        `[email] Would send verification email to ${to} (token redacted)`
       );
       logger.info(
         `[email] Email service not configured - email not sent (development mode)`
