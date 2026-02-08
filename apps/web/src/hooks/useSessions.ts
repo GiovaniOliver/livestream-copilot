@@ -37,7 +37,7 @@ import { logger } from "@/lib/logger";
  */
 export interface SessionFilters {
   workflow?: string;
-  status?: "active" | "ended";
+  status?: "live" | "ended";
   limit?: number;
   offset?: number;
 }
@@ -182,28 +182,27 @@ export function useSessions(
       const limit = filters?.limit || 50;
       const offset = filters?.offset || 0;
 
-      // Fetch sessions from the backend API (pass auth token if available)
+      // Build server-side filters
+      const serverFilters: { workflow?: string; active?: boolean } = {};
+      if (filters?.workflow) {
+        serverFilters.workflow = filters.workflow;
+      }
+      if (filters?.status === "live") {
+        serverFilters.active = true;
+      } else if (filters?.status === "ended") {
+        serverFilters.active = false;
+      }
+
+      // Fetch sessions from the backend API with filters (pass auth token if available)
       const { sessions: apiSessions, pagination: paginationInfo } = await getSessions(
         limit,
         offset,
-        accessToken || undefined
+        accessToken || undefined,
+        serverFilters
       );
 
       // Map API response to frontend Session format
-      let mappedSessions = apiSessions.map(mapApiSessionToSession);
-
-      // Apply client-side filters
-      if (filters?.workflow) {
-        mappedSessions = mappedSessions.filter(
-          (session) => session.workflow.toLowerCase() === filters.workflow?.toLowerCase()
-        );
-      }
-
-      if (filters?.status) {
-        mappedSessions = mappedSessions.filter(
-          (session) => session.status === filters.status
-        );
-      }
+      const mappedSessions = apiSessions.map(mapApiSessionToSession);
 
       setSessions(mappedSessions);
       setPagination(paginationInfo);

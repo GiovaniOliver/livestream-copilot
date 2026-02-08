@@ -149,11 +149,18 @@ async function exportPostHandler(req: Request, res: Response): Promise<void> {
 
     const request: ExportPostRequest = validationResult.data;
 
+    // Validate organization membership
+    const organizationId = user.organizations[0]?.id;
+    if (!organizationId) {
+      sendError(res, 403, 'NO_ORGANIZATION', 'User must belong to an organization');
+      return;
+    }
+
     // Export post
     const result = await exportService.exportPost(
       user.id,
       request,
-      user.organizations[0]?.id
+      organizationId
     );
 
     sendSuccess(res, result, 201);
@@ -186,11 +193,18 @@ async function exportClipHandler(req: Request, res: Response): Promise<void> {
 
     const request: ExportClipRequest = validationResult.data;
 
+    // Validate organization membership
+    const organizationId = user.organizations[0]?.id;
+    if (!organizationId) {
+      sendError(res, 403, 'NO_ORGANIZATION', 'User must belong to an organization');
+      return;
+    }
+
     // Export clip
     const result = await exportService.exportClip(
       user.id,
       request,
-      user.organizations[0]?.id
+      organizationId
     );
 
     sendSuccess(res, result, 201);
@@ -223,11 +237,18 @@ async function exportBatchHandler(req: Request, res: Response): Promise<void> {
 
     const request = validationResult.data as ExportBatchRequest;
 
+    // Validate organization membership
+    const organizationId = user.organizations[0]?.id;
+    if (!organizationId) {
+      sendError(res, 403, 'NO_ORGANIZATION', 'User must belong to an organization');
+      return;
+    }
+
     // Export batch
     const result = await exportService.exportBatch(
       user.id,
       request,
-      user.organizations[0]?.id
+      organizationId
     );
 
     sendSuccess(res, result, 201);

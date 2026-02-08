@@ -19,7 +19,6 @@ import { logger } from "@/lib/logger";
 
 interface StreamerDashboardProps {
   sessionId: string;
-  wsUrl: string;
 }
 
 const FilmIcon = () => (
@@ -67,7 +66,7 @@ function detectPlatform(text: string): string[] {
   return platforms.length > 0 ? platforms : ["General"];
 }
 
-export function StreamerDashboard({ sessionId, wsUrl }: StreamerDashboardProps) {
+export function StreamerDashboard({ sessionId }: StreamerDashboardProps) {
   const { connect, disconnect, clips, outputs, moments, isConnected } = useWebSocket();
   const [previewClip, setPreviewClip] = useState<Clip | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);

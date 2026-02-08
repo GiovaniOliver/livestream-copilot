@@ -140,8 +140,6 @@ export default async function StreamerPage({ params }: StreamerPageProps) {
     workflow: "Producer Desk",
   };
 
-  const wsUrl = API_CONFIG.desktopWsUrl;
-
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader

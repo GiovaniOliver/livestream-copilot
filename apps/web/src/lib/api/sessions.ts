@@ -108,16 +108,26 @@ export interface SessionOutput {
  * @param limit - Maximum number of sessions to return (default: 50)
  * @param offset - Number of sessions to skip (default: 0)
  * @param accessToken - Optional access token for authentication
+ * @param filters - Optional filters for workflow and active status
  */
 export async function getSessions(
   limit = 50,
   offset = 0,
-  accessToken?: string
+  accessToken?: string,
+  filters?: { workflow?: string; active?: boolean }
 ): Promise<{ sessions: SessionListItem[]; pagination: PaginationInfo }> {
+  const params: Record<string, string | number | boolean | undefined> = { limit, offset };
+  if (filters?.workflow) {
+    params.workflow = filters.workflow;
+  }
+  if (filters?.active !== undefined) {
+    params.active = filters.active;
+  }
+
   const response = await apiClient.get(
     "/api/sessions",
     getSessionsResponseSchema,
-    withAuth(accessToken, { params: { limit, offset } })
+    withAuth(accessToken, { params })
   );
 
   if (!response.success) {

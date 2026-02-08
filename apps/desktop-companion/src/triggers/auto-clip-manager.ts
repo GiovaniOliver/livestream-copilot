@@ -18,6 +18,35 @@ import type { EventEnvelope } from "@livestream-copilot/shared";
 import type { AudioTriggerEvent } from "./audio-trigger.service.js";
 
 import { logger } from '../logger/index.js';
+
+/**
+ * Safely convert a status string to a valid ClipQueueStatus value
+ */
+const VALID_CLIP_QUEUE_STATUSES = ["pending", "recording", "processing", "completed", "failed"] as const;
+type ClipQueueStatus = typeof VALID_CLIP_QUEUE_STATUSES[number];
+
+function toClipQueueStatus(status: string): ClipQueueStatus {
+  const lower = status.toLowerCase();
+  if ((VALID_CLIP_QUEUE_STATUSES as readonly string[]).includes(lower)) {
+    return lower as ClipQueueStatus;
+  }
+  return "pending";
+}
+
+/**
+ * Safely convert a trigger type string to a valid trigger source value
+ */
+const VALID_TRIGGER_SOURCES = ["audio", "visual", "manual"] as const;
+type TriggerSource = typeof VALID_TRIGGER_SOURCES[number];
+
+function toTriggerSource(triggerType: string): TriggerSource {
+  const lower = triggerType.toLowerCase();
+  if ((VALID_TRIGGER_SOURCES as readonly string[]).includes(lower)) {
+    return lower as TriggerSource;
+  }
+  return "manual";
+}
+
 /**
  * Visual trigger event (from visual detection service)
  */
@@ -226,7 +255,7 @@ export class AutoClipManager {
       this.emitClipIntentEnd(
         activeClip.sessionId,
         endTime,
-        activeClip.triggerType.toLowerCase() as "audio" | "visual" | "manual"
+        toTriggerSource(activeClip.triggerType)
       );
 
       // Emit CLIP_QUEUE_UPDATED event
@@ -382,8 +411,8 @@ export class AutoClipManager {
       type: "CLIP_QUEUE_UPDATED",
       payload: {
         queueItemId: queueItem.id,
-        status: queueItem.status.toLowerCase() as "pending" | "recording" | "processing" | "completed" | "failed",
-        triggerType: queueItem.triggerType.toLowerCase() as "audio" | "visual" | "manual",
+        status: toClipQueueStatus(queueItem.status),
+        triggerType: toTriggerSource(queueItem.triggerType),
         triggerSource: queueItem.triggerSource ?? undefined,
         t0: queueItem.t0,
         t1: queueItem.t1 ?? undefined,

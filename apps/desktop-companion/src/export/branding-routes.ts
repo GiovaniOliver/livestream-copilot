@@ -218,10 +218,17 @@ async function brandedExportHandler(req: Request, res: Response): Promise<void> 
       return;
     }
 
+    // Validate organization membership
+    const organizationId = user.organizations[0]?.id;
+    if (!organizationId) {
+      sendError(res, 403, 'NO_ORGANIZATION', 'User must belong to an organization');
+      return;
+    }
+
     // Create export record
     const exportRecord = await ExportDBService.createExport({
       userId: user.id,
-      organizationId: user.organizations[0]?.id,
+      organizationId,
       sessionId: clip.sessionId,
       clipId: clip.id,
       type: ExportType.CLIP,
@@ -382,10 +389,17 @@ async function createPresetHandler(req: Request, res: Response): Promise<void> {
       });
     }
 
+    // Validate organization membership
+    const organizationId = user.organizations[0]?.id;
+    if (!organizationId) {
+      sendError(res, 403, 'NO_ORGANIZATION', 'User must belong to an organization');
+      return;
+    }
+
     const preset: BrandingPreset = {
       id: generateId(),
       userId: user.id,
-      organizationId: user.organizations[0]?.id,
+      organizationId,
       name,
       config: { ...config, id: undefined },
       isDefault,

@@ -13,7 +13,6 @@ import {
 
 interface DebateDashboardProps {
   sessionId: string;
-  wsUrl: string;
 }
 
 const ScaleIcon = () => (
@@ -36,7 +35,7 @@ function formatTimestamp(ts: number): string {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-export function DebateDashboard({ sessionId, wsUrl }: DebateDashboardProps) {
+export function DebateDashboard({ sessionId }: DebateDashboardProps) {
   const { connect, disconnect, outputs, isConnected } = useWebSocket();
 
   useEffect(() => {

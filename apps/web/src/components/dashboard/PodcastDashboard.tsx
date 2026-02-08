@@ -14,7 +14,6 @@ import {
 
 interface PodcastDashboardProps {
   sessionId: string;
-  wsUrl: string;
 }
 
 const BookIcon = () => (
@@ -43,7 +42,7 @@ function formatTimestamp(ts: number): string {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-export function PodcastDashboard({ sessionId, wsUrl }: PodcastDashboardProps) {
+export function PodcastDashboard({ sessionId }: PodcastDashboardProps) {
   const { connect, disconnect, outputs, isConnected } = useWebSocket();
 
   useEffect(() => {

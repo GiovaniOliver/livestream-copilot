@@ -27,8 +27,6 @@ import {
 import { getSessionById } from "../db/services/session.service.js";
 import { authenticateToken } from "../auth/middleware.js";
 import { complete, isAIConfigured, getDefaultModel, getDefaultMaxTokens } from "../agents/client.js";
-import { logger } from "../logger/index.js";
-
 import { apiLogger } from '../logger/index.js';
 // =============================================================================
 // VALIDATION SCHEMAS
