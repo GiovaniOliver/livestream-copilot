@@ -252,6 +252,11 @@ async function saveReplayBuffer(): Promise<string | null> {
   // OBS writes replay file to the configured path.
   // We listen for the ReplayBufferSaved event to get the actual path.
   try {
+    if (!obs.identified) {
+      obsLogger.warn("SaveReplayBuffer requested while OBS is disconnected");
+      return null;
+    }
+
     // Reset last path before saving
     lastReplayBufferPath = null;
 
@@ -982,6 +987,10 @@ async function main() {
 
       // If trimming succeeded, emit an update event with the trimmed clip path
       if (trimResult) {
+        await ClipService.updateClip(dbClip.id, {
+          path: trimResult.clipPath,
+        });
+
         const updateEvent: any = {
           id: uuidv4(),
           type: "ARTIFACT_CLIP_CREATED",
