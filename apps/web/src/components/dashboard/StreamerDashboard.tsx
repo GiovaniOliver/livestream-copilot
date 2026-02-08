@@ -74,13 +74,11 @@ export function StreamerDashboard({ sessionId, wsUrl }: StreamerDashboardProps) 
 
   // Connect to WebSocket on mount
   useEffect(() => {
-    if (wsUrl) {
-      connect(wsUrl);
-    }
+    connect();
     return () => {
       disconnect();
     };
-  }, [wsUrl, connect, disconnect]);
+  }, [connect, disconnect]);
 
   // Process outputs for social posts
   const socialPosts = useMemo(() => {
@@ -128,9 +126,11 @@ export function StreamerDashboard({ sessionId, wsUrl }: StreamerDashboardProps) 
   const handlePreviewClip = (clip: typeof clipList[0]) => {
     const clipData: Clip = {
       id: clip.artifactId,
+      artifactId: clip.artifactId,
       title: clip.title,
       hookText: clip.hookText,
       thumbnailUrl: clip.thumbnailUrl,
+      path: clip.path,
       duration: clip.duration,
       status: clip.status,
       createdAt: clip.createdAt,

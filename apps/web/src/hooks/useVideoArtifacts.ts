@@ -68,11 +68,13 @@ export function useVideoArtifacts(sessionId?: string) {
       const { payload } = event;
       const newClip: Clip = {
         id: payload.artifactId,
+        artifactId: payload.artifactId,
         title: `Clip ${payload.artifactId.slice(0, 8)}`,
         hookText: "Auto-generated clip from stream",
         thumbnailUrl: payload.thumbnailArtifactId
           ? getClipThumbnailUrl(payload.thumbnailArtifactId)
           : getClipThumbnailUrl(payload.artifactId),
+        path: "",
         duration: payload.t1 - payload.t0,
         status: "ready",
         createdAt: new Date(event.ts),

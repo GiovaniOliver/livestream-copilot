@@ -81,13 +81,15 @@ export const sessionCountsSchema = z.object({
  * Session list item schema
  */
 export const sessionListItemSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // CUID format (e.g., cmlbcgemg0000i7b80ufgh3ko)
   workflow: workflowSchema,
   captureMode: captureModeSchema,
   title: z.string().nullable(),
   participants: z.array(z.string()),
   startedAt: z.string().datetime(),
   endedAt: z.string().datetime().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   isActive: z.boolean(),
   counts: sessionCountsSchema,
 });
@@ -115,7 +117,7 @@ export const getSessionByIdResponseSchema = apiResponseSchema(
  * Start session response
  */
 export const startSessionResponseSchema = z.object({
-  sessionId: z.string().uuid(),
+  sessionId: z.string().min(1),
   startedAt: z.number().int().min(0),
 });
 
@@ -144,7 +146,7 @@ export const forceStopSessionResponseSchema = z.object({
 export const sessionStatusResponseSchema = z.object({
   ok: z.boolean(),
   active: z.boolean(),
-  sessionId: z.string().uuid().optional(),
+  sessionId: z.string().min(1).optional(),
   workflow: workflowSchema.optional(),
   captureMode: captureModeSchema.optional(),
   title: z.string().optional(),
@@ -167,12 +169,12 @@ export const sessionStatusResponseSchema = z.object({
  * Session output schema
  */
 export const sessionOutputSchema = z.object({
-  id: z.string().uuid(),
-  sessionId: z.string().uuid(),
+  id: z.string().min(1), // CUID format
+  sessionId: z.string().min(1),
   type: z.string().min(1),
   label: z.string().nullable(),
   content: z.string(),
-  metadata: z.record(z.unknown()).nullable(),
+  metadata: z.record(z.string(), z.unknown()).nullable(),
   createdAt: z.string().datetime(),
 });
 
@@ -207,9 +209,9 @@ export const clipSourceSchema = z.enum(["gesture", "voice", "button", "api"]);
  * Clip info schema
  */
 export const clipInfoSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // CUID format
   artifactId: z.string().min(1),
-  sessionId: z.string().uuid(),
+  sessionId: z.string().min(1),
   path: z.string().min(1),
   t0: z.number().min(0),
   t1: z.number().min(0),
@@ -243,7 +245,7 @@ export const clipResponseSchema = apiResponseSchema(
  */
 export const clipIntentResponseSchema = z.object({
   success: z.boolean(),
-  sessionId: z.string().uuid(),
+  sessionId: z.string().min(1),
   t: z.number().min(0),
   source: clipSourceSchema,
 });
@@ -294,7 +296,7 @@ export const healthResponseSchema = z.object({
   }),
   session: z.object({
     active: z.boolean(),
-    sessionId: z.string().uuid().optional(),
+    sessionId: z.string().min(1).optional(),
     workflow: z.string().optional(),
     elapsed: z.number().int().min(0).optional(),
   }),
@@ -389,8 +391,8 @@ export const momentTypeSchema = z.enum([
  * Moment info schema
  */
 export const momentInfoSchema = z.object({
-  id: z.string().uuid(),
-  sessionId: z.string().uuid(),
+  id: z.string().min(1), // CUID format
+  sessionId: z.string().min(1),
   type: momentTypeSchema,
   label: z.string().min(1),
   description: z.string().optional(),
@@ -431,13 +433,13 @@ export const outputStatusSchema = z.enum(["draft", "approved", "published", "arc
  * Output info schema
  */
 export const outputInfoSchema = z.object({
-  id: z.string().uuid(),
-  sessionId: z.string().uuid(),
+  id: z.string().min(1), // CUID format
+  sessionId: z.string().min(1),
   category: z.string().min(1),
   title: z.string().nullable(),
   text: z.string(),
   refs: z.array(z.string()),
-  meta: z.record(z.unknown()).nullable(),
+  meta: z.record(z.string(), z.unknown()).nullable(),
   status: outputStatusSchema,
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -448,7 +450,7 @@ export const outputInfoSchema = z.object({
  */
 export const outputWithSessionSchema = outputInfoSchema.extend({
   session: z.object({
-    id: z.string().uuid(),
+    id: z.string().min(1), // CUID format
     workflow: z.string().min(1),
     title: z.string().nullable(),
   }),
@@ -511,8 +513,8 @@ export const postStatusSchema = z.enum(["draft", "scheduled", "published", "fail
  * Post info schema
  */
 export const postInfoSchema = z.object({
-  id: z.string().uuid(),
-  sessionId: z.string().uuid(),
+  id: z.string().min(1), // CUID format
+  sessionId: z.string().min(1),
   platform: postPlatformSchema,
   content: z.string(),
   media: z.array(z.string()).nullable(),
@@ -560,8 +562,8 @@ export const exportStatusSchema = z.enum(["pending", "processing", "completed", 
  * Export info schema
  */
 export const exportInfoSchema = z.object({
-  id: z.string().uuid(),
-  sessionId: z.string().uuid(),
+  id: z.string().min(1), // CUID format
+  sessionId: z.string().min(1),
   format: exportFormatSchema,
   status: exportStatusSchema,
   progress: z.number().min(0).max(100),
@@ -591,7 +593,7 @@ export const loginResponseSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(1),
   user: z.object({
-    id: z.string().uuid(),
+    id: z.string().min(1), // CUID format
     email: z.string().email(),
     name: z.string().min(1),
   }),
@@ -601,7 +603,7 @@ export const loginResponseSchema = z.object({
  * User info schema
  */
 export const userInfoSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // CUID format
   email: z.string().email(),
   name: z.string().min(1),
   createdAt: z.string().datetime(),
@@ -639,7 +641,7 @@ export const sttStatusSchema = z.object({
   active: z.boolean(),
   provider: sttProviderSchema.optional(),
   language: z.string().optional(),
-  sessionId: z.string().uuid().optional(),
+  sessionId: z.string().min(1).optional(),
   startedAt: z.number().int().min(0).optional(),
   segmentCount: z.number().int().min(0).optional(),
   wordCount: z.number().int().min(0).optional(),
@@ -651,7 +653,7 @@ export const sttStatusSchema = z.object({
  */
 export const sttStartResponseSchema = z.object({
   success: z.boolean(),
-  sessionId: z.string().uuid(),
+  sessionId: z.string().min(1),
   provider: sttProviderSchema,
   language: z.string(),
 });
@@ -661,7 +663,7 @@ export const sttStartResponseSchema = z.object({
  */
 export const sttStopResponseSchema = z.object({
   success: z.boolean(),
-  sessionId: z.string().uuid(),
+  sessionId: z.string().min(1),
   duration: z.number().min(0),
   segmentCount: z.number().int().min(0),
   wordCount: z.number().int().min(0),
@@ -671,7 +673,7 @@ export const sttStopResponseSchema = z.object({
  * Transcript segment schema
  */
 export const transcriptSegmentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // CUID format
   speakerId: z.string().optional(),
   text: z.string(),
   t0: z.number().min(0),
@@ -754,7 +756,7 @@ export const exportDownloadResponseSchema = z.object({
  * User schema (comprehensive)
  */
 export const userSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().min(1), // CUID format
   email: z.string().email(),
   emailVerified: z.boolean(),
   name: z.string().nullable(),
@@ -766,7 +768,7 @@ export const userSchema = z.object({
   organizations: z
     .array(
       z.object({
-        id: z.string().uuid(),
+        id: z.string().min(1), // CUID format
         name: z.string().min(1),
         slug: z.string().optional(),
         role: z.string(),

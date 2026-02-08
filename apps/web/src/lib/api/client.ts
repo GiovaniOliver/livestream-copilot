@@ -118,7 +118,7 @@ export class ValidationError extends Error {
    * Get formatted validation error messages
    */
   getFormattedErrors(): string[] {
-    return this.zodError.errors.map(
+    return this.zodError.issues.map(
       (err) => `${err.path.join(".")}: ${err.message}`
     );
   }
@@ -215,19 +215,19 @@ async function request<T>(
 async function request<T>(
   method: string,
   path: string,
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   options?: RequestOptions
 ): Promise<T>;
 
 async function request<T>(
   method: string,
   path: string,
-  schemaOrOptions?: z.ZodSchema<T> | RequestOptions,
+  schemaOrOptions?: z.ZodType<T> | RequestOptions,
   maybeOptions?: RequestOptions
 ): Promise<T> {
   // Determine if schema validation is being used
   const hasSchema = schemaOrOptions && "parse" in schemaOrOptions;
-  const schema = hasSchema ? (schemaOrOptions as z.ZodSchema<T>) : undefined;
+  const schema = hasSchema ? (schemaOrOptions as z.ZodType<T>) : undefined;
   const options: RequestOptions = hasSchema
     ? (maybeOptions ?? {})
     : (schemaOrOptions as RequestOptions) ?? {};
@@ -322,18 +322,39 @@ async function request<T>(
 /**
  * API client with typed HTTP methods supporting Zod validation
  */
-export const apiClient = {
+/**
+ * API client interface with properly overloaded method signatures
+ * for Zod v4 type inference compatibility
+ */
+interface ApiClient {
+  get<T>(path: string, schema: z.ZodType<T>, options?: RequestOptions): Promise<T>;
+  get<T = unknown>(path: string, paramsOrOptions?: Record<string, string | number | boolean | undefined> | RequestOptions): Promise<T>;
+
+  post<T>(path: string, schema: z.ZodType<T>, body?: unknown, options?: RequestOptions): Promise<T>;
+  post<T = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
+
+  put<T>(path: string, schema: z.ZodType<T>, body?: unknown, options?: RequestOptions): Promise<T>;
+  put<T = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
+
+  patch<T>(path: string, schema: z.ZodType<T>, body?: unknown, options?: RequestOptions): Promise<T>;
+  patch<T = unknown>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
+
+  delete<T>(path: string, schema: z.ZodType<T>, options?: RequestOptions): Promise<T>;
+  delete<T = unknown>(path: string, options?: RequestOptions): Promise<T>;
+}
+
+export const apiClient: ApiClient = {
   /**
    * Make a GET request
    */
-  get<T>(
+  get(
     path: string,
-    schemaOrParams?: z.ZodSchema<T> | Record<string, string | number | boolean | undefined> | RequestOptions,
+    schemaOrParams?: z.ZodType | Record<string, string | number | boolean | undefined> | RequestOptions,
     maybeOptions?: RequestOptions
-  ): Promise<T> {
+  ): Promise<unknown> {
     // Handle schema overload
     if (schemaOrParams && "parse" in schemaOrParams) {
-      return request<T>("GET", path, schemaOrParams as z.ZodSchema<T>, maybeOptions);
+      return request("GET", path, schemaOrParams as z.ZodType, maybeOptions);
     }
 
     // Support both params object and full options object
@@ -341,27 +362,27 @@ export const apiClient = {
       typeof schemaOrParams === "object" && ("headers" in schemaOrParams || "params" in schemaOrParams)
         ? (schemaOrParams as RequestOptions)
         : { params: schemaOrParams as Record<string, string | number | boolean | undefined> };
-    return request<T>("GET", path, options);
+    return request("GET", path, options);
   },
 
   /**
    * Make a POST request
    */
-  post<T>(
+  post(
     path: string,
-    schemaOrBody?: z.ZodSchema<T> | unknown,
-    bodyOrOptions?: unknown | RequestOptions,
+    schemaOrBody?: z.ZodType | unknown,
+    bodyOrOptions?: unknown,
     maybeOptions?: RequestOptions
-  ): Promise<T> {
+  ): Promise<unknown> {
     // Handle schema overload
     if (schemaOrBody && typeof schemaOrBody === "object" && "parse" in schemaOrBody) {
-      return request<T>("POST", path, schemaOrBody as z.ZodSchema<T>, {
+      return request("POST", path, schemaOrBody as z.ZodType, {
         ...maybeOptions,
         body: bodyOrOptions,
       });
     }
 
-    return request<T>("POST", path, {
+    return request("POST", path, {
       ...(bodyOrOptions as RequestOptions),
       body: schemaOrBody,
     });
@@ -370,21 +391,21 @@ export const apiClient = {
   /**
    * Make a PUT request
    */
-  put<T>(
+  put(
     path: string,
-    schemaOrBody?: z.ZodSchema<T> | unknown,
-    bodyOrOptions?: unknown | RequestOptions,
+    schemaOrBody?: z.ZodType | unknown,
+    bodyOrOptions?: unknown,
     maybeOptions?: RequestOptions
-  ): Promise<T> {
+  ): Promise<unknown> {
     // Handle schema overload
     if (schemaOrBody && typeof schemaOrBody === "object" && "parse" in schemaOrBody) {
-      return request<T>("PUT", path, schemaOrBody as z.ZodSchema<T>, {
+      return request("PUT", path, schemaOrBody as z.ZodType, {
         ...maybeOptions,
         body: bodyOrOptions,
       });
     }
 
-    return request<T>("PUT", path, {
+    return request("PUT", path, {
       ...(bodyOrOptions as RequestOptions),
       body: schemaOrBody,
     });
@@ -393,21 +414,21 @@ export const apiClient = {
   /**
    * Make a PATCH request
    */
-  patch<T>(
+  patch(
     path: string,
-    schemaOrBody?: z.ZodSchema<T> | unknown,
-    bodyOrOptions?: unknown | RequestOptions,
+    schemaOrBody?: z.ZodType | unknown,
+    bodyOrOptions?: unknown,
     maybeOptions?: RequestOptions
-  ): Promise<T> {
+  ): Promise<unknown> {
     // Handle schema overload
     if (schemaOrBody && typeof schemaOrBody === "object" && "parse" in schemaOrBody) {
-      return request<T>("PATCH", path, schemaOrBody as z.ZodSchema<T>, {
+      return request("PATCH", path, schemaOrBody as z.ZodType, {
         ...maybeOptions,
         body: bodyOrOptions,
       });
     }
 
-    return request<T>("PATCH", path, {
+    return request("PATCH", path, {
       ...(bodyOrOptions as RequestOptions),
       body: schemaOrBody,
     });
@@ -416,17 +437,17 @@ export const apiClient = {
   /**
    * Make a DELETE request
    */
-  delete<T>(
+  delete(
     path: string,
-    schemaOrOptions?: z.ZodSchema<T> | RequestOptions,
+    schemaOrOptions?: z.ZodType | RequestOptions,
     maybeOptions?: RequestOptions
-  ): Promise<T> {
+  ): Promise<unknown> {
     // Handle schema overload
     if (schemaOrOptions && typeof schemaOrOptions === "object" && "parse" in schemaOrOptions) {
-      return request<T>("DELETE", path, schemaOrOptions as z.ZodSchema<T>, maybeOptions);
+      return request("DELETE", path, schemaOrOptions as z.ZodType, maybeOptions);
     }
 
-    return request<T>("DELETE", path, schemaOrOptions as RequestOptions);
+    return request("DELETE", path, schemaOrOptions as RequestOptions);
   },
 };
 

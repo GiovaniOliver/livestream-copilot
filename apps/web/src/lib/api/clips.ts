@@ -3,6 +3,7 @@
  * Enhanced with comprehensive Zod schema validation for runtime type safety
  */
 
+import { z } from "zod";
 import { apiClient } from "./client";
 import {
   clipsListResponseSchema,
@@ -138,7 +139,7 @@ export async function deleteClip(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const deleteResponseSchema = apiResponseSchema(undefined);
+  const deleteResponseSchema = apiResponseSchema(z.unknown());
 
   return apiClient.delete(
     `/api/clips/${id}`,

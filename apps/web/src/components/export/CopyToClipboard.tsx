@@ -67,7 +67,7 @@ export function CopyToClipboard({
   disabled = false,
 }: CopyToClipboardProps) {
   const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
     return () => {

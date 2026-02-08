@@ -22,6 +22,7 @@ import {
   type StartSessionConfig,
   type StartSessionResponse,
   type SessionOutput,
+  type PaginationInfo,
 } from "@/lib/api/sessions";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useAuth } from "@/lib/contexts/AuthContext";
@@ -31,6 +32,19 @@ import { WORKFLOW_TYPES, CAPTURE_MODES, type WorkflowType, type CaptureMode } fr
 import { API_CONFIG } from '@/lib/config';
 import { logger } from "@/lib/logger";
 
+/**
+ * Filters for session queries
+ */
+export interface SessionFilters {
+  workflow?: string;
+  status?: "active" | "ended";
+  limit?: number;
+  offset?: number;
+}
+
+/**
+ * Return type for useSessions hook
+ */
 export interface UseSessionsReturn {
   sessions: Session[];
   activeSession: Session | null;
@@ -38,6 +52,7 @@ export interface UseSessionsReturn {
   error: string | null;
   isConnected: boolean;
   isAuthenticated: boolean;
+  pagination: PaginationInfo;
 
   // Actions
   createSession: (config: StartSessionConfig) => Promise<StartSessionResponse>;
@@ -45,6 +60,7 @@ export interface UseSessionsReturn {
   updateSession: (id: string, updates: { title?: string; participants?: string[] }) => Promise<void>;
   deleteSession: (id: string) => Promise<void>;
   getSessionOutputs: (id: string) => Promise<SessionOutput[]>;
+  refetch: () => Promise<void>;
   refreshSessions: () => Promise<void>;
   forceStop: () => Promise<void>;
   clearError: () => void;
@@ -101,9 +117,9 @@ function mapApiSessionToSession(apiSession: SessionListItem): Session {
     name: apiSession.title || "Untitled Session",
     workflow: mapApiWorkflow(apiSession.workflow),
     captureMode: mapApiCaptureMode(apiSession.captureMode),
-    // "active" means session is in progress, but not necessarily streaming
-    // The actual "live" streaming status comes from useLiveStream hook
-    status: apiSession.isActive ? "active" : "ended",
+    // Map isActive to "live" for active sessions, "ended" for completed sessions
+    // This matches the dashboard page expectations for session status
+    status: apiSession.isActive ? "live" : "ended",
     startedAt: apiSession.startedAt,
     endedAt: apiSession.endedAt || undefined,
     duration: formatDuration(durationMs),
@@ -121,12 +137,22 @@ function mapApiSessionToSession(apiSession: SessionListItem): Session {
  * - Automatic data refresh on events
  * - Error handling with user-friendly messages
  * - Authentication via AuthContext
+ * - Support for filtering by workflow and status
  *
+ * @param filters - Optional filters for sessions (workflow, status, limit, offset)
  * @param autoConnect - Whether to connect WebSocket on mount (default: true)
  */
-export function useSessions(autoConnect = true): UseSessionsReturn {
+export function useSessions(
+  filters?: SessionFilters,
+  autoConnect = true
+): UseSessionsReturn {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    limit: filters?.limit || 50,
+    offset: filters?.offset || 0,
+    total: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isLoadingRef = useRef(false);
@@ -153,12 +179,34 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
     try {
       setError(null);
 
+      const limit = filters?.limit || 50;
+      const offset = filters?.offset || 0;
+
       // Fetch sessions from the backend API (pass auth token if available)
-      const { sessions: apiSessions } = await getSessions(50, 0, accessToken || undefined);
+      const { sessions: apiSessions, pagination: paginationInfo } = await getSessions(
+        limit,
+        offset,
+        accessToken || undefined
+      );
 
       // Map API response to frontend Session format
-      const mappedSessions = apiSessions.map(mapApiSessionToSession);
+      let mappedSessions = apiSessions.map(mapApiSessionToSession);
+
+      // Apply client-side filters
+      if (filters?.workflow) {
+        mappedSessions = mappedSessions.filter(
+          (session) => session.workflow.toLowerCase() === filters.workflow?.toLowerCase()
+        );
+      }
+
+      if (filters?.status) {
+        mappedSessions = mappedSessions.filter(
+          (session) => session.status === filters.status
+        );
+      }
+
       setSessions(mappedSessions);
+      setPagination(paginationInfo);
 
       // Find the active session (if any)
       const active = mappedSessions.find((s) => s.status === "live") || null;
@@ -171,7 +219,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
       setIsLoading(false);
       isLoadingRef.current = false;
     }
-  }, [accessToken]);
+  }, [accessToken, filters]);
 
   /**
    * Create a new session
@@ -353,6 +401,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
   return {
     sessions,
     activeSession,
+    pagination,
     isLoading,
     error,
     isConnected,
@@ -362,6 +411,7 @@ export function useSessions(autoConnect = true): UseSessionsReturn {
     updateSession,
     deleteSession,
     getSessionOutputs,
+    refetch: loadSessions,
     refreshSessions: loadSessions,
     forceStop,
     clearError,

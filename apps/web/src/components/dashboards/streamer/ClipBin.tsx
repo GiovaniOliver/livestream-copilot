@@ -102,6 +102,7 @@ export function ClipBin({
     all: clips.length,
     ready: clips.filter((c) => c.status === "ready").length,
     processing: clips.filter((c) => c.status === "processing").length,
+    exported: clips.filter((c) => c.status === "exported").length,
     error: clips.filter((c) => c.status === "error").length,
   };
 

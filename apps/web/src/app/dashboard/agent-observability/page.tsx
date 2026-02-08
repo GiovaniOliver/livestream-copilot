@@ -595,7 +595,7 @@ export default function AgentObservabilityPage() {
 
                 {/* Refresh Button */}
                 <Button
-                  variant="secondary"
+                  variant="outline"
                   className="w-full"
                   onClick={fetchAgentStats}
                   disabled={statsLoading}

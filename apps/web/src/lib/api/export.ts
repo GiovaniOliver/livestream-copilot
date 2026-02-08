@@ -19,16 +19,85 @@ import { logger } from "@/lib/logger";
 // ============================================================
 
 /**
+ * Backend platform enum values (uppercase)
+ * Maps frontend lowercase platform IDs to backend UPPERCASE enum values
+ */
+const PLATFORM_API_MAP: Record<SocialPlatform, string> = {
+  x: "TWITTER",
+  linkedin: "LINKEDIN",
+  instagram: "INSTAGRAM",
+  tiktok: "TIKTOK",
+  youtube: "YOUTUBE",
+} as const;
+
+/**
+ * Backend format enum values (uppercase)
+ */
+const FORMAT_API_MAP: Record<string, string> = {
+  mp4: "MP4",
+  mov: "MOV",
+  webm: "WEBM",
+} as const;
+
+/**
+ * Transform frontend platform ID to backend API enum value
+ */
+function toApiPlatform(platform: SocialPlatform): string {
+  return PLATFORM_API_MAP[platform] || platform.toUpperCase();
+}
+
+/**
+ * Transform frontend format to backend API enum value
+ */
+function toApiFormat(format: string): string {
+  return FORMAT_API_MAP[format.toLowerCase()] || format.toUpperCase();
+}
+
+/**
  * Request body for starting an export job
  */
 export interface StartExportRequest {
   sessionId: string;
   contentId?: string;
+  clipId?: string;
   platforms: SocialPlatform[];
   caption?: string;
   hashtags?: string[];
   formatOptions: ExportFormatOptions;
   customFilename?: string;
+}
+
+/**
+ * Backend API request format (with transformed enums)
+ */
+interface ApiExportClipRequest {
+  clipId: string;
+  format: string; // "MP4" | "WEBM" | "MOV"
+  platform?: string; // "TWITTER" | "LINKEDIN" | etc.
+  options?: {
+    quality?: "low" | "medium" | "high" | "original";
+    generateThumbnail?: boolean;
+    addWatermark?: boolean;
+    optimizeForPlatform?: boolean;
+    targetAspectRatio?: string;
+  };
+}
+
+/**
+ * Backend API request format for posts
+ */
+interface ApiExportPostRequest {
+  text: string;
+  platform: string; // "TWITTER" | "LINKEDIN" | etc.
+  sessionId?: string;
+  clipId?: string;
+  options?: {
+    copyToClipboard?: boolean;
+    saveToFile?: boolean;
+    optimizeHashtags?: boolean;
+    addTimestamps?: boolean;
+    createThread?: boolean;
+  };
 }
 
 /**
@@ -96,15 +165,86 @@ export interface ExportDownloadResponse {
  * ```
  */
 export async function startExport(
-  sessionId: string,
-  options: Omit<StartExportRequest, "sessionId">
+  contentId: string,
+  options: Omit<StartExportRequest, "sessionId" | "contentId">
 ): Promise<StartExportResponse> {
-  const request: StartExportRequest = {
-    sessionId,
-    ...options,
-  };
+  const { platforms, caption, hashtags, formatOptions, customFilename } = options;
 
-  return apiClient.post<StartExportResponse>("/api/v1/export", request);
+  // Determine if this is a clip export or post export based on content type
+  // For now, we'll default to clip export. This should be determined by contentId metadata
+  const isClipExport = true; // TODO: Determine from content metadata
+
+  if (isClipExport) {
+    // Prepare clip export request with enum transformations
+    const apiRequest: ApiExportClipRequest = {
+      clipId: contentId,
+      format: toApiFormat(formatOptions.format),
+      platform: platforms.length > 0 ? toApiPlatform(platforms[0]) : undefined,
+      options: {
+        quality: formatOptions.quality === "1080p" ? "high" :
+                 formatOptions.quality === "720p" ? "medium" : "high",
+        generateThumbnail: true,
+        addWatermark: formatOptions.includeWatermark,
+        optimizeForPlatform: true,
+        targetAspectRatio: formatOptions.aspectRatio,
+      },
+    };
+
+    logger.debug("[export API] Sending clip export request:", apiRequest);
+
+    // Call backend clip export endpoint
+    const response = await apiClient.post<{ success: boolean; data: any }>(
+      "/api/export/clip",
+      apiRequest
+    );
+
+    // Transform response to match expected format
+    return {
+      exportId: response.data.id,
+      status: mapBackendStatus(response.data.status),
+      createdAt: response.data.createdAt || new Date().toISOString(),
+    };
+  } else {
+    // Prepare post export request with enum transformations
+    const apiRequest: ApiExportPostRequest = {
+      text: caption || "",
+      platform: toApiPlatform(platforms[0]),
+      clipId: contentId,
+      options: {
+        copyToClipboard: false,
+        saveToFile: true,
+        optimizeHashtags: hashtags && hashtags.length > 0,
+      },
+    };
+
+    logger.debug("[export API] Sending post export request:", apiRequest);
+
+    // Call backend post export endpoint
+    const response = await apiClient.post<{ success: boolean; data: any }>(
+      "/api/export/post",
+      apiRequest
+    );
+
+    // Transform response to match expected format
+    return {
+      exportId: response.data.id,
+      status: mapBackendStatus(response.data.status),
+      createdAt: response.data.createdAt || new Date().toISOString(),
+    };
+  }
+}
+
+/**
+ * Map backend status enum to frontend status type
+ */
+function mapBackendStatus(status: string): ExportJobStatus {
+  const statusMap: Record<string, ExportJobStatus> = {
+    PENDING: "pending",
+    PROCESSING: "processing",
+    COMPLETED: "completed",
+    FAILED: "failed",
+  };
+  return statusMap[status] || "pending";
 }
 
 /**
@@ -124,7 +264,35 @@ export async function startExport(
 export async function getExportStatus(
   exportId: string
 ): Promise<ExportStatusResponse> {
-  return apiClient.get<ExportStatusResponse>(`/api/v1/export/${exportId}`);
+  const response = await apiClient.get<{ success: boolean; data: any }>(
+    `/api/export/${exportId}/status`
+  );
+
+  const data = response.data;
+
+  // Calculate progress based on status
+  let progress = 0;
+  const status = mapBackendStatus(data.status);
+
+  if (status === "completed") {
+    progress = 100;
+  } else if (status === "processing" || status === "encoding") {
+    progress = data.progress || 50;
+  } else if (status === "preparing") {
+    progress = 25;
+  }
+
+  return {
+    exportId: data.id,
+    status,
+    progress,
+    message: data.metadata?.message,
+    error: data.errorMessage,
+    downloadUrl: data.filePath ? `/api/export/${exportId}/download` : undefined,
+    filename: data.filePath ? data.filePath.split("/").pop() : undefined,
+    fileSize: data.fileSize ? Number(data.fileSize) : undefined,
+    completedAt: data.completedAt,
+  };
 }
 
 /**
@@ -143,9 +311,22 @@ export async function getExportStatus(
 export async function getExportDownloadUrl(
   exportId: string
 ): Promise<ExportDownloadResponse> {
-  return apiClient.get<ExportDownloadResponse>(
-    `/api/v1/export/${exportId}/download`
-  );
+  // Get export status first to validate completion
+  const status = await getExportStatus(exportId);
+
+  if (status.status !== "completed") {
+    throw new Error("Export is not ready for download");
+  }
+
+  if (!status.downloadUrl) {
+    throw new Error("Download URL not available");
+  }
+
+  return {
+    downloadUrl: status.downloadUrl,
+    filename: status.filename || "export.mp4",
+    fileSize: status.fileSize || 0,
+  };
 }
 
 // ============================================================

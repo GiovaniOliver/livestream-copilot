@@ -223,4 +223,4 @@ export async function regenerateOutput(
 }
 
 // Re-export types for convenience
-export type { OutputStatus, OutputInfo, OutputWithSession, PaginationInfo };
+export type { OutputStatus, OutputInfo, PaginationInfo };

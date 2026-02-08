@@ -12,6 +12,7 @@ import {
   pingResponseSchema,
   type HealthStatus,
 } from "./schemas";
+export type { HealthStatus };
 import { API_CONFIG } from '@/lib/config';
 
 /**

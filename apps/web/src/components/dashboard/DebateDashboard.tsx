@@ -40,13 +40,11 @@ export function DebateDashboard({ sessionId, wsUrl }: DebateDashboardProps) {
   const { connect, disconnect, outputs, isConnected } = useWebSocket();
 
   useEffect(() => {
-    if (wsUrl) {
-      connect(wsUrl);
-    }
+    connect();
     return () => {
       disconnect();
     };
-  }, [wsUrl, connect, disconnect]);
+  }, [connect, disconnect]);
 
   // Process outputs for claims
   const claims = useMemo(() => {

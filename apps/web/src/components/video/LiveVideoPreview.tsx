@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import type HlsType from "hls.js";
 import { cn } from "@/lib/utils";
 import { GestureDetectionOverlay } from "@/components/gesture-detection";
 import type { GestureDetection } from "@/hooks/useMediaPipeGestures";
@@ -137,7 +138,7 @@ export function LiveVideoPreview({
   onGestureTrigger,
 }: LiveVideoPreviewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const hlsRef = useRef<HlsType | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

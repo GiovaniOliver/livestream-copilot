@@ -104,7 +104,7 @@ function mapFrontendCaptureModeToBackend(captureMode: CaptureMode): string {
 
 export function NewSessionModal({ isOpen, onClose, onSessionCreated }: NewSessionModalProps) {
   const router = useRouter();
-  const { createSession, forceStop } = useSessions(false); // Don't auto-connect WebSocket in modal
+  const { createSession, forceStop } = useSessions(undefined, false); // Don't auto-connect WebSocket in modal
   const [step, setStep] = useState<"workflow" | "details">("workflow");
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowType | null>(null);
   const [selectedCaptureMode, setSelectedCaptureMode] = useState<CaptureMode>(CAPTURE_MODES.AUDIO_VIDEO);

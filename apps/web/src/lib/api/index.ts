@@ -44,8 +44,6 @@ export type {
   EndSessionResponse,
   SessionOutput,
   PaginationInfo,
-  UpdateSessionResponse,
-  GetSessionOutputsResponse,
 } from "./sessions";
 
 // Clips API

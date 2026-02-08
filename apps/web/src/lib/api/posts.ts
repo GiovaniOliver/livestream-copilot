@@ -50,7 +50,7 @@ const schedulePostResponseSchema = apiResponseSchema(
 /**
  * Post information from the API
  */
-export interface PostInfo extends OutputInfo {
+export interface PostInfo extends Omit<OutputInfo, 'status'> {
   status: PostStatus;
   scheduledFor?: string;
 }

@@ -9,7 +9,7 @@ import { API_CONFIG } from '@/lib/config';
 // Clip Types
 // ============================================================
 
-export type ClipStatus = "processing" | "ready" | "error";
+export type ClipStatus = "processing" | "ready" | "exported" | "error";
 
 export interface Clip {
   id: string;

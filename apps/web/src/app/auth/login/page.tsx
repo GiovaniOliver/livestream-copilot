@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AuthLayout } from '@/components/auth/AuthLayout';
@@ -11,6 +11,14 @@ import { useAuth } from '@/lib/contexts/AuthContext';
 import { logger } from "@/lib/logger";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<AuthLayout title="Welcome back" subtitle="Sign in to your account to continue"><div className="animate-pulse h-64" /></AuthLayout>}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
+
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, isLoading, error: authError, clearError, isAuthenticated } = useAuth();

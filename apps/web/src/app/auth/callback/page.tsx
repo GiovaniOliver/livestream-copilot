@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { logger } from "@/lib/logger";
 import { API_CONFIG } from '@/lib/config';
 
 export default function OAuthCallbackPage() {
+  return (
+    <Suspense fallback={<AuthLayout title="Completing sign in" subtitle="Please wait..."><div className="animate-pulse h-32" /></AuthLayout>}>
+      <OAuthCallbackContent />
+    </Suspense>
+  );
+}
+
+function OAuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);

@@ -17,6 +17,7 @@ const STATUS_CONFIG: Record<
 > = {
   ready: { label: "Ready", variant: "teal" },
   processing: { label: "Processing", variant: "warning" },
+  exported: { label: "Exported", variant: "teal" },
   error: { label: "Error", variant: "error" },
 };
 

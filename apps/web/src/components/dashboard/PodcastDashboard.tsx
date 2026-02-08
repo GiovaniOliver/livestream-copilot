@@ -47,13 +47,11 @@ export function PodcastDashboard({ sessionId, wsUrl }: PodcastDashboardProps) {
   const { connect, disconnect, outputs, isConnected } = useWebSocket();
 
   useEffect(() => {
-    if (wsUrl) {
-      connect(wsUrl);
-    }
+    connect();
     return () => {
       disconnect();
     };
-  }, [wsUrl, connect, disconnect]);
+  }, [connect, disconnect]);
 
   // Process outputs for chapters
   const chapters = useMemo(() => {

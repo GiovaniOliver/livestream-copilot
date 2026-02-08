@@ -247,8 +247,8 @@ export function useClips(
     const clipEvents = events.filter(
       (event) =>
         event.type === "ARTIFACT_CLIP_CREATED" ||
-        event.type === "clip_created" ||
-        event.type === "clip_deleted"
+        event.type === ("clip_created" as typeof event.type) ||
+        event.type === ("clip_deleted" as typeof event.type)
     );
 
     if (clipEvents.length > 0) {

@@ -8,6 +8,7 @@
  */
 
 import { useEffect } from "react";
+import { logger } from "../lib/logger";
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -16,8 +17,8 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log to console in development
-    console.error("Error caught:", error);
+    // Log error
+    logger.error("Error caught:", error);
   }, [error]);
 
   return (

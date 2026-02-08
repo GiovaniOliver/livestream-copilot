@@ -174,8 +174,8 @@ export async function getSession(
   // Map new API format to legacy SessionDetails format
   return {
     sessionId: session.id,
-    workflow: session.workflow,
-    captureMode: session.captureMode,
+    workflow: session.workflow as SessionConfig["workflow"],
+    captureMode: session.captureMode as SessionConfig["captureMode"],
     title: session.title || undefined,
     startedAt: new Date(session.startedAt).getTime(),
     endedAt: session.endedAt ? new Date(session.endedAt).getTime() : undefined,

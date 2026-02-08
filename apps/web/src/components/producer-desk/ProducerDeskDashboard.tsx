@@ -202,9 +202,11 @@ export function ProducerDeskDashboard({
   const handlePreviewClip = useCallback((clip: ClipData) => {
     const clipData: Clip = {
       id: clip.artifactId,
+      artifactId: clip.artifactId,
       title: clip.title,
       hookText: clip.hookVariants[0] || "",
       thumbnailUrl: clip.thumbnailUrl,
+      path: "",
       duration: clip.duration,
       status: clip.status,
       createdAt: clip.createdAt,
