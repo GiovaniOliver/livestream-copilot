@@ -280,23 +280,33 @@ export const componentHealthSchema = z.object({
 /**
  * Health response schema
  */
-export const healthResponseSchema = z.object({
-  ok: z.boolean(),
-  service: z.string().min(1),
-  version: z.string().min(1),
-  uptime: z.number().min(0),
-  timestamp: z.string().datetime(),
-  components: z.object({
-    database: z.boolean(),
-    obs: z.boolean(),
-    stt: z.boolean(),
-    ai: z.boolean(),
-    ffmpeg: z.boolean(),
-    agents: z.boolean(),
-  }),
-  session: z.object({
-    active: z.boolean(),
-    sessionId: z.string().min(1).optional(),
+  export const healthResponseSchema = z.object({
+    ok: z.boolean(),
+    service: z.string().min(1),
+    version: z.string().min(1),
+    uptime: z.number().min(0),
+    timestamp: z.string().datetime(),
+    components: z.object({
+      database: z.boolean(),
+      obs: z.boolean(),
+      stt: z.boolean(),
+      ai: z.boolean(),
+      ffmpeg: z.boolean(),
+      agents: z.boolean(),
+      replayBuffer: z
+        .object({
+          active: z.boolean(),
+          lastSavedAt: z.number().nullable().optional(),
+          lastSavedPath: z.string().nullable().optional(),
+          lastSaveRequestedAt: z.number().nullable().optional(),
+          lastError: z.string().nullable().optional(),
+          outputDir: z.string().nullable().optional(),
+        })
+        .optional(),
+    }),
+    session: z.object({
+      active: z.boolean(),
+      sessionId: z.string().min(1).optional(),
     workflow: z.string().optional(),
     elapsed: z.number().int().min(0).optional(),
   }),

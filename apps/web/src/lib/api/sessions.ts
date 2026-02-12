@@ -7,6 +7,7 @@
  * Enhanced with comprehensive Zod schema validation for runtime type safety.
  */
 
+import { z } from "zod";
 import { apiClient, type RequestOptions } from "./client";
 import type { SessionConfig } from "@livestream-copilot/shared";
 import {
@@ -19,7 +20,6 @@ import {
   getSessionOutputsResponseSchema,
   updateSessionResponseSchema,
   apiResponseSchema,
-  sessionListItemSchema,
   sessionOutputSchema,
   type SessionListItem,
   type PaginationInfo,
@@ -372,7 +372,7 @@ export async function deleteSession(
   id: string,
   accessToken?: string
 ): Promise<void> {
-  const deleteResponseSchema = apiResponseSchema(sessionListItemSchema.optional());
+  const deleteResponseSchema = apiResponseSchema(z.object({ message: z.string() }));
 
   const response = await apiClient.delete(
     `/api/sessions/${encodeURIComponent(id)}`,

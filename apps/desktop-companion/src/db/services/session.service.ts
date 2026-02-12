@@ -12,7 +12,8 @@ export interface CreateSessionInput {
   captureMode: string;
   title?: string;
   participants?: string[];
-  startedAt: Date;
+  startedAt?: Date | null;
+  status?: string;
 }
 
 export interface UpdateSessionInput {
@@ -40,7 +41,8 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
       captureMode: input.captureMode,
       title: input.title,
       participants: input.participants ?? [],
-      startedAt: input.startedAt,
+      startedAt: input.startedAt ?? null,
+      status: input.status ?? "draft",
     },
   });
 }

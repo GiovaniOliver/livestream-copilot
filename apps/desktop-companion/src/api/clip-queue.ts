@@ -13,9 +13,12 @@
 
 import { Router, type Request, type Response } from "express";
 import { z, ZodError } from "zod";
+import type { WebSocketServer } from "ws";
+import { v4 as uuidv4 } from "uuid";
 import * as ClipQueueService from "../db/services/clip-queue.service.js";
 import { getSessionById } from "../db/services/session.service.js";
 import { authenticateToken } from "../auth/middleware.js";
+import type { EventEnvelope } from "@livestream-copilot/shared";
 
 import { apiLogger } from '../logger/index.js';
 // =============================================================================
@@ -29,6 +32,11 @@ const listQueueSchema = z.object({
 });
 
 const updateQueueItemSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+});
+
+const manualClipSchema = z.object({
+  durationSeconds: z.coerce.number().int().min(5).max(300).default(30),
   title: z.string().min(1).max(200).optional(),
 });
 
@@ -104,6 +112,62 @@ function transformQueueItem(
   };
 }
 
+function toClipQueueStatus(status: string): "pending" | "recording" | "processing" | "completed" | "failed" {
+  const lower = status.toLowerCase();
+  switch (lower) {
+    case "pending":
+    case "recording":
+    case "processing":
+    case "completed":
+    case "failed":
+      return lower;
+    default:
+      return "pending";
+  }
+}
+
+function toTriggerSource(triggerType: string): "audio" | "visual" | "manual" {
+  const lower = triggerType.toLowerCase();
+  switch (lower) {
+    case "audio":
+    case "visual":
+    case "manual":
+      return lower;
+    default:
+      return "manual";
+  }
+}
+
+function emitQueueUpdated(wss: WebSocketServer | undefined, queueItem: ClipQueueService.ClipQueueItem | null): void {
+  if (!wss || !queueItem) return;
+
+  const event: EventEnvelope = {
+    id: uuidv4(),
+    sessionId: queueItem.sessionId,
+    ts: Date.now(),
+    type: "CLIP_QUEUE_UPDATED",
+    payload: {
+      queueItemId: queueItem.id,
+      status: toClipQueueStatus(queueItem.status),
+      triggerType: toTriggerSource(queueItem.triggerType),
+      triggerSource: queueItem.triggerSource ?? undefined,
+      t0: queueItem.t0,
+      t1: queueItem.t1 ?? undefined,
+      clipId: queueItem.clipId ?? undefined,
+      thumbnailPath: queueItem.thumbnailPath ?? undefined,
+      title: queueItem.title ?? undefined,
+      errorMessage: queueItem.errorMessage ?? undefined,
+    },
+  };
+
+  const message = JSON.stringify(event);
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(message);
+    }
+  });
+}
+
 // =============================================================================
 // ROUTE HANDLERS
 // =============================================================================
@@ -154,6 +218,70 @@ async function listSessionClipQueueHandler(req: Request, res: Response): Promise
   } catch (error) {
     apiLogger.error({ err: error }, "[api/clip-queue] Error listing clip queue");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to list clip queue.");
+  }
+}
+
+/**
+ * POST /api/sessions/:sessionId/clip-queue/manual
+ * Create a manual clip queue item for the last N seconds.
+ */
+async function createManualClipHandler(
+  req: Request,
+  res: Response,
+  deps?: { wss?: WebSocketServer; saveReplayBuffer?: () => Promise<string | null> }
+): Promise<void> {
+  try {
+    const { sessionId } = req.params;
+
+    const validationResult = manualClipSchema.safeParse(req.body ?? {});
+    if (!validationResult.success) {
+      handleValidationError(res, validationResult.error);
+      return;
+    }
+
+    const { durationSeconds, title } = validationResult.data;
+
+    // Check if session exists
+    const session = await getSessionById(sessionId);
+    if (!session) {
+      sendError(res, 404, "NOT_FOUND", "Session not found.");
+      return;
+    }
+
+    const sessionStartMs = session.startedAt?.getTime() ?? Date.now();
+    const nowMs = Date.now();
+    const t1 = Math.max(0, (nowMs - sessionStartMs) / 1000);
+    const t0 = Math.max(0, t1 - durationSeconds);
+
+    if (deps?.saveReplayBuffer) {
+      try {
+        await deps.saveReplayBuffer();
+      } catch (error) {
+        apiLogger.warn({ err: error }, "[api/clip-queue] Failed to save replay buffer for manual clip");
+      }
+    }
+
+    const queueItem = await ClipQueueService.createClipQueueItem({
+      sessionId,
+      triggerType: "MANUAL",
+      triggerSource: "manual",
+      t0,
+      title: title ?? "Manual clip",
+    });
+
+    const finalized = await ClipQueueService.endRecording(queueItem.id, t1);
+
+    emitQueueUpdated(deps?.wss, finalized);
+
+    const itemWithDuration: ClipQueueService.ClipQueueItemWithDuration = {
+      ...finalized,
+      duration: finalized.t1 !== null ? finalized.t1 - finalized.t0 : null,
+    };
+
+    sendSuccess(res, { item: transformQueueItem(itemWithDuration) }, 201);
+  } catch (error) {
+    apiLogger.error({ err: error }, "[api/clip-queue] Error creating manual clip");
+    sendError(res, 500, "INTERNAL_ERROR", "Failed to create manual clip.");
   }
 }
 
@@ -332,11 +460,14 @@ export function createClipQueueRouter(): Router {
   return router;
 }
 
-export function createSessionClipQueueRouter(): Router {
+export function createSessionClipQueueRouter(
+  deps?: { wss?: WebSocketServer; saveReplayBuffer?: () => Promise<string | null> }
+): Router {
   const router = Router({ mergeParams: true });
 
   // List queue items for a session
   router.get("/", listSessionClipQueueHandler);
+  router.post("/manual", (req, res) => createManualClipHandler(req, res, deps));
 
   return router;
 }

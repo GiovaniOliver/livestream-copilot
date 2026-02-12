@@ -15,6 +15,7 @@ import { z, ZodError } from "zod";
 import rateLimit from "express-rate-limit";
 import {
   listSessions,
+  createSession,
   getSessionById,
   getSessionWithCounts,
   getSessionWithRelations,
@@ -142,6 +143,13 @@ const listSessionsSchema = z.object({
   orderDir: z.enum(["asc", "desc"]).default("desc"),
 });
 
+const createSessionSchema = z.object({
+  workflow: z.string().max(100),
+  captureMode: z.string().max(50),
+  title: z.string().max(200).optional(),
+  participants: z.array(z.string().max(100)).max(50).optional(),
+});
+
 const getSessionOutputsSchema = z.object({
   category: z.string().max(50).optional(),
   status: z.enum(["draft", "approved", "published", "archived"]).optional(),
@@ -182,6 +190,23 @@ function handleValidationError(res: Response, error: ZodError): void {
   sendError(res, 400, "VALIDATION_ERROR", messages.join("; "));
 }
 
+function transformSession(session: SessionWithCounts) {
+  return {
+    id: session.id,
+    workflow: session.workflow,
+    captureMode: session.captureMode,
+    title: session.title,
+    participants: session.participants,
+    status: session.status,
+    startedAt: session.startedAt?.toISOString() ?? null,
+    endedAt: session.endedAt?.toISOString() ?? null,
+    createdAt: session.createdAt.toISOString(),
+    updatedAt: session.updatedAt.toISOString(),
+    isActive: isSessionTrulyActive(session.id, session.endedAt),
+    counts: session._count ?? { events: 0, outputs: 0, clips: 0 },
+  };
+}
+
 // =============================================================================
 // ROUTE HANDLERS
 // =============================================================================
@@ -218,19 +243,7 @@ async function listSessionsHandler(req: Request, res: Response): Promise<void> {
     });
 
     // Transform sessions for API response
-    const transformedSessions = sessions.map((session) => ({
-      id: session.id,
-      workflow: session.workflow,
-      captureMode: session.captureMode,
-      title: session.title,
-      participants: session.participants,
-      startedAt: session.startedAt?.toISOString() ?? null,
-      endedAt: session.endedAt?.toISOString() ?? null,
-      createdAt: session.createdAt.toISOString(),
-      updatedAt: session.updatedAt.toISOString(),
-      isActive: isSessionTrulyActive(session.id, session.endedAt),
-      counts: session._count ?? { events: 0, outputs: 0, clips: 0 },
-    }));
+    const transformedSessions = sessions.map((session) => transformSession(session));
 
     sendSuccess(res, {
       sessions: transformedSessions,

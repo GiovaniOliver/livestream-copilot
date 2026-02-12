@@ -34,27 +34,27 @@ function getEnv(key: string, defaultValue: string): string {
 export const API_CONFIG = {
   /**
    * Base URL for REST API endpoints
-   * @default "http://localhost:3123"
+   * @default "http://localhost:3125"
    */
-  baseUrl: getEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3123'),
+  baseUrl: getEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3125'),
 
   /**
    * Base URL for WebSocket connections
-   * @default "ws://localhost:3124"
+   * @default "ws://localhost:3126"
    */
-  wsUrl: getEnv('NEXT_PUBLIC_WS_URL', 'ws://localhost:3124'),
+  wsUrl: getEnv('NEXT_PUBLIC_WS_URL', 'ws://localhost:3126'),
 
   /**
    * Desktop companion API URL (legacy)
-   * @default "http://localhost:3123"
+   * @default "http://localhost:3125"
    */
-  desktopApiUrl: getEnv('NEXT_PUBLIC_DESKTOP_API_URL', 'http://localhost:3123'),
+  desktopApiUrl: getEnv('NEXT_PUBLIC_DESKTOP_API_URL', 'http://localhost:3125'),
 
   /**
    * Desktop companion WebSocket URL (legacy)
-   * @default "ws://localhost:3124"
+   * @default "ws://localhost:3126"
    */
-  desktopWsUrl: getEnv('NEXT_PUBLIC_DESKTOP_WS_URL', 'ws://localhost:3124'),
+  desktopWsUrl: getEnv('NEXT_PUBLIC_DESKTOP_WS_URL', 'ws://localhost:3126'),
 
   /**
    * Request timeout in milliseconds

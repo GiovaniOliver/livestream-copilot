@@ -42,6 +42,14 @@ export interface HealthResponse {
     ai: boolean;
     ffmpeg: boolean;
     agents: boolean;
+    replayBuffer?: {
+      active: boolean;
+      lastSavedAt?: number | null;
+      lastSavedPath?: string | null;
+      lastSaveRequestedAt?: number | null;
+      lastError?: string | null;
+      outputDir?: string | null;
+    };
   };
   session: {
     active: boolean;

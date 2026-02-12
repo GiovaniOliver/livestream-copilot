@@ -200,8 +200,9 @@ export class AutoClipManager {
         endTimer: null,
       };
 
-      // Set up auto-end timer if enabled and not manual
-      if (this.autoClipEnabled) {
+      // Set up auto-end timer for auto clips and manual clips
+      const shouldAutoEnd = this.autoClipEnabled || type === "manual";
+      if (shouldAutoEnd) {
         activeClip.endTimer = setTimeout(() => {
           this.endClip(queueItem.id, t + this.autoClipDuration);
         }, this.autoClipDuration * 1000);

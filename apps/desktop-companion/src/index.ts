@@ -94,19 +94,24 @@ import { outputsRouter, sessionOutputsRouter } from "./api/outputs.js";
 import { eventsRouter, sessionEventsRouter } from "./api/events.js";
 import { recordingsRouter } from "./api/recordings.js";
 // Note: triggersRouter requires multer - will be loaded dynamically if available
-import { clipQueueRouter, sessionClipQueueRouter } from "./api/clip-queue.js";
+import { clipQueueRouter, createSessionClipQueueRouter } from "./api/clip-queue.js";
+import { createObsRouter } from "./api/obs.js";
+import type { ObsRouteDeps } from "./api/obs.types.js";
 import { billingRouter } from "./billing/index.js";
 import { exportRouter } from "./export/index.js";
 import { brandingRouter } from "./export/branding-routes.js";
 import { socialRouter } from "./social/index.js";
 import { videoRouter, getMediaMTXManager } from "./video/index.js";
 import { getVisualTriggerService } from "./triggers/visual-trigger.service.js";
+import { getAudioTriggerService } from "./triggers/audio-trigger.service.js";
+import { getAutoClipManager } from "./triggers/auto-clip-manager.js";
+import { getClipQueueProcessor } from "./triggers/clip-queue-processor.js";
 
 // Use validated config values
 const OBS_WS_URL = config.OBS_WS_URL;
 const OBS_WS_PASSWORD = config.OBS_WS_PASSWORD;
 const HTTP_PORT = config.HTTP_PORT;
-const WS_PORT = config.WS_PORT;
+const CONFIG_WS_PORT = config.WS_PORT;
 const SESSION_DIR = config.SESSION_DIR;
 const REPLAY_BUFFER_SECONDS = config.REPLAY_BUFFER_SECONDS;
 
@@ -154,14 +159,72 @@ const dbLogger = logger.child({ module: "db" });
 // Agent logger
 const agentLogger = logger.child({ module: "agents" });
 
-// Track last saved replay buffer path (updated via OBS event)
-let lastReplayBufferPath: string | null = null;
+  // Track replay buffer state (updated via OBS events and save requests)
+  let lastReplayBufferPath: string | null = null;
+  let replayBufferState: {
+    active: boolean;
+    lastSavedAt: number | null;
+    lastSavedPath: string | null;
+    lastSaveRequestedAt: number | null;
+    lastError: string | null;
+  } = {
+    active: false,
+    lastSavedAt: null,
+    lastSavedPath: null,
+    lastSaveRequestedAt: null,
+    lastError: null,
+  };
 
 // Track FFmpeg availability
 let ffmpegReady = false;
 
 // Track MediaMTX availability
 let mediamtxAvailable = false;
+
+async function startWebSocketServer(preferredPort: number): Promise<{
+  server: WebSocketServer;
+  port: number;
+}> {
+  const startOnPort = (port: number) =>
+    new Promise<{ server: WebSocketServer; port: number }>((resolve, reject) => {
+      const server = new WebSocketServer({ port });
+
+      const cleanup = () => {
+        server.off("listening", onListening);
+        server.off("error", onError);
+      };
+
+      const onListening = () => {
+        cleanup();
+        const address = server.address();
+        const actualPort = typeof address === "object" && address ? address.port : port;
+        resolve({ server, port: actualPort });
+      };
+
+      const onError = (err: Error) => {
+        cleanup();
+        server.close();
+        reject(err);
+      };
+
+      server.once("listening", onListening);
+      server.once("error", onError);
+    });
+
+  try {
+    return await startOnPort(preferredPort);
+  } catch (err: any) {
+    if (err?.code === "EADDRINUSE") {
+      logger.warn(
+        { port: preferredPort },
+        "WebSocket port in use, selecting a free port"
+      );
+      return await startOnPort(0);
+    }
+
+    throw err;
+  }
+}
 
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
@@ -225,52 +288,81 @@ async function connectOBS() {
     await obs.connect(OBS_WS_URL, OBS_WS_PASSWORD || undefined);
     obsLogger.info({ url: OBS_WS_URL }, "Connected to OBS WebSocket");
 
-    // Listen for replay buffer saved events to capture the output path
-    obs.on("ReplayBufferSaved", (data: any) => {
-      lastReplayBufferPath = data.savedReplayPath;
-      obsLogger.info({ path: lastReplayBufferPath }, "Replay buffer saved");
-    });
+      // Replay buffer state events
+      obs.on("ReplayBufferSaved", (data: any) => {
+        lastReplayBufferPath = data.savedReplayPath;
+        replayBufferState.lastSavedAt = Date.now();
+        replayBufferState.lastSavedPath = lastReplayBufferPath;
+        replayBufferState.lastError = null;
+        obsLogger.info({ path: lastReplayBufferPath }, "Replay buffer saved");
+      });
+      obs.on("ReplayBufferStarted", () => {
+        replayBufferState.active = true;
+        replayBufferState.lastError = null;
+      });
+      obs.on("ReplayBufferStopped", () => {
+        replayBufferState.active = false;
+      });
   } catch (err) {
     obsLogger.error({ err, url: OBS_WS_URL }, "Failed to connect to OBS WebSocket");
   }
 }
 
-async function ensureReplayBuffer() {
-  // Best-effort: start replay buffer if not running.
-  try {
-    const status = await obs.call("GetReplayBufferStatus");
-    if (!status.outputActive) {
-      await obs.call("StartReplayBuffer");
-      obsLogger.info("Replay buffer started");
+  async function ensureReplayBuffer() {
+    // Best-effort: start replay buffer if not running.
+    try {
+      const status = await obs.call("GetReplayBufferStatus");
+      replayBufferState.active = status.outputActive;
+      if (!status.outputActive) {
+        await obs.call("StartReplayBuffer");
+        replayBufferState.active = true;
+        replayBufferState.lastError = null;
+        obsLogger.info("Replay buffer started");
+      }
+    } catch (err) {
+      replayBufferState.lastError = "Failed to ensure replay buffer";
+      obsLogger.warn({ err }, "Failed to ensure replay buffer (is obs-websocket enabled?)");
     }
-  } catch (err) {
-    obsLogger.warn({ err }, "Failed to ensure replay buffer (is obs-websocket enabled?)");
   }
-}
 
-async function saveReplayBuffer(): Promise<string | null> {
-  // OBS writes replay file to the configured path.
-  // We listen for the ReplayBufferSaved event to get the actual path.
-  try {
-    // Reset last path before saving
-    lastReplayBufferPath = null;
+  async function saveReplayBuffer(): Promise<string | null> {
+    // OBS writes replay file to the configured path.
+    // We listen for the ReplayBufferSaved event to get the actual path.
+    try {
+      // Reset last path before saving
+      lastReplayBufferPath = null;
+      replayBufferState.lastSaveRequestedAt = Date.now();
+      replayBufferState.lastError = null;
 
-    await obs.call("SaveReplayBuffer");
+      await obs.call("SaveReplayBuffer");
 
-    // Wait briefly for the event to fire (OBS sends it after file is written)
-    await new Promise((resolve) => setTimeout(resolve, 500));
+      // Wait briefly for the event to fire (OBS sends it after file is written)
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-    if (lastReplayBufferPath) {
-      return lastReplayBufferPath;
+      if (lastReplayBufferPath) {
+        replayBufferState.lastSavedAt = Date.now();
+        replayBufferState.lastSavedPath = lastReplayBufferPath;
+        return lastReplayBufferPath;
+      }
+
+      // Fallback: attempt to resolve from output directory
+      if (OBS_REPLAY_OUTPUT_DIR) {
+        const latest = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
+        if (latest) {
+          replayBufferState.lastSavedAt = Date.now();
+          replayBufferState.lastSavedPath = latest;
+          return latest;
+        }
+      }
+
+      replayBufferState.lastError = "Replay buffer saved but output path not found";
+      return "(obs-managed)";
+    } catch (err) {
+      replayBufferState.lastError = "SaveReplayBuffer failed";
+      obsLogger.warn({ err }, "SaveReplayBuffer failed");
+      return null;
     }
-
-    // Fallback: if we didn't get the event, return placeholder
-    return "(obs-managed)";
-  } catch (err) {
-    obsLogger.warn({ err }, "SaveReplayBuffer failed");
-    return null;
   }
-}
 
 async function takeScreenshot(sceneOrSourceName: string, outputPath: string) {
   // Screenshot a source by name. The caller controls where to store it.
@@ -458,7 +550,7 @@ async function main() {
     {
       nodeEnv: config.NODE_ENV,
       httpPort: HTTP_PORT,
-      wsPort: WS_PORT,
+      wsPort: CONFIG_WS_PORT,
       sessionDir: SESSION_DIR,
       obsWsUrl: OBS_WS_URL,
       logLevel: config.LOG_LEVEL,
@@ -582,13 +674,6 @@ async function main() {
   }
 
   // =============================================================================
-  // Clip Queue Routes
-  // =============================================================================
-  app.use("/api/clip-queue", clipQueueRouter);
-  app.use("/api/sessions/:sessionId/clip-queue", sessionClipQueueRouter);
-  apiLogger.info("Clip queue routes mounted at /api/clip-queue and /api/sessions/:sessionId/clip-queue");
-
-  // =============================================================================
   // Billing Routes (API v1)
   // =============================================================================
   // Raw body parsing for Stripe webhooks
@@ -649,70 +734,18 @@ async function main() {
   });
   apiLogger.info("Agent observability routes mounted at /api/agents");
 
-  // OBS Status endpoint
-  app.get("/api/obs/status", async (_req, res) => {
-    const connected = obs.identified;
-    let replayBufferActive = false;
-
-    if (connected) {
-      try {
-        const status = await obs.call("GetReplayBufferStatus");
-        replayBufferActive = status.outputActive;
-      } catch {
-        // Replay buffer might not be available
-      }
-    }
-
-    res.json({
-      success: true,
-      data: {
-        connected,
-        wsUrl: OBS_WS_URL,
-        hasPassword: !!OBS_WS_PASSWORD,
-        replayBufferActive,
-        help: !connected ? {
-          message: "OBS WebSocket is not connected. Make sure:",
-          steps: [
-            "1. OBS Studio is running",
-            "2. WebSocket Server is enabled in OBS (Tools > WebSocket Server Settings)",
-            "3. Check the port matches OBS_WS_URL (default: ws://127.0.0.1:4455)",
-            "4. If authentication is enabled in OBS, set OBS_WS_PASSWORD in your .env file",
-          ],
-        } : null,
-      },
-    });
-  });
-
-  // Reconnect OBS endpoint
-  app.post("/api/obs/reconnect", async (_req, res) => {
-    try {
-      if (obs.identified) {
-        await obs.disconnect();
-      }
-      await obs.connect(OBS_WS_URL, OBS_WS_PASSWORD || undefined);
-      obsLogger.info({ url: OBS_WS_URL }, "Reconnected to OBS WebSocket");
-      res.json({ success: true, message: "Reconnected to OBS" });
-    } catch (err) {
-      obsLogger.error({ err, url: OBS_WS_URL }, "Failed to reconnect to OBS");
-      res.status(500).json({
-        success: false,
-        error: err instanceof Error ? err.message : "Failed to connect to OBS",
-        help: {
-          message: "Connection failed. Verify:",
-          steps: [
-            "1. OBS is running with WebSocket Server enabled",
-            `2. WebSocket URL is correct: ${OBS_WS_URL}`,
-            "3. Password matches if authentication is enabled",
-          ],
-        },
-      });
-    }
-  });
-  apiLogger.info("OBS status routes mounted at /api/obs");
-
   let wss: WebSocketServer;
+  let wsPort = CONFIG_WS_PORT;
   try {
-    wss = new WebSocketServer({ port: WS_PORT });
+    const started = await startWebSocketServer(CONFIG_WS_PORT);
+    wss = started.server;
+    wsPort = started.port;
+    if (wsPort !== CONFIG_WS_PORT) {
+      logger.warn(
+        { configuredPort: CONFIG_WS_PORT, activePort: wsPort },
+        "WebSocket server started on a fallback port"
+      );
+    }
     wss.on("connection", (ws) => {
       logger.debug("New WebSocket client connected");
       ws.send(JSON.stringify({ type: "hello", ok: true }));
@@ -741,23 +774,257 @@ async function main() {
       });
     });
   } catch (err: any) {
-    logger.error({ err, port: WS_PORT }, "Failed to start WebSocket server");
+    logger.error({ err, port: wsPort }, "Failed to start WebSocket server");
     // If WebSocket fails, we can't really function as a real-time service
     // but we can at least log the error clearly.
     throw err;
   }
+
+  // =============================================================================
+  // Clip Queue Routes (requires wss)
+  // =============================================================================
+  app.use("/api/clip-queue", clipQueueRouter);
+  app.use("/api/sessions/:sessionId/clip-queue", createSessionClipQueueRouter({ wss, saveReplayBuffer }));
+  apiLogger.info("Clip queue routes mounted at /api/clip-queue and /api/sessions/:sessionId/clip-queue");
 
   // Initialize STT Manager with WebSocket server
   const sttManager = getSTTManager();
   sttManager.initialize(wss);
   sttLogger.info("STT Manager initialized");
 
+  // Initialize clip queue processor
+  const clipQueueProcessor = getClipQueueProcessor(wss);
+  clipQueueProcessor.start();
+
+  // Initialize trigger services + auto-clip manager
+  const autoClipManager = getAutoClipManager(wss);
+  const audioTriggerService = getAudioTriggerService(wss);
+  const visualTriggerService = getVisualTriggerService(wss);
+
+  audioTriggerService.onTrigger((event) => {
+    void autoClipManager.handleTrigger({ type: "audio", event });
+  });
+
+  visualTriggerService.onTrigger((event) => {
+    void autoClipManager.handleTrigger({
+      type: "visual",
+      event: {
+        sessionId: event.sessionId,
+        workflow: event.workflow,
+        label: event.detection.label,
+        confidence: event.detection.confidence,
+        t: event.t,
+      },
+    });
+  });
+
   // =============================================================================
-  // Agent Processing Routes (API v1)
+  // Extracted Helper Functions
   // =============================================================================
-  // Note: agentRouter is an internal event router, not an Express router
-  // It processes events via routeEvent() calls, not HTTP endpoints
-  // apiLogger.info("Agent event router initialized (internal use only)");
+
+  function buildWsUrl(req: express.Request): string {
+    const host = req.hostname || "localhost";
+    const protocol = req.secure ? "wss" : "ws";
+    return `${protocol}://${host}:${wsPort}`;
+  }
+
+  async function startSessionInternal(body: Record<string, unknown>): Promise<{
+    sessionId: string;
+    startedAt: number;
+  }> {
+    if (session) {
+      throw new Error("Session already active");
+    }
+
+    const validated = SessionConfigSchema.parse(body);
+    const t0 = nowMs();
+
+    const dbSession = await SessionService.createSession({
+      workflow: validated.workflow,
+      captureMode: validated.captureMode,
+      title: validated.title,
+      participants: validated.participants.map((p) => p.name),
+      startedAt: new Date(t0),
+    });
+
+    const sessionId = dbSession.id;
+    const sessionDir = path.join(SESSION_DIR, sessionId);
+    ensureDir(sessionDir);
+
+    session = {
+      config: { ...validated, sessionId },
+      dbId: dbSession.id,
+      t0UnixMs: t0,
+    };
+
+    await ensureReplayBuffer();
+
+    await autoClipManager.initialize(validated.workflow);
+    await visualTriggerService.start(sessionId, validated.workflow, "mediapipe");
+
+    const startEvent: any = {
+      id: uuidv4(),
+      type: "SESSION_START",
+      ts: t0,
+      payload: { sessionId, workflow: validated.workflow, title: validated.title },
+    };
+    emitEvent(wss, startEvent);
+
+    apiLogger.info({ sessionId, workflow: validated.workflow }, "Session started");
+    return { sessionId, startedAt: t0 };
+  }
+
+  async function stopSessionInternal(): Promise<{ ok: boolean; t1: number; duration: number }> {
+    if (!session) {
+      throw new Error("No active session");
+    }
+
+    const t1 = nowMs();
+    const duration = t1 - session.t0UnixMs;
+
+    await SessionService.updateSession(session.dbId, {
+      endedAt: new Date(t1),
+      status: "completed",
+    });
+
+    await autoClipManager.stopAll();
+    audioTriggerService.stop();
+    visualTriggerService.stop();
+
+    const endEvent: any = {
+      id: uuidv4(),
+      type: "SESSION_END",
+      ts: t1,
+      payload: { sessionId: session.config.sessionId, duration },
+    };
+    emitEvent(wss, endEvent);
+
+    apiLogger.info({ sessionId: session.config.sessionId, duration }, "Session stopped");
+    session = null;
+    return { ok: true, t1, duration };
+  }
+
+  async function createClipInternal(now: number) {
+    if (!session) {
+      throw new Error("No active session");
+    }
+
+    const clipStart = session.clipStartT || now - REPLAY_BUFFER_SECONDS * 1000;
+    session.clipStartT = now;
+
+    const replayBufferPath = await saveReplayBuffer();
+    const artifactId = uuidv4();
+    const t0 = Math.max(0, (clipStart - session.t0UnixMs) / 1000);
+    const t1 = (now - session.t0UnixMs) / 1000;
+
+    const artifactEvent: any = {
+      id: uuidv4(),
+      type: "ARTIFACT_CLIP_CREATED",
+      ts: now,
+      payload: { artifactId, type: "clip", path: replayBufferPath || "(pending)", t0, t1, duration: t1 - t0 },
+    };
+    emitEvent(wss, artifactEvent);
+
+    let trimResult: TrimClipResult | null = null;
+    if (ffmpegReady && replayBufferPath && replayBufferPath !== "(obs-managed)" && fs.existsSync(replayBufferPath)) {
+      trimResult = await attemptClipTrim(replayBufferPath, t0, t1, sessionPath(), artifactId, session.t0UnixMs, now);
+    } else if (ffmpegReady && OBS_REPLAY_OUTPUT_DIR) {
+      const latestReplayBuffer = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
+      if (latestReplayBuffer) {
+        ffmpegLogger.info({ path: latestReplayBuffer }, "Using latest replay buffer file from directory scan");
+        trimResult = await attemptClipTrim(latestReplayBuffer, t0, t1, sessionPath(), artifactId, session.t0UnixMs, now);
+      }
+    }
+
+    await ClipService.createClip({
+      sessionId: session.dbId,
+      artifactId,
+      path: trimResult?.clipPath || replayBufferPath || "(pending)",
+      t0,
+      t1,
+      thumbnailId: undefined,
+    });
+
+    if (trimResult) {
+      const updateEvent: any = {
+        id: uuidv4(),
+        type: "ARTIFACT_CLIP_CREATED",
+        ts: nowMs(),
+        payload: {
+          artifactId, type: "clip", path: trimResult.clipPath, thumbnailPath: trimResult.thumbnailPath,
+          t0, t1, duration: trimResult.duration, format: trimResult.metadata?.format,
+          videoCodec: trimResult.metadata?.codec, audioCodec: trimResult.metadata?.codec,
+        },
+      };
+      emitEvent(wss, updateEvent);
+    }
+
+    apiLogger.info({ artifactId, t0, t1, duration: t1 - t0, trimmed: !!trimResult, clipPath: trimResult?.clipPath }, "Clip created");
+
+    return {
+      ok: true,
+      artifactId,
+      replayBufferPath,
+      clipPath: trimResult?.clipPath,
+      thumbnailPath: trimResult?.thumbnailPath,
+      t0,
+      t1,
+      duration: trimResult?.duration || t1 - t0,
+    };
+  }
+
+  // =============================================================================
+  // OBS Routes (modular router)
+  // =============================================================================
+  const obsRouteDeps: ObsRouteDeps = {
+    obs,
+    getSession: () => session,
+    setSession: (s) => { session = s as SessionState | null; },
+    wss,
+    emitEvent,
+    config: { OBS_WS_URL, OBS_WS_PASSWORD: OBS_WS_PASSWORD || "", WS_PORT: wsPort },
+    ffmpegReady: () => ffmpegReady,
+    ffmpegStatus: () => checkFFmpegAvailability(),
+    saveReplayBuffer,
+    startSessionInternal,
+    stopSessionInternal,
+  };
+  const obsRouter = createObsRouter(obsRouteDeps);
+  app.use("/api/obs", obsRouter);
+  app.use("/obs", obsRouter);
+  apiLogger.info("OBS routes mounted at /api/obs and /obs");
+
+  // =============================================================================
+  // Dual Route Mounting (API compatibility)
+  // =============================================================================
+  app.use("/sessions", sessionsRouter);
+  app.use("/sessions/:sessionId/clips", sessionClipsRouter);
+  app.use("/sessions/:sessionId/events", sessionEventsRouter);
+  app.get("/agents/status", (_req, res) => {
+    const stats = agentRouter.getStats();
+    res.json({ ok: true, success: true, data: stats });
+  });
+  apiLogger.info("Dual route mounts registered (non-prefixed aliases)");
+
+  // =============================================================================
+  // FFmpeg Status Route
+  // =============================================================================
+  app.get("/ffmpeg/status", async (_req, res) => {
+    const status = await checkFFmpegAvailability();
+    res.json({
+      ok: true,
+      success: true,
+      data: {
+        ready: ffmpegReady,
+        ffmpeg: status.ffmpeg,
+        ffprobe: status.ffprobe,
+        clipOutputFormat: CLIP_OUTPUT_FORMAT,
+        ffmpegPath: FFMPEG_PATH || "(default)",
+        ffprobePath: FFPROBE_PATH || "(default)",
+      },
+    });
+  });
+  apiLogger.info("FFmpeg status route mounted at /ffmpeg/status");
 
   // =============================================================================
   // Session Management Routes
@@ -769,47 +1036,13 @@ async function main() {
           ok: false,
           error: "Session already active",
           session: session.config,
-          startedAt: session.t0UnixMs
+          startedAt: session.t0UnixMs,
         });
       }
 
-      const validated = SessionConfigSchema.parse(req.body);
-      const t0 = nowMs();
-
-      // Persist session to database FIRST to get the canonical ID
-      const dbSession = await SessionService.createSession({
-        workflow: validated.workflow,
-        captureMode: validated.captureMode,
-        title: validated.title,
-        participants: validated.participants.map((p) => p.name),
-        startedAt: new Date(t0),
-      });
-
-      // Use the database-generated ID as the canonical session ID
-      const sessionId = dbSession.id;
-
-      const sessionDir = path.join(SESSION_DIR, sessionId);
-      ensureDir(sessionDir);
-
-      session = {
-        config: { ...validated, sessionId },
-        dbId: dbSession.id,
-        t0UnixMs: t0,
-      };
-
-      await ensureReplayBuffer();
-
-      // Emit SESSION_START event
-      const startEvent: any = {
-        id: uuidv4(),
-        type: "SESSION_START",
-        ts: t0,
-        payload: { sessionId, workflow: validated.workflow, title: validated.title },
-      };
-      emitEvent(wss, startEvent);
-
-      apiLogger.info({ sessionId, workflow: validated.workflow }, "Session started");
-      return res.json({ sessionId, startedAt: t0 });
+      const result = await startSessionInternal(req.body);
+      const ws = buildWsUrl(req);
+      return res.json({ ok: true, ...result, ws });
     } catch (err: any) {
       apiLogger.error({ err }, "Failed to start session");
       return res.status(400).json({ ok: false, error: err.message });
@@ -817,36 +1050,19 @@ async function main() {
   });
 
   app.post("/session/stop", async (req, res) => {
-    if (!session) {
-      return res.status(404).json({ ok: false, error: "No active session" });
+    try {
+      const result = await stopSessionInternal();
+      return res.json(result);
+    } catch (err: any) {
+      return res.status(404).json({ ok: false, error: err.message });
     }
-
-    const t1 = nowMs();
-    const duration = t1 - session.t0UnixMs;
-
-    // Update session in database
-    await SessionService.updateSession(session.dbId, {
-      endedAt: new Date(t1),
-      status: "completed",
-    });
-
-    // Emit SESSION_END event
-    const endEvent: any = {
-      id: uuidv4(),
-      type: "SESSION_END",
-      ts: t1,
-      payload: { sessionId: session.config.sessionId, duration },
-    };
-    emitEvent(wss, endEvent);
-
-    apiLogger.info({ sessionId: session.config.sessionId, duration }, "Session stopped");
-
-    session = null;
-    return res.json({ ok: true, t1, duration });
   });
 
   app.get("/session/force-stop", async (req, res) => {
     session = null;
+    await autoClipManager.stopAll();
+    audioTriggerService.stop();
+    visualTriggerService.stop();
     return res.json({ ok: true, message: "Session cleared via GET" });
   });
 
@@ -870,6 +1086,10 @@ async function main() {
     } else {
       apiLogger.info("Force-stop called but no active session in memory");
     }
+
+    await autoClipManager.stopAll();
+    audioTriggerService.stop();
+    visualTriggerService.stop();
 
     return res.json({ ok: true, message: "Session state cleared", t1 });
   });
@@ -898,142 +1118,21 @@ async function main() {
   // OBS Integration Routes
   // =============================================================================
   app.post("/clip", async (req, res) => {
-    if (!session) {
-      return res.status(404).json({ ok: false, error: "No active session" });
-    }
-
     try {
-      const now = nowMs();
-      const clipStart = session.clipStartT || now - REPLAY_BUFFER_SECONDS * 1000;
-      session.clipStartT = now;
-
-      // Save replay buffer
-      const replayBufferPath = await saveReplayBuffer();
-
-      // Generate artifact ID
-      const artifactId = uuidv4();
-
-      // Calculate clip timestamps
-      const t0 = Math.max(0, (clipStart - session.t0UnixMs) / 1000);
-      const t1 = (now - session.t0UnixMs) / 1000;
-
-      // Emit artifact event (before trimming)
-      const artifactEvent: any = {
-        id: uuidv4(),
-        type: "ARTIFACT_CLIP_CREATED",
-        ts: now,
-        payload: {
-          artifactId,
-          type: "clip",
-          path: replayBufferPath || "(pending)",
-          t0,
-          t1,
-          duration: t1 - t0,
-        },
-      };
-      emitEvent(wss, artifactEvent);
-
-      // Attempt FFmpeg trim if available and we have a valid replay buffer path
-      let trimResult: TrimClipResult | null = null;
-      if (
-        ffmpegReady &&
-        replayBufferPath &&
-        replayBufferPath !== "(obs-managed)" &&
-        fs.existsSync(replayBufferPath)
-      ) {
-        trimResult = await attemptClipTrim(
-          replayBufferPath,
-          t0,
-          t1,
-          sessionPath(),
-          artifactId,
-          session.t0UnixMs,
-          now
-        );
-      } else if (ffmpegReady && OBS_REPLAY_OUTPUT_DIR) {
-        // Fallback: try to find the latest replay buffer file
-        const latestReplayBuffer = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
-        if (latestReplayBuffer) {
-          ffmpegLogger.info(
-            { path: latestReplayBuffer },
-            "Using latest replay buffer file from directory scan"
-          );
-          trimResult = await attemptClipTrim(
-            latestReplayBuffer,
-            t0,
-            t1,
-            sessionPath(),
-            artifactId,
-            session.t0UnixMs,
-            now
-          );
-        }
-      }
-
-      // Persist clip to database
-      const dbClip = await ClipService.createClip({
-        sessionId: session.dbId,
-        artifactId,
-        path: trimResult?.clipPath || replayBufferPath || "(pending)",
-        t0,
-        t1,
-        thumbnailId: undefined, // TODO: implement thumbnail ID tracking
-      });
-
-      // If trimming succeeded, emit an update event with the trimmed clip path
-      if (trimResult) {
-        const updateEvent: any = {
-          id: uuidv4(),
-          type: "ARTIFACT_CLIP_CREATED",
-          ts: nowMs(),
-          payload: {
-            artifactId,
-            type: "clip",
-            path: trimResult.clipPath,
-            thumbnailPath: trimResult.thumbnailPath,
-            t0,
-            t1,
-            duration: trimResult.duration,
-            format: trimResult.metadata?.format,
-            videoCodec: trimResult.metadata?.codec,
-            audioCodec: trimResult.metadata?.codec,
-          },
-        };
-        emitEvent(wss, updateEvent);
-      }
-
-      apiLogger.info(
-        {
-          artifactId,
-          t0,
-          t1,
-          duration: t1 - t0,
-          trimmed: !!trimResult,
-          clipPath: trimResult?.clipPath,
-        },
-        "Clip created"
-      );
-
-      return res.json({
-        ok: true,
-        artifactId,
-        replayBufferPath,
-        clipPath: trimResult?.clipPath,
-        thumbnailPath: trimResult?.thumbnailPath,
-        t0,
-        t1,
-        duration: trimResult?.duration || t1 - t0,
-      });
+      const result = await createClipInternal(nowMs());
+      return res.json(result);
     } catch (err: any) {
+      const statusCode = err.message === "No active session" ? 404 : 500;
       apiLogger.error({ err }, "Failed to create clip");
-      return res.status(500).json({ ok: false, error: err.message });
+      return res.status(statusCode).json({ ok: false, error: err.message });
     }
   });
 
-  app.post("/screenshot", async (req, res) => {
-    if (!session) {
-      return res.status(404).json({ ok: false, error: "No active session" });
-    }
+  // Screenshot handler (used by both /screenshot and /frame)
+  const screenshotHandler: express.RequestHandler = async (req, res) => {
+        if (!session) {
+          return res.status(409).json({ ok: false, error: "No active session. Start a session first." });
+        }
 
     try {
       const { sourceName } = req.body;
@@ -1071,12 +1170,14 @@ async function main() {
       apiLogger.error({ err }, "Failed to capture screenshot");
       return res.status(500).json({ ok: false, error: err.message });
     }
-  });
+  };
+  app.post("/screenshot", screenshotHandler);
+  app.post("/frame", screenshotHandler);
 
   // =============================================================================
   // Speech-to-Text Routes
   // =============================================================================
-  app.post("/stt/start", async (req, res) => {
+  const startSttHandler: express.RequestHandler = async (req, res) => {
     try {
       if (!session) {
         return res.status(404).json({ ok: false, error: "No active session" });
@@ -1093,40 +1194,52 @@ async function main() {
 
       await sttManager.start(sttConfig);
 
+      const provider = sttManager.getProvider();
+      if (provider) {
+        await audioTriggerService.start(sttConfig.sessionId, session.config.workflow, provider);
+      }
+
       sttLogger.info({ sessionId: sttConfig.sessionId }, "STT started");
       return res.json({ ok: true, sessionId: sttConfig.sessionId });
     } catch (err: any) {
       sttLogger.error({ err }, "Failed to start STT");
       return res.status(500).json({ ok: false, error: err.message });
     }
-  });
+  };
 
-  app.post("/stt/stop", async (req, res) => {
+  const stopSttHandler: express.RequestHandler = async (_req, res) => {
     try {
       await sttManager.stop();
+      audioTriggerService.stop();
       sttLogger.info("STT stopped");
       return res.json({ ok: true });
     } catch (err: any) {
       sttLogger.error({ err }, "Failed to stop STT");
       return res.status(500).json({ ok: false, error: err.message });
     }
-  });
+  };
 
-  app.post("/stt/audio", async (req, res) => {
+  const sendSttAudioHandler: express.RequestHandler = async (req, res) => {
     try {
-      if (!req.body || !Buffer.isBuffer(req.body)) {
-        return res.status(400).json({ ok: false, error: "Audio data required (raw buffer)" });
+      let audioBuffer: Buffer;
+
+      if (Buffer.isBuffer(req.body)) {
+        audioBuffer = req.body;
+      } else if (req.body && typeof req.body.audio === "string") {
+        audioBuffer = Buffer.from(req.body.audio, "base64");
+      } else {
+        return res.status(400).json({ ok: false, error: "Audio data required (raw buffer or { audio: base64 })" });
       }
 
-      await sttManager.sendAudio(req.body);
+      await sttManager.sendAudio(audioBuffer);
       return res.json({ ok: true });
     } catch (err: any) {
       sttLogger.error({ err }, "Failed to send audio");
       return res.status(500).json({ ok: false, error: err.message });
     }
-  });
+  };
 
-  app.get("/stt/status", (req, res) => {
+  const sttStatusHandler: express.RequestHandler = (_req, res) => {
     const status = sttManager.getStatus();
     const providers = listSTTProviders();
 
@@ -1138,7 +1251,18 @@ async function main() {
       availableProviders: providers,
       configured: isSTTProviderAvailable(config.STT_PROVIDER),
     });
-  });
+  };
+
+  app.post("/stt/start", startSttHandler);
+  app.post("/stt/stop", stopSttHandler);
+  app.post("/stt/audio", sendSttAudioHandler);
+  app.get("/stt/status", sttStatusHandler);
+
+  // API aliases for frontend compatibility
+  app.post("/api/stt/start", startSttHandler);
+  app.post("/api/stt/stop", stopSttHandler);
+  app.post("/api/stt/audio", sendSttAudioHandler);
+  app.get("/api/stt/status", sttStatusHandler);
 
   // =============================================================================
   // Sentry Error Handler (must be before other error handlers)
@@ -1172,7 +1296,18 @@ async function main() {
     const sttConfigured = isSTTProviderAvailable(config.STT_PROVIDER);
 
     // Get video streaming status
-    const videoStatus = await mediamtxManager.getStatus();
+      const videoStatus = await mediamtxManager.getStatus();
+
+      // Refresh replay buffer active state from OBS (best-effort)
+      if (obs.identified) {
+        try {
+          const status = await obs.call("GetReplayBufferStatus");
+          replayBufferState.active = status.outputActive;
+        } catch (err) {
+          replayBufferState.lastError = "Failed to read replay buffer status";
+          obsLogger.warn({ err }, "Failed to read replay buffer status");
+        }
+      }
 
     return res.json({
       ok: true,
@@ -1180,18 +1315,31 @@ async function main() {
       version: "1.0.0",
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
-      components: {
-        database: dbHealthy,
-        obs: obs.identified,
-        stt: sttConfigured,
-        ai: aiConfigured,
-        ffmpeg: ffmpegReady,
-        agents: agentRouter.isEnabled(),
-        video: {
-          enabled: videoStatus.enabled,
-          serverRunning: videoStatus.serverRunning,
-          streamActive: videoStatus.streamActive,
-        },
+      // Top-level convenience fields
+      database: dbHealthy,
+      ffmpeg: ffmpegReady,
+      agents: agentRouter.isEnabled(),
+      sessionId: session?.config.sessionId ?? null,
+        components: {
+          database: dbHealthy,
+          obs: obs.identified,
+          stt: sttConfigured,
+          ai: aiConfigured,
+          ffmpeg: ffmpegReady,
+          agents: agentRouter.isEnabled(),
+          replayBuffer: {
+            active: replayBufferState.active,
+            lastSavedAt: replayBufferState.lastSavedAt,
+            lastSavedPath: replayBufferState.lastSavedPath,
+            lastSaveRequestedAt: replayBufferState.lastSaveRequestedAt,
+            lastError: replayBufferState.lastError,
+            outputDir: OBS_REPLAY_OUTPUT_DIR ?? null,
+          },
+          video: {
+            enabled: videoStatus.enabled,
+            serverRunning: videoStatus.serverRunning,
+            streamActive: videoStatus.streamActive,
+          },
       },
       session: session
         ? {

@@ -87,7 +87,7 @@ function handleValidationError(res: Response, error: ZodError): void {
 }
 
 // =============================================================================
-// FILE UPLOAD SETUP
+// FILE UPLOAD SETUP (lazy-loaded)
 // =============================================================================
 
 const UPLOAD_DIR = path.join(config.SESSION_DIR, "reference-images");
@@ -101,32 +101,52 @@ async function ensureUploadDir(): Promise<void> {
   }
 }
 
-const storage = multer.diskStorage({
-  destination: async (_req, _file, cb) => {
-    await ensureUploadDir();
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `ref-${uniqueSuffix}${ext}`);
-  },
-});
+async function uploadImageMiddleware(
+  req: Request,
+  res: Response,
+  next: (err?: any) => void
+): Promise<void> {
+  const multer = await getMulter();
+  if (!multer) {
+    sendError(res, 503, "MULTER_UNAVAILABLE", "File uploads are disabled (multer not installed).");
+    return;
+  }
 
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
-  },
-  fileFilter: (_req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed."));
+  const storage = multer.diskStorage({
+    destination: async (_req, _file, cb) => {
+      await ensureUploadDir();
+      cb(null, UPLOAD_DIR);
+    },
+    filename: (_req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      cb(null, `ref-${uniqueSuffix}${ext}`);
+    },
+  });
+
+  const upload = multer({
+    storage,
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+    },
+    fileFilter: (_req, file, cb) => {
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed."));
+      }
+    },
+  });
+
+  upload.single("image")(req, res, (err: Error | undefined) => {
+    if (err) {
+      sendError(res, 400, "UPLOAD_ERROR", err.message);
+      return;
     }
-  },
-});
+    next();
+  });
+}
 
 // =============================================================================
 // ROUTE HANDLERS
@@ -353,7 +373,7 @@ export function createTriggersRouter(): Router {
   router.post("/audio", addAudioTriggerHandler);
   router.delete("/audio/:triggerId", removeAudioTriggerHandler);
   router.patch("/audio/:triggerId", toggleAudioTriggerHandler);
-  router.post("/visual", upload.single("image"), addVisualTriggerHandler);
+  router.post("/visual", uploadImageMiddleware, addVisualTriggerHandler);
   router.delete("/visual/:triggerId", removeVisualTriggerHandler);
 
   return router;

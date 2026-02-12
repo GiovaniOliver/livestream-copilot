@@ -5,11 +5,14 @@ import { Badge, Button, Card } from "@/components/ui";
 import { ClipQueueItemCard, type ClipQueueItem } from "./ClipQueueItemCard";
 import { logger } from "@/lib/logger";
 import { API_CONFIG } from "@/lib/config";
+import { getHealth } from "@/lib/api/health";
 
 interface ClipQueueDashboardProps {
   sessionId: string;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  /** Whether OBS is actively streaming. Clip queue only activates when true. */
+  isStreaming?: boolean;
 }
 
 type FilterStatus = "all" | "pending" | "recording" | "processing" | "completed" | "failed";
@@ -23,10 +26,20 @@ interface ClipQueueStats {
   failed: number;
 }
 
+interface ReplayBufferState {
+  active: boolean;
+  lastSavedAt?: number | null;
+  lastSavedPath?: string | null;
+  lastSaveRequestedAt?: number | null;
+  lastError?: string | null;
+  outputDir?: string | null;
+}
+
 export function ClipQueueDashboard({
   sessionId,
   isCollapsed = false,
   onToggleCollapse,
+  isStreaming = false,
 }: ClipQueueDashboardProps) {
   const [items, setItems] = useState<ClipQueueItem[]>([]);
   const [stats, setStats] = useState<ClipQueueStats>({
@@ -40,9 +53,27 @@ export function ClipQueueDashboard({
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [replayBuffer, setReplayBuffer] = useState<ReplayBufferState | null>(null);
+  const [isSavingReplay, setIsSavingReplay] = useState(false);
 
   const apiBase = API_CONFIG.desktopApiUrl;
   const wsBase = API_CONFIG.desktopWsUrl;
+
+  const formatReplayTimestamp = (ts?: number | null) => {
+    if (!ts) return "Never";
+    return new Date(ts).toLocaleTimeString();
+  };
+
+  const computeStats = useCallback((queueItems: ClipQueueItem[]): ClipQueueStats => {
+    return queueItems.reduce<ClipQueueStats>(
+      (acc, item) => {
+        acc.total += 1;
+        acc[item.status as keyof ClipQueueStats] += 1;
+        return acc;
+      },
+      { total: 0, pending: 0, recording: 0, processing: 0, completed: 0, failed: 0 }
+    );
+  }, []);
 
   // Fetch queue items
   const fetchItems = useCallback(async () => {
@@ -51,19 +82,33 @@ export function ClipQueueDashboard({
       if (!response.ok) throw new Error("Failed to fetch clip queue");
 
       const data = await response.json();
-      setItems(data.items || []);
-      setStats(data.stats || stats);
+      const nextItems = data.items || [];
+      setItems(nextItems);
+      setStats(data.stats || computeStats(nextItems));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load queue");
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, apiBase, stats]);
+  }, [sessionId, apiBase, computeStats]);
 
-  // Subscribe to WebSocket updates
+  // Fetch replay buffer status
+  const fetchReplayStatus = useCallback(async () => {
+    try {
+      const health = await getHealth();
+      setReplayBuffer(health.components?.replayBuffer ?? null);
+    } catch {
+      setReplayBuffer(null);
+    }
+  }, []);
+
+  // Subscribe to WebSocket updates (keep connection stable regardless of streaming state)
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      setIsLoading(false);
+      return;
+    }
 
     fetchItems();
 
@@ -101,27 +146,16 @@ export function ClipQueueDashboard({
               createdAt: new Date().toISOString(),
             };
 
+            let newItems: ClipQueueItem[];
             if (existingIndex >= 0) {
-              const newItems = [...prevItems];
+              newItems = [...prevItems];
               newItems[existingIndex] = updatedItem;
-              return newItems;
+            } else {
+              newItems = [updatedItem, ...prevItems];
             }
 
-            return [updatedItem, ...prevItems];
-          });
-
-          // Update stats
-          setStats((prevStats) => {
-            const newStats = { ...prevStats };
-
-            // Update based on status change
-            if (payload.status === "pending") newStats.pending++;
-            if (payload.status === "recording") newStats.recording++;
-            if (payload.status === "processing") newStats.processing++;
-            if (payload.status === "completed") newStats.completed++;
-            if (payload.status === "failed") newStats.failed++;
-
-            return newStats;
+            setStats(computeStats(newItems));
+            return newItems;
           });
         }
       } catch {
@@ -140,7 +174,14 @@ export function ClipQueueDashboard({
     return () => {
       ws.close();
     };
-  }, [sessionId, wsBase, fetchItems]);
+  }, [sessionId, wsBase, fetchItems, computeStats]);
+
+  // Poll replay buffer status
+  useEffect(() => {
+    fetchReplayStatus();
+    const interval = setInterval(fetchReplayStatus, 5000);
+    return () => clearInterval(interval);
+  }, [fetchReplayStatus]);
 
   // Handle item actions
   const handleRetry = async (itemId: string) => {
@@ -180,6 +221,20 @@ export function ClipQueueDashboard({
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update");
+    }
+  };
+
+  const handleSaveReplay = async () => {
+    if (isSavingReplay) return;
+    try {
+      setIsSavingReplay(true);
+      const response = await fetch(`${apiBase}/api/obs/replay/save`, { method: "POST" });
+      if (!response.ok) throw new Error("Failed to save replay buffer");
+      await fetchReplayStatus();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save replay buffer");
+    } finally {
+      setIsSavingReplay(false);
     }
   };
 
@@ -269,6 +324,38 @@ export function ClipQueueDashboard({
         </button>
       </div>
 
+      {/* Replay Buffer Status */}
+      {replayBuffer && (
+        <div className="mx-4 mt-3 p-3 rounded-lg border border-stroke bg-bg-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant={replayBuffer.active ? "success" : "outline"} className="text-xs">
+                Replay {replayBuffer.active ? "Active" : "Inactive"}
+              </Badge>
+              <span className="text-xs text-text-dim">
+                Last save: {formatReplayTimestamp(replayBuffer.lastSavedAt)}
+              </span>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSaveReplay}
+              disabled={isSavingReplay}
+            >
+              {isSavingReplay ? "Saving..." : "Save"}
+            </Button>
+          </div>
+          {replayBuffer.lastError && (
+            <p className="mt-2 text-xs text-error">Error: {replayBuffer.lastError}</p>
+          )}
+          {!replayBuffer.active && (
+            <p className="mt-2 text-xs text-warning">
+              Replay buffer is inactive. Enable it in OBS to capture clips.
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Active Recording Banner */}
       {activeRecording && (
         <div className="mx-4 mt-4 p-3 rounded-lg bg-error/10 border border-error/30 animate-pulse">
@@ -329,7 +416,29 @@ export function ClipQueueDashboard({
 
       {/* Queue Items */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {isLoading ? (
+        {!isStreaming && items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <svg
+              className="h-12 w-12 text-text-dim mb-3 opacity-50"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
+              />
+            </svg>
+            <p className="text-sm font-medium text-text-dim">
+              Waiting for stream
+            </p>
+            <p className="text-xs text-text-dim mt-1">
+              Start streaming in OBS to enable clip capture
+            </p>
+          </div>
+        ) : isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-sm text-text-muted">Loading...</div>
           </div>

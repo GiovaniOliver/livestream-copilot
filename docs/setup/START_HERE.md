@@ -94,6 +94,22 @@ npm run dev
 
 ---
 
+### Step 4b: Live Preview (OBS + MediaMTX)
+
+If you want the live preview working:
+1. In OBS, click **Start Streaming**.
+2. OBS RTMP settings must be:
+- Server: `rtmp://localhost:1935/live` (stream key: `stream`)
+   - Stream Key: `stream`
+   - Stream Key: `stream`
+3. Optional checks:
+   ```cmd
+   curl http://localhost:9997/v3/paths/list
+   curl http://localhost:8888/live/stream/index.m3u8
+   ```
+
+---
+
 ### Step 5: Create Test Session (5 min)
 
 **In a fourth terminal:**

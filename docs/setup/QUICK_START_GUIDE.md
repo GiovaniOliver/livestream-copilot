@@ -126,6 +126,19 @@ npm run dev
 
 Open http://localhost:3000
 
+### 3b. Live Preview (OBS + MediaMTX)
+If you want the live preview:
+1. In OBS, click **Start Streaming**.
+2. OBS RTMP settings:
+- Server: `rtmp://localhost:1935/live` (stream key: `stream`)
+   - Stream Key: `stream`
+   - Stream Key: `stream`
+3. Optional checks:
+   ```bash
+   curl http://localhost:9997/v3/paths/list
+   curl http://localhost:8888/live/stream/index.m3u8
+   ```
+
 ### 4. Test Authentication
 
 1. Navigate to http://localhost:3000/auth/register

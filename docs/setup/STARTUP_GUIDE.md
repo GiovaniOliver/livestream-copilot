@@ -39,6 +39,11 @@ DEEPGRAM_API_KEY=your-deepgram-key-here
 OBS_WS_URL=ws://localhost:4455
 OBS_WS_PASSWORD=your-obs-password
 
+# MediaMTX Live Preview (RTMP ingest + WebRTC/HLS playback)
+# RTMP ingest path must be exactly live/stream (see OBS settings below)
+# WebRTC playback uses WHEP under the hood
+# Ports: RTMP 1935, WebRTC 8889, HLS 8888, MediaMTX API 9997
+
 # Server Ports
 HTTP_PORT=3123
 WS_PORT=3001
@@ -229,6 +234,23 @@ curl -X POST http://localhost:3123/session/start \
 
 2. **Check URL and password** in desktop-companion/.env match OBS settings
 
+### Live Preview Not Showing (OBS + MediaMTX)
+
+1. **Confirm OBS is streaming** (not just recording/virtual camera).
+2. **OBS RTMP settings**:
+- Server: `rtmp://localhost:1935/live` (stream key: `stream`)
+   - Stream Key: `stream`
+3. **Check MediaMTX active paths**:
+   ```bash
+   curl http://localhost:9997/v3/paths/list
+   ```
+   You should see `live/stream` with `ready: true`.
+4. **Check HLS playlist**:
+   ```bash
+   curl http://localhost:8888/live/stream/index.m3u8
+   ```
+5. If WebRTC connects but shows black video, HLS fallback will stabilize preview.
+
 ### STT Not Working
 
 1. **Verify Deepgram API key**:
@@ -303,6 +325,10 @@ curl -X POST http://localhost:3123/session/start \
 | Desktop Companion WebSocket | 3001 | Real-time events |
 | Web Dashboard | 3000 | Next.js dev server |
 | OBS WebSocket | 4455 | OBS integration |
+| MediaMTX RTMP | 1935 | OBS ingest |
+| MediaMTX WebRTC | 8889 | Low-latency preview |
+| MediaMTX HLS | 8888 | Fallback preview |
+| MediaMTX API | 9997 | Control API |
 | PostgreSQL | 5432 | Database |
 
 ## Next Steps

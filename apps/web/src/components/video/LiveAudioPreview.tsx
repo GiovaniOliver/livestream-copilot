@@ -192,6 +192,7 @@ export function LiveAudioPreview({
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const lastActiveAtRef = useRef<number>(0);
 
   const sizeClasses = {
     sm: "h-16",
@@ -252,6 +253,12 @@ export function LiveAudioPreview({
   const connectWebRTC = useCallback(async (): Promise<boolean> => {
     if (!audioRef.current) return false;
 
+    const toHttpUrl = (url: string) =>
+      url.replace(/^ws:\/\//i, "http://").replace(/^wss:\/\//i, "https://");
+    const normalizeUrl = (url: string) => url.replace(/\/+$/, "");
+    const ensureWhep = (url: string) =>
+      url.endsWith("/whep") ? url : `${url}/whep`;
+
     try {
       updateConnectionState("connecting");
 
@@ -287,35 +294,65 @@ export function LiveAudioPreview({
         }
       });
 
-      const response = await fetch(
-        webrtcUrl.replace("ws://", "http://").replace("wss://", "https://"),
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/sdp" },
-          body: pc.localDescription?.sdp,
-        }
-      );
+      const baseUrl = normalizeUrl(toHttpUrl(webrtcUrl));
+      const candidates = baseUrl.endsWith("/whep")
+        ? [baseUrl]
+        : [ensureWhep(baseUrl), baseUrl];
 
-      if (!response.ok) {
-        throw new Error(`WebRTC signaling failed: ${response.statusText}`);
+      let answerSdp: string | null = null;
+      let lastError: Error | null = null;
+
+      for (const url of candidates) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/sdp" },
+            body: pc.localDescription?.sdp,
+          });
+
+          if (!response.ok) {
+            throw new Error(`WebRTC signaling failed: ${response.statusText}`);
+          }
+
+          answerSdp = await response.text();
+          break;
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error("WebRTC signaling failed");
+        }
       }
 
-      const answerSdp = await response.text();
+      if (!answerSdp) {
+        throw lastError ?? new Error("WebRTC signaling failed");
+      }
+
       await pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
 
-      pc.onconnectionstatechange = () => {
-        switch (pc.connectionState) {
-          case "connected":
-            updateConnectionState("connected");
-            break;
-          case "disconnected":
-          case "failed":
-          case "closed":
-            updateConnectionState("disconnected");
-            break;
-        }
-      };
+      const connected = await new Promise<boolean>((resolve) => {
+        const timeout = setTimeout(() => resolve(false), 5000);
+        const handler = () => {
+          switch (pc.connectionState) {
+            case "connected":
+              clearTimeout(timeout);
+              pc.removeEventListener("connectionstatechange", handler);
+              resolve(true);
+              break;
+            case "disconnected":
+            case "failed":
+            case "closed":
+              clearTimeout(timeout);
+              pc.removeEventListener("connectionstatechange", handler);
+              resolve(false);
+              break;
+          }
+        };
+        pc.addEventListener("connectionstatechange", handler);
+      });
 
+      if (!connected) {
+        throw new Error("WebRTC connection failed");
+      }
+
+      updateConnectionState("connected");
       return true;
     } catch (error) {
       cleanup();
@@ -330,7 +367,12 @@ export function LiveAudioPreview({
     cleanup();
     setErrorMessage(null);
 
-    if (!isStreamActive) {
+    const now = Date.now();
+    if (isStreamActive) {
+      lastActiveAtRef.current = now;
+    }
+
+    if (!isStreamActive && now - lastActiveAtRef.current > 5000) {
       updateConnectionState("disconnected");
       return;
     }
@@ -344,17 +386,22 @@ export function LiveAudioPreview({
   }, [cleanup, isStreamActive, updateConnectionState, connectWebRTC, onError]);
 
   useEffect(() => {
+    const now = Date.now();
     if (isStreamActive) {
-      connect();
-    } else {
+      if (connectionState !== "connected") {
+        connect();
+      }
+    } else if (now - lastActiveAtRef.current > 5000) {
       cleanup();
       updateConnectionState("disconnected");
     }
+  }, [isStreamActive, connectionState, connect, cleanup, updateConnectionState]);
 
+  useEffect(() => {
     return () => {
       cleanup();
     };
-  }, [isStreamActive]);
+  }, [cleanup]);
 
   return (
     <div

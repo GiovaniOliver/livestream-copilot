@@ -223,9 +223,18 @@ export class MediaMTXManager {
       return;
     }
 
-    // Use the bundled config file (with API enabled) instead of generating a custom one
-    // The bundled config is in the same directory as the binary
-    this.configPath = path.join(path.dirname(this.binaryPath!), "mediamtx.yml");
+    // Prefer bundled config (with API enabled). If missing, generate one.
+    // Bundled config is expected next to the binary.
+    const bundledConfigPath = path.join(path.dirname(this.binaryPath!), "mediamtx.yml");
+    if (fs.existsSync(bundledConfigPath)) {
+      this.configPath = bundledConfigPath;
+    } else {
+      videoLogger.warn(
+        { bundledConfigPath },
+        "MediaMTX bundled config not found; generating config file"
+      );
+      this.configPath = this.generateConfigFile();
+    }
 
     videoLogger.info(
       {

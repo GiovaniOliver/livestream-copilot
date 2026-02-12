@@ -12,6 +12,7 @@ import {
 } from "@/components/ui";
 import { LiveVideoPreview, useLiveStream } from "@/components/video";
 import { ClipQueueDashboard } from "@/components/clip-queue";
+import { StreamDebugPanel } from "@/components/debug/StreamDebugPanel";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
 import { useClips } from "@/hooks/useClips";
@@ -30,6 +31,15 @@ interface MomentMarker {
   type: "hype" | "qa" | "sponsor" | "clip";
   timestamp: number;
   label: string;
+}
+
+interface ReplayBufferState {
+  active: boolean;
+  lastSavedAt?: number | null;
+  lastSavedPath?: string | null;
+  lastSaveRequestedAt?: number | null;
+  lastError?: string | null;
+  outputDir?: string | null;
 }
 
 // ============================================================
@@ -375,6 +385,11 @@ function calculateLiveDuration(startedAt: string): string {
   const secs = seconds % 60;
 
   return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
+function formatReplayTimestamp(ts?: number | null): string {
+  if (!ts) return "Never";
+  return new Date(ts).toLocaleTimeString();
 }
 
 // ============================================================
@@ -828,6 +843,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
 
   // OBS connection status
   const [isObsConnected, setIsObsConnected] = useState(false);
+  const [replayBuffer, setReplayBuffer] = useState<ReplayBufferState | null>(null);
 
   // Live duration ticker (for live sessions)
   const [liveDuration, setLiveDuration] = useState<string>("0:00:00");
@@ -898,8 +914,10 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
     try {
       const health = await getHealth();
       setIsObsConnected(health.components?.obs ?? false);
+      setReplayBuffer(health.components?.replayBuffer ?? null);
     } catch {
       setIsObsConnected(false);
+      setReplayBuffer(null);
     }
   }, []);
 
@@ -1069,19 +1087,30 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
           {/* Main Content - Video Preview */}
           <div className="lg:col-span-2">
             <Card variant="elevated">
-              <CardHeader>
-                <CardTitle>Live Preview</CardTitle>
-                <CardDescription>
-                  Real-time stream preview with highlight detection
-                </CardDescription>
-              </CardHeader>
+                <CardHeader>
+                  <CardTitle>Live Preview</CardTitle>
+                  <CardDescription>
+                    Real-time stream preview with highlight detection
+                  </CardDescription>
+                  {replayBuffer && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-text-dim">
+                      <Badge variant={replayBuffer.active ? "success" : "outline"}>
+                        Replay Buffer {replayBuffer.active ? "Active" : "Inactive"}
+                      </Badge>
+                      <span>Last save: {formatReplayTimestamp(replayBuffer.lastSavedAt)}</span>
+                      {replayBuffer.lastError && (
+                        <span className="text-red-400">Error: {replayBuffer.lastError}</span>
+                      )}
+                    </div>
+                  )}
+                </CardHeader>
               <CardContent>
                 {/* Live Video Preview */}
                 <div className="relative">
                   <LiveVideoPreview
                     webrtcUrl={videoStatus?.webrtcUrl}
                     hlsUrl={videoStatus?.hlsUrl}
-                    isStreamActive={videoStatus?.isStreaming ?? isObsConnected}
+                    isStreamActive={videoStatus?.isStreaming ?? false}
                     onConnectionChange={(connected) => {
                       // Optional: sync with OBS connection state if needed
                       if (connected && !isObsConnected) {
@@ -1098,6 +1127,11 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
                 </div>
               </CardContent>
             </Card>
+
+            <StreamDebugPanel
+              sessionId={sessionId}
+              isStreaming={videoStatus?.isStreaming ?? false}
+            />
           </div>
 
           {/* Sidebar - Detected Clips */}
@@ -1448,6 +1482,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
         sessionId={sessionId}
         isCollapsed={isClipQueueCollapsed}
         onToggleCollapse={() => setIsClipQueueCollapsed(!isClipQueueCollapsed)}
+        isStreaming={videoStatus?.isStreaming ?? false}
       />
     </div>
   );

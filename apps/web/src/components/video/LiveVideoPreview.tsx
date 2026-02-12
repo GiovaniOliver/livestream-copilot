@@ -141,6 +141,7 @@ export function LiveVideoPreview({
   const hlsRef = useRef<HlsType | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const trackReceivedRef = useRef(false);
 
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("disconnected");
@@ -148,8 +149,11 @@ export function LiveVideoPreview({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [latencyMs, setLatencyMs] = useState<number | null>(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const preferHlsUntilRef = useRef<number>(0);
+  const lastActiveAtRef = useRef<number>(0);
 
   const MAX_RECONNECT_ATTEMPTS = 3;
+  const WEBRTC_BACKOFF_MS = 30000;
 
   /**
    * Update connection state and notify parent
@@ -182,6 +186,7 @@ export function LiveVideoPreview({
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;
     }
+    trackReceivedRef.current = false;
   }, []);
 
   /**
@@ -217,6 +222,13 @@ export function LiveVideoPreview({
    */
   const connectWebRTC = useCallback(async (): Promise<boolean> => {
     if (!videoRef.current) return false;
+    if (typeof RTCPeerConnection === "undefined") return false;
+
+    const toHttpUrl = (url: string) =>
+      url.replace(/^ws:\/\//i, "http://").replace(/^wss:\/\//i, "https://");
+    const normalizeUrl = (url: string) => url.replace(/\/+$/, "");
+    const ensureWhep = (url: string) =>
+      url.endsWith("/whep") ? url : `${url}/whep`;
 
     try {
       updateConnectionState("connecting");
@@ -232,15 +244,26 @@ export function LiveVideoPreview({
       pc.addTransceiver("video", { direction: "recvonly" });
       pc.addTransceiver("audio", { direction: "recvonly" });
 
-      // Handle incoming tracks
-      pc.ontrack = (event) => {
-        if (videoRef.current && event.streams[0]) {
-          videoRef.current.srcObject = event.streams[0];
-          videoRef.current.play().catch(() => {
-            // Autoplay may be blocked
-          });
-        }
-      };
+      const mediaReady = new Promise<boolean>((resolve) => {
+        const timeout = setTimeout(() => resolve(false), 5000);
+        const onLoadedMetadata = () => {
+          clearTimeout(timeout);
+          resolve(true);
+        };
+
+        pc.ontrack = (event) => {
+          if (videoRef.current && event.streams[0]) {
+            trackReceivedRef.current = true;
+            videoRef.current.srcObject = event.streams[0];
+            videoRef.current.addEventListener("loadedmetadata", onLoadedMetadata, {
+              once: true,
+            });
+            videoRef.current.play().catch(() => {
+              // Autoplay may be blocked
+            });
+          }
+        };
+      });
 
       // Create offer
       const offer = await pc.createOffer();
@@ -261,43 +284,79 @@ export function LiveVideoPreview({
         }
       });
 
-      // Send offer to WHEP endpoint
-      const response = await fetch(webrtcUrl.replace("ws://", "http://").replace("wss://", "https://"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/sdp",
-        },
-        body: pc.localDescription?.sdp,
-      });
+      // Send offer to WHEP endpoint (MediaMTX expects /whep)
+      const baseUrl = normalizeUrl(toHttpUrl(webrtcUrl));
+      const candidates = baseUrl.endsWith("/whep")
+        ? [baseUrl]
+        : [ensureWhep(baseUrl), baseUrl];
 
-      if (!response.ok) {
-        throw new Error(`WebRTC signaling failed: ${response.statusText}`);
+      let answerSdp: string | null = null;
+      let lastError: Error | null = null;
+
+      for (const url of candidates) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/sdp",
+            },
+            body: pc.localDescription?.sdp,
+          });
+
+          if (!response.ok) {
+            throw new Error(`WebRTC signaling failed: ${response.statusText}`);
+          }
+
+          answerSdp = await response.text();
+          break;
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error("WebRTC signaling failed");
+        }
       }
 
-      const answerSdp = await response.text();
+      if (!answerSdp) {
+        throw lastError ?? new Error("WebRTC signaling failed");
+      }
+
       await pc.setRemoteDescription({
         type: "answer",
         sdp: answerSdp,
       });
 
-      // Monitor connection state
-      pc.onconnectionstatechange = () => {
-        switch (pc.connectionState) {
-          case "connected":
-            updateConnectionState("connected");
-            setLatencyMs(100); // WebRTC typically <500ms latency
-            setReconnectAttempts(0);
-            break;
-          case "disconnected":
-          case "failed":
-            updateConnectionState("disconnected");
-            break;
-          case "closed":
-            updateConnectionState("disconnected");
-            break;
-        }
-      };
+      // Monitor connection state and wait for a stable connection
+      const connected = await new Promise<boolean>((resolve) => {
+        const timeout = setTimeout(() => resolve(false), 5000);
+        const handler = () => {
+          switch (pc.connectionState) {
+            case "connected":
+              clearTimeout(timeout);
+              pc.removeEventListener("connectionstatechange", handler);
+              resolve(true);
+              break;
+            case "disconnected":
+            case "failed":
+            case "closed":
+              clearTimeout(timeout);
+              pc.removeEventListener("connectionstatechange", handler);
+              resolve(false);
+              break;
+          }
+        };
+        pc.addEventListener("connectionstatechange", handler);
+      });
 
+      if (!connected) {
+        throw new Error("WebRTC connection failed");
+      }
+
+      const hasMedia = await mediaReady;
+      if (!hasMedia) {
+        throw new Error("WebRTC connected but no media received");
+      }
+
+      updateConnectionState("connected");
+      setLatencyMs(100); // WebRTC typically <500ms latency
+      setReconnectAttempts(0);
       return true;
     } catch (error) {
       cleanupWebRTC();
@@ -314,6 +373,29 @@ export function LiveVideoPreview({
     try {
       updateConnectionState("connecting");
       setStreamMode("hls");
+
+      // Confirm HLS playlist is reachable before attaching
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2000);
+      let hlsReady = false;
+
+      try {
+        const response = await fetch(hlsUrl, {
+          method: "GET",
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        hlsReady = response.ok;
+      } catch {
+        hlsReady = false;
+      } finally {
+        clearTimeout(timeout);
+      }
+
+      if (!hlsReady) {
+        cleanupHLS();
+        return false;
+      }
 
       // Check if HLS is supported natively (Safari)
       if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
@@ -404,17 +486,27 @@ export function LiveVideoPreview({
     cleanup();
     setErrorMessage(null);
 
+    const now = Date.now();
+    if (isStreamActive) {
+      lastActiveAtRef.current = now;
+    }
+
     // Only attempt connection if stream is expected to be active
-    if (!isStreamActive) {
+    if (!isStreamActive && now - lastActiveAtRef.current > 5000) {
       updateConnectionState("disconnected");
       setStreamMode("none");
       return;
     }
 
-    // Try WebRTC first for lowest latency
-    const webrtcSuccess = await connectWebRTC();
-    if (webrtcSuccess) {
-      return;
+    const shouldSkipWebRTC = now < preferHlsUntilRef.current;
+    if (!shouldSkipWebRTC) {
+      // Try WebRTC first for lowest latency
+      const webrtcSuccess = await connectWebRTC();
+      if (webrtcSuccess) {
+        return;
+      }
+      // Back off WebRTC for a bit if it failed
+      preferHlsUntilRef.current = Date.now() + WEBRTC_BACKOFF_MS;
     }
 
     // Fall back to HLS
@@ -456,18 +548,23 @@ export function LiveVideoPreview({
    * Effect to handle connection when stream becomes active
    */
   useEffect(() => {
+    const now = Date.now();
     if (isStreamActive) {
-      connect();
-    } else {
+      if (connectionState !== "connected") {
+        connect();
+      }
+    } else if (now - lastActiveAtRef.current > 5000) {
       cleanup();
       updateConnectionState("disconnected");
       setStreamMode("none");
     }
+  }, [isStreamActive, connect, cleanup, updateConnectionState, connectionState]);
 
+  useEffect(() => {
     return () => {
       cleanup();
     };
-  }, [isStreamActive, connect, cleanup, updateConnectionState]);
+  }, [cleanup]);
 
   /**
    * Render content based on connection state

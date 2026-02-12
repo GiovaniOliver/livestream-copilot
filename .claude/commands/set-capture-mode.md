@@ -1,8 +1,3 @@
-Update `captureMode` for the active session.
+Alias for `/live-set-capture-mode`. See [live-set-capture-mode.md](./live-set-capture-mode.md) for full details.
 
-Rules:
-- If set to `audio`, stop screenshot sampling and clip generation.
-- If set to `video`, disable transcript-dependent outputs unless OCR/visual tags are enabled.
-- If set to `av`, enable full pipeline.
-
-Write changes to `session/current/session.config.json` and emit a status message.
+Update the current session capture mode to one of: `audio`, `video`, `av`.

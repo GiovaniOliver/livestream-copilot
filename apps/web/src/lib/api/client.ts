@@ -72,6 +72,13 @@ const BASE_URL = API_CONFIG.baseUrl;
 const DEFAULT_TIMEOUT = API_CONFIG.timeout;
 const isDev = API_CONFIG.enableLogging;
 
+if (isDev) {
+  logger.debug("[API] Using baseUrl/wsUrl", {
+    baseUrl: API_CONFIG.baseUrl,
+    wsUrl: API_CONFIG.wsUrl,
+  });
+}
+
 /**
  * API error with status code and response body
  *

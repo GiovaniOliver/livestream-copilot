@@ -84,6 +84,22 @@ Open browser to: http://localhost:3000
 ### 3. Check WebSocket
 Open browser console and check WebSocket connection status in the dashboard header.
 
+### 4. Verify Live Preview (OBS + MediaMTX)
+1. In OBS, click **Start Streaming**.
+2. OBS RTMP settings must be:
+- Server: `rtmp://localhost:1935/live` (stream key: `stream`)
+   - Stream Key: `stream`
+   - Stream Key: `stream`
+3. Confirm MediaMTX sees the stream:
+   ```cmd
+   curl http://localhost:9997/v3/paths/list
+   ```
+   Expect a path named `live/stream` with `ready: true`.
+4. Confirm HLS playlist:
+   ```cmd
+   curl http://localhost:8888/live/stream/index.m3u8
+   ```
+
 ---
 
 ## Common Issues
@@ -185,6 +201,10 @@ cd apps\desktop-companion
 | Backend API | 3123 | http://localhost:3123 |
 | WebSocket | 3124 | ws://localhost:3124 |
 | Web App | 3000 | http://localhost:3000 |
+| MediaMTX RTMP | 1935 | rtmp://localhost:1935/live (stream key: `stream`) |
+| MediaMTX WebRTC (WHEP) | 8889 | http://localhost:8889/live/stream/whep |
+| MediaMTX HLS | 8888 | http://localhost:8888/live/stream/index.m3u8 |
+| MediaMTX API | 9997 | http://localhost:9997 |
 | Prisma Studio | 5555 | http://localhost:5555 |
 | Expo Dev | Auto | Check terminal for QR code |
 

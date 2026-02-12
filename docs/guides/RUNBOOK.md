@@ -207,7 +207,50 @@ npm run db:studio  # Should open Prisma Studio
 2. Check audio input is being captured
 3. Verify microphone permissions
 
+### Issue: Live Preview Flickers / Black Screen (OBS + MediaMTX)
+
+**Symptoms**:
+- Live preview rapidly toggles between loading and connected
+- WebRTC shows connected but video is black
+- HLS playlist returns 404
+
+**Diagnosis**:
+```bash
+# OBS streaming status (desktop companion)
+curl http://localhost:3125/api/obs/status
+
+# MediaMTX active paths
+curl http://localhost:9997/v3/paths/list
+
+# HLS playlist availability
+curl http://localhost:8888/live/stream/index.m3u8
+```
+
+**Resolution**:
+1. Confirm OBS is **Streaming** (not just Recording/Virtual Camera).
+2. Ensure OBS RTMP settings:
+  - Server: `rtmp://localhost:1935/live` (stream key: `stream`)
+   - Stream Key: `stream`
+3. Verify MediaMTX reports an active path named `live/stream`.
+4. If WebRTC connects without video, allow HLS fallback to stabilize preview.
+
+**Notes**:
+- MediaMTX WebRTC uses **WHEP**; preview now attempts `/whep` first and falls back if needed.
+- Preview is debounced to avoid resets when `streamActive` briefly blips.
+
 ## Rollback Procedures
+
+## Recent Fixes (2026-02-09)
+
+### Live Preview Stability
+- **WebRTC signaling** now prefers WHEP endpoint and falls back if needed.
+- **Fallback logic** avoids marking WebRTC connected until media is received.
+- **Reconnect behavior** debounced to prevent rapid teardown/reconnect loops.
+- **HLS fallback** prioritized when WebRTC fails repeatedly.
+
+**Files Updated**:
+- `apps/web/src/components/video/LiveVideoPreview.tsx`
+- `apps/web/src/components/video/LiveAudioPreview.tsx`
 
 ### Application Rollback
 

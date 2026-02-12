@@ -17,6 +17,8 @@ import type { EventEnvelope } from "@livestream-copilot/shared";
 import type { ClipQueueItem } from "../db/services/clip-queue.service.js";
 
 import { logger } from '../logger/index.js';
+
+const OBS_REPLAY_OUTPUT_DIR = process.env.OBS_REPLAY_OUTPUT_DIR;
 /**
  * Processing options
  */
@@ -147,7 +149,9 @@ export class ClipQueueProcessor {
       const replayBufferPath = await this.findReplayBuffer(sessionDir);
 
       if (!replayBufferPath) {
-        throw new Error("Replay buffer not found");
+        throw new Error(
+          "Replay buffer not found. Check OBS replay buffer is enabled and OBS_REPLAY_OUTPUT_DIR is set."
+        );
       }
 
       // Calculate session started time
@@ -214,30 +218,60 @@ export class ClipQueueProcessor {
     try {
       // Look for replay buffer files in session directory
       const files = await fs.readdir(sessionDir);
-      const replayFiles = files.filter(
-        (f) => f.startsWith("replay") && (f.endsWith(".mp4") || f.endsWith(".mkv"))
-      );
+      const replayFiles = files.filter((f) => /\.(mp4|mkv|flv|mov|ts)$/i.test(f));
 
       if (replayFiles.length === 0) {
         // Also check parent directory for replay buffer
         const parentDir = path.dirname(sessionDir);
         const parentFiles = await fs.readdir(parentDir);
-        const parentReplayFiles = parentFiles.filter(
-          (f) => f.startsWith("replay") && (f.endsWith(".mp4") || f.endsWith(".mkv"))
-        );
+        const parentReplayFiles = parentFiles.filter((f) => /\.(mp4|mkv|flv|mov|ts)$/i.test(f));
 
-        if (parentReplayFiles.length > 0) {
-          // Return most recent
-          parentReplayFiles.sort().reverse();
-          return path.join(parentDir, parentReplayFiles[0]);
+          if (parentReplayFiles.length > 0) {
+            const parentCandidates = await Promise.all(
+              parentReplayFiles.map(async (f) => {
+                const fullPath = path.join(parentDir, f);
+                const stats = await fs.stat(fullPath);
+                return { path: fullPath, mtime: stats.mtimeMs };
+              })
+            );
+            parentCandidates.sort((a, b) => b.mtime - a.mtime);
+            return parentCandidates[0].path;
+          }
+
+        // Fallback: check OBS replay output directory if configured
+        if (OBS_REPLAY_OUTPUT_DIR) {
+          try {
+            const obsFiles = await fs.readdir(OBS_REPLAY_OUTPUT_DIR);
+            const obsReplayFiles = obsFiles.filter((f) => /\.(mp4|mkv|flv|mov|ts)$/i.test(f));
+            if (obsReplayFiles.length > 0) {
+              const obsCandidates = await Promise.all(
+                obsReplayFiles.map(async (f) => {
+                  const fullPath = path.join(OBS_REPLAY_OUTPUT_DIR, f);
+                  const stats = await fs.stat(fullPath);
+                  return { path: fullPath, mtime: stats.mtimeMs };
+                })
+              );
+              obsCandidates.sort((a, b) => b.mtime - a.mtime);
+              return obsCandidates[0].path;
+            }
+          } catch {
+            // ignore
+          }
         }
 
         return null;
       }
 
       // Return most recent
-      replayFiles.sort().reverse();
-      return path.join(sessionDir, replayFiles[0]);
+      const candidates = await Promise.all(
+        replayFiles.map(async (f) => {
+          const fullPath = path.join(sessionDir, f);
+          const stats = await fs.stat(fullPath);
+          return { path: fullPath, mtime: stats.mtimeMs };
+        })
+      );
+      candidates.sort((a, b) => b.mtime - a.mtime);
+      return candidates[0].path;
     } catch {
       return null;
     }
