@@ -128,7 +128,7 @@ describe("useSessions Hook", () => {
 
       expect(result.current.sessions).toHaveLength(2);
       expect(result.current.error).toBeNull();
-      expect(sessionsApi.getSessions).toHaveBeenCalledWith(50, 0, mockAccessToken);
+      expect(sessionsApi.getSessions).toHaveBeenCalledWith(50, 0, mockAccessToken, {});
     });
 
     it("should identify active session from loaded sessions", async () => {
@@ -238,7 +238,7 @@ describe("useSessions Hook", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(sessionsApi.getSessions).toHaveBeenCalledWith(50, 0, mockAccessToken);
+      expect(sessionsApi.getSessions).toHaveBeenCalledWith(50, 0, mockAccessToken, {});
     });
   });
 

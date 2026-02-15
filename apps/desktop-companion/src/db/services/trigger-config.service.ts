@@ -79,8 +79,8 @@ function parseTriggerConfig(raw: {
 }): TriggerConfig {
   return {
     ...raw,
-    audioTriggers: (raw.audioTriggers as AudioTrigger[]) ?? [],
-    visualTriggers: (raw.visualTriggers as VisualTrigger[]) ?? [],
+    audioTriggers: (raw.audioTriggers as unknown as AudioTrigger[]) ?? [],
+    visualTriggers: (raw.visualTriggers as unknown as VisualTrigger[]) ?? [],
   };
 }
 

@@ -75,7 +75,6 @@ interface ClipApiResponse {
   duration: number;
   thumbnailId: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 function transformClip(clip: ClipWithDuration): ClipApiResponse {
@@ -89,7 +88,6 @@ function transformClip(clip: ClipWithDuration): ClipApiResponse {
     duration: clip.duration,
     thumbnailId: clip.thumbnailId,
     createdAt: clip.createdAt.toISOString(),
-    updatedAt: clip.updatedAt.toISOString(),
   };
 }
 

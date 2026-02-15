@@ -4,12 +4,19 @@
  * Type definitions for social media export functionality.
  */
 
-export {
+import {
   ExportType,
   ExportStatus,
   SocialPlatform,
   ExportFormat
 } from "../generated/prisma/enums.js";
+
+export {
+  ExportType,
+  ExportStatus,
+  SocialPlatform,
+  ExportFormat
+};
 
 /**
  * Platform-specific character limits and constraints

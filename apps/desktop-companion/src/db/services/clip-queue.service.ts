@@ -47,7 +47,7 @@ export interface UpdateClipQueueItemInput {
   t1?: number;
   thumbnailPath?: string;
   title?: string;
-  errorMessage?: string;
+  errorMessage?: string | null;
 }
 
 export interface ClipQueueFilters {

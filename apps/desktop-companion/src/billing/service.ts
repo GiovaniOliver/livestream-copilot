@@ -149,13 +149,15 @@ export const PLANS: Record<string, PlanConfig> = {
 
 /**
  * Helper to ensure Stripe is configured before using billing features.
+ * Returns the narrowed Stripe instance to avoid TS module-level narrowing limitations.
  */
-function ensureStripeConfigured(): asserts stripe is Stripe {
+function getStripe(): Stripe {
   if (!stripe) {
     throw new Error(
       "Stripe is not configured. Set STRIPE_SECRET_KEY in your environment variables to enable billing features."
     );
   }
+  return stripe;
 }
 
 class BillingService {
@@ -168,7 +170,7 @@ class BillingService {
     successUrl: string,
     cancelUrl: string
   ): Promise<CheckoutSessionResult> {
-    ensureStripeConfigured();
+    const stripeClient = getStripe();
 
     // Get or create Stripe customer
     const org = await prisma.organization.findUnique({
@@ -184,7 +186,7 @@ class BillingService {
 
     if (!customerId) {
       // Create Stripe customer
-      const customer = await stripe.customers.create({
+      const customer = await stripeClient.customers.create({
         email: org.owner.email,
         name: org.name,
         metadata: {
@@ -210,7 +212,7 @@ class BillingService {
     }
 
     // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripeClient.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       mode: "subscription",
@@ -245,7 +247,7 @@ class BillingService {
     organizationId: string,
     returnUrl: string
   ): Promise<PortalSessionResult> {
-    ensureStripeConfigured();
+    const stripeClient = getStripe();
 
     const subscription = await prisma.subscription.findUnique({
       where: { organizationId },
@@ -255,7 +257,7 @@ class BillingService {
       throw new Error("No billing account found");
     }
 
-    const session = await stripe.billingPortal.sessions.create({
+    const session = await stripeClient.billingPortal.sessions.create({
       customer: subscription.stripeCustomerId,
       return_url: returnUrl,
     });
@@ -299,7 +301,7 @@ class BillingService {
     payload: string | Buffer,
     signature: string
   ): Promise<void> {
-    ensureStripeConfigured();
+    const stripeClient = getStripe();
 
     const webhookSecret = config.STRIPE_WEBHOOK_SECRET;
 
@@ -307,7 +309,7 @@ class BillingService {
       throw new Error("Stripe webhook secret not configured");
     }
 
-    const event = stripe.webhooks.constructEvent(
+    const event = stripeClient.webhooks.constructEvent(
       payload,
       signature,
       webhookSecret
