@@ -36,6 +36,7 @@ import { WebSocketServer } from "ws";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
+import net from "net";
 import OBSWebSocket from "obs-websocket-js";
 import { config } from "./config/index.js";
 import { withOpikTrace } from "./observability/opik.js";
@@ -234,9 +235,28 @@ function nowMs() {
   return Date.now();
 }
 
+function isPortAvailable(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const tester = net
+      .createServer()
+      .once("error", (err: NodeJS.ErrnoException) => {
+        if (err.code === "EADDRINUSE") {
+          resolve(false);
+          return;
+        }
+        logger.warn({ err, port }, "Unexpected error while checking port availability");
+        resolve(false);
+      })
+      .once("listening", () => {
+        tester.close(() => resolve(true));
+      })
+      .listen(port, "0.0.0.0");
+  });
+}
+
 function sessionPath(...parts: string[]) {
   if (!session) throw new Error("No active session");
-  return path.join(SESSION_DIR, session.config.sessionId, ...parts);
+  return path.join(SESSION_DIR, session.config.sessionId!, ...parts);
 }
 
 function appendEvent(ev: EventEnvelope) {
@@ -270,7 +290,7 @@ function emitEvent(wsServer: WebSocketServer, ev: EventEnvelope) {
   if (session && agentRouter.isEnabled()) {
     agentRouter
       .routeEvent(ev, {
-        sessionId: session.config.sessionId,
+        sessionId: session.config.sessionId!,
         dbSessionId: session.dbId,
         workflow: session.config.workflow as any,
         title: session.config.title,
@@ -296,11 +316,11 @@ async function connectOBS() {
         replayBufferState.lastError = null;
         obsLogger.info({ path: lastReplayBufferPath }, "Replay buffer saved");
       });
-      obs.on("ReplayBufferStarted", () => {
+      (obs as any).on("ReplayBufferStarted", () => {
         replayBufferState.active = true;
         replayBufferState.lastError = null;
       });
-      obs.on("ReplayBufferStopped", () => {
+      (obs as any).on("ReplayBufferStopped", () => {
         replayBufferState.active = false;
       });
   } catch (err) {
@@ -363,6 +383,13 @@ async function connectOBS() {
       return null;
     }
   }
+
+async function startReplayBuffer(): Promise<void> {
+  const status = await obs.call("GetReplayBufferStatus");
+  if (!status.outputActive) {
+    await obs.call("StartReplayBuffer");
+  }
+}
 
 async function takeScreenshot(sceneOrSourceName: string, outputPath: string) {
   // Screenshot a source by name. The caller controls where to store it.
@@ -632,6 +659,7 @@ async function main() {
   // Sessions Routes (API v1)
   // =============================================================================
   app.use("/api/sessions", sessionsRouter);
+  app.use("/sessions", sessionsRouter);
   apiLogger.info("Sessions routes mounted at /api/sessions");
 
   // =============================================================================
@@ -639,6 +667,7 @@ async function main() {
   // =============================================================================
   app.use("/api/clips", clipsRouter);
   app.use("/api/sessions/:sessionId/clips", sessionClipsRouter);
+  app.use("/sessions/:sessionId/clips", sessionClipsRouter);
   apiLogger.info("Clips routes mounted at /api/clips and /api/sessions/:sessionId/clips");
 
   // =============================================================================
@@ -653,6 +682,7 @@ async function main() {
   // =============================================================================
   app.use("/api/events", eventsRouter);
   app.use("/api/sessions/:sessionId/events", sessionEventsRouter);
+  app.use("/sessions/:sessionId/events", sessionEventsRouter);
   apiLogger.info("Events routes mounted at /api/events and /api/sessions/:sessionId/events");
 
   // =============================================================================
@@ -732,6 +762,18 @@ async function main() {
       },
     });
   });
+  app.get("/agents/status", (_req, res) => {
+    const stats = agentRouter.getStats();
+    res.json({
+      ok: true,
+      enabled: stats.enabled,
+      workflowCount: stats.workflowCount,
+      agentCount: stats.agentCount,
+      activeSessionCount: stats.activeSessionCount,
+      aiProvider: config.AI_PROVIDER,
+      aiModel: config.AI_MODEL,
+    });
+  });
   apiLogger.info("Agent observability routes mounted at /api/agents");
 
   let wss: WebSocketServer;
@@ -740,6 +782,9 @@ async function main() {
     const started = await startWebSocketServer(CONFIG_WS_PORT);
     wss = started.server;
     wsPort = started.port;
+    wss.on("error", (err) => {
+      logger.error({ err, port: wsPort }, "WebSocket server error");
+    });
     if (wsPort !== CONFIG_WS_PORT) {
       logger.warn(
         { configuredPort: CONFIG_WS_PORT, activePort: wsPort },
@@ -1128,11 +1173,32 @@ async function main() {
     }
   });
 
+  app.post("/clip/start", async (req, res) => {
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
+    const now = typeof req.body?.t === "number" ? req.body.t : nowMs();
+    session.clipStartT = now;
+    return res.json({ ok: true, t: now });
+  });
+
+  app.post("/clip/end", async (req, res) => {
+    try {
+      const now = typeof req.body?.t === "number" ? req.body.t : nowMs();
+      const result = await createClipInternal(now);
+      return res.json(result);
+    } catch (err: any) {
+      const statusCode = err.message === "No active session" ? 404 : 500;
+      apiLogger.error({ err }, "Failed to create clip");
+      return res.status(statusCode).json({ ok: false, error: err.message });
+    }
+  });
+
   // Screenshot handler (used by both /screenshot and /frame)
   const screenshotHandler: express.RequestHandler = async (req, res) => {
-        if (!session) {
-          return res.status(409).json({ ok: false, error: "No active session. Start a session first." });
-        }
+    if (!session) {
+      return res.status(409).json({ ok: false, error: "No active session. Start a session first." });
+    }
 
     try {
       const { sourceName } = req.body;
@@ -1184,7 +1250,7 @@ async function main() {
       }
 
       const sttConfig: STTStartConfig = {
-        sessionId: session.config.sessionId,
+        sessionId: session.config.sessionId!,
         sessionStartedAt: session.t0UnixMs,
         language: req.body.language || "en-US",
         enableDiarization: req.body.diarization !== false,
@@ -1221,18 +1287,23 @@ async function main() {
 
   const sendSttAudioHandler: express.RequestHandler = async (req, res) => {
     try {
-      let audioBuffer: Buffer;
+      let audioBuffer: Buffer | null = null;
 
       if (Buffer.isBuffer(req.body)) {
         audioBuffer = req.body;
-      } else if (req.body && typeof req.body.audio === "string") {
-        audioBuffer = Buffer.from(req.body.audio, "base64");
-      } else {
-        return res.status(400).json({ ok: false, error: "Audio data required (raw buffer or { audio: base64 })" });
+      } else if (req.body?.audio && typeof req.body.audio === "string") {
+        const base64 = req.body.audio.includes(",")
+          ? req.body.audio.split(",")[1]
+          : req.body.audio;
+        audioBuffer = Buffer.from(base64, "base64");
+      }
+
+      if (!audioBuffer) {
+        return res.status(400).json({ ok: false, error: "Audio data required" });
       }
 
       await sttManager.sendAudio(audioBuffer);
-      return res.json({ ok: true });
+      return res.json({ ok: true, bytesReceived: audioBuffer.length });
     } catch (err: any) {
       sttLogger.error({ err }, "Failed to send audio");
       return res.status(500).json({ ok: false, error: err.message });
@@ -1315,31 +1386,30 @@ async function main() {
       version: "1.0.0",
       uptime: process.uptime(),
       timestamp: new Date().toISOString(),
-      // Top-level convenience fields
       database: dbHealthy,
       ffmpeg: ffmpegReady,
       agents: agentRouter.isEnabled(),
       sessionId: session?.config.sessionId ?? null,
-        components: {
-          database: dbHealthy,
-          obs: obs.identified,
-          stt: sttConfigured,
-          ai: aiConfigured,
-          ffmpeg: ffmpegReady,
-          agents: agentRouter.isEnabled(),
-          replayBuffer: {
-            active: replayBufferState.active,
-            lastSavedAt: replayBufferState.lastSavedAt,
-            lastSavedPath: replayBufferState.lastSavedPath,
-            lastSaveRequestedAt: replayBufferState.lastSaveRequestedAt,
-            lastError: replayBufferState.lastError,
-            outputDir: OBS_REPLAY_OUTPUT_DIR ?? null,
-          },
-          video: {
-            enabled: videoStatus.enabled,
-            serverRunning: videoStatus.serverRunning,
-            streamActive: videoStatus.streamActive,
-          },
+      components: {
+        database: dbHealthy,
+        obs: obs.identified,
+        stt: sttConfigured,
+        ai: aiConfigured,
+        ffmpeg: ffmpegReady,
+        agents: agentRouter.isEnabled(),
+        replayBuffer: {
+          active: replayBufferState.active,
+          lastSavedAt: replayBufferState.lastSavedAt,
+          lastSavedPath: replayBufferState.lastSavedPath,
+          lastSaveRequestedAt: replayBufferState.lastSaveRequestedAt,
+          lastError: replayBufferState.lastError,
+          outputDir: OBS_REPLAY_OUTPUT_DIR ?? null,
+        },
+        video: {
+          enabled: videoStatus.enabled,
+          serverRunning: videoStatus.serverRunning,
+          streamActive: videoStatus.streamActive,
+        },
       },
       session: session
         ? {
