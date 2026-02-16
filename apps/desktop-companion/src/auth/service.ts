@@ -972,9 +972,8 @@ export const authService = {
       data: {
         userId: user.id,
         email: normalizedEmail,
-        token: resetHash, // Store hash, not plaintext
+        tokenHash: resetHash, // Store hash, not plaintext
         expiresAt: resetExpiry,
-        used: false,
       },
     });
 
@@ -1011,12 +1010,11 @@ export const authService = {
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const tokenHash = hashToken(token);
 
-    // Find all non-expired, unused password reset tokens
+    // Find all non-expired password reset tokens
     // We query multiple tokens to use constant-time comparison for security
     const resetTokens = await prisma.passwordResetToken.findMany({
       where: {
         expiresAt: { gt: new Date() },
-        used: false,
       },
       include: { user: true },
     });
@@ -1025,7 +1023,7 @@ export const authService = {
     // This prevents timing attacks that could reveal valid token hashes
     let matchedReset: typeof resetTokens[0] | null = null;
     for (const reset of resetTokens) {
-      const bufferA = Buffer.from(reset.token, "hex");
+      const bufferA = Buffer.from(reset.tokenHash, "hex");
       const bufferB = Buffer.from(tokenHash, "hex");
 
       // Ensure same length before timing-safe comparison
@@ -1087,10 +1085,9 @@ export const authService = {
           // status: UserStatus.ACTIVE,
         },
       }),
-      // Mark token as used (single-use tokens)
-      prisma.passwordResetToken.update({
+      // Delete token after use (single-use tokens)
+      prisma.passwordResetToken.delete({
         where: { id: matchedReset.id },
-        data: { used: true },
       }),
       // Revoke all existing sessions for security
       // Forces user to log in with new password
@@ -1103,14 +1100,11 @@ export const authService = {
       }),
     ]);
 
-    // Clean up old expired and used tokens for this user
+    // Clean up old expired tokens for this user
     await prisma.passwordResetToken.deleteMany({
       where: {
         userId: matchedReset.userId,
-        OR: [
-          { expiresAt: { lt: new Date() } },
-          { used: true },
-        ],
+        expiresAt: { lt: new Date() },
       },
     });
 

@@ -40,8 +40,9 @@ describe("useExport Hook", () => {
     id: "content-123",
     type: "clip",
     title: "Test Clip",
-    thumbnail: "https://example.com/thumb.jpg",
+    thumbnailUrl: "https://example.com/thumb.jpg",
     duration: 30,
+    createdAt: new Date(),
   };
 
   const mockExportRequest: ExportRequest = {
@@ -190,7 +191,7 @@ describe("useExport Hook", () => {
       const onError = vi.fn();
       const { result } = renderHook(() => useExport({ onError }));
 
-      let error: Error | null = null;
+      let error: Error | undefined;
       await act(async () => {
         try {
           await result.current.handleExport(mockExportRequest);
@@ -199,7 +200,7 @@ describe("useExport Hook", () => {
         }
       });
 
-      expect(error?.message).toBe("Failed to start export");
+      expect(error!.message).toBe("Failed to start export");
 
       // Wait for error state to be updated
       await waitFor(() => {
@@ -232,7 +233,7 @@ describe("useExport Hook", () => {
       const onError = vi.fn();
       const { result } = renderHook(() => useExport({ onError }));
 
-      let exportError: Error | null = null;
+      let exportError: Error | undefined;
       let exportPromise: Promise<any>;
 
       await act(async () => {
@@ -252,7 +253,7 @@ describe("useExport Hook", () => {
         await vi.runAllTimersAsync();
       });
 
-      expect(exportError?.message).toBe("Encoding failed");
+      expect(exportError!.message).toBe("Encoding failed");
       expect(result.current.progress.status).toBe("error");
       expect(onError).toHaveBeenCalled();
     });
@@ -315,6 +316,7 @@ describe("useExport Hook", () => {
         id: "clip-1",
         type: "clip",
         title: "Test Clip",
+        createdAt: new Date(),
       };
 
       const suggestions = result.current.generateHashtagSuggestions(clipContent);
@@ -332,6 +334,7 @@ describe("useExport Hook", () => {
         id: "post-1",
         type: "post",
         title: "Test Post",
+        createdAt: new Date(),
       };
 
       const suggestions = result.current.generateHashtagSuggestions(postContent);
@@ -348,6 +351,7 @@ describe("useExport Hook", () => {
         id: "any-1",
         type: "clip",
         title: "Any Content",
+        createdAt: new Date(),
       };
 
       const suggestions = result.current.generateHashtagSuggestions(content);
@@ -455,12 +459,14 @@ describe("useExport Hook", () => {
       vi.useFakeTimers();
 
       const contents: ExportContent[] = [
-        { id: "content-1", type: "clip", title: "Clip 1" },
-        { id: "content-2", type: "clip", title: "Clip 2" },
+        { id: "content-1", type: "clip", title: "Clip 1", createdAt: new Date() },
+        { id: "content-2", type: "clip", title: "Clip 2", createdAt: new Date() },
       ];
 
       const baseRequest: Omit<ExportRequest, "contentId"> = {
         platforms: ["youtube"],
+        caption: "",
+        hashtags: [],
         formatOptions: { format: "mp4", quality: "1080p", aspectRatio: "16:9" },
       };
 

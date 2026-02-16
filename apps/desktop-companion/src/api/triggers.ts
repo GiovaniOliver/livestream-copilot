@@ -20,19 +20,21 @@ import { config } from "../config/index.js";
 
 import { apiLogger } from '../logger/index.js';
 // Multer will be lazy-loaded when needed
-let _multer: typeof import("multer") | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _multerInstance: any = null;
 let _multerLoadAttempted = false;
 
-async function getMulter() {
+async function getMulter(): Promise<any> {
   if (!_multerLoadAttempted) {
     _multerLoadAttempted = true;
     try {
-      _multer = await import("multer");
+      const mod = await import("multer");
+      _multerInstance = mod.default ?? mod;
     } catch {
       apiLogger.warn("[triggers] multer not available - file upload disabled");
     }
   }
-  return _multer?.default;
+  return _multerInstance;
 }
 
 // =============================================================================
@@ -113,11 +115,11 @@ async function uploadImageMiddleware(
   }
 
   const storage = multer.diskStorage({
-    destination: async (_req, _file, cb) => {
+    destination: async (_req: Express.Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
       await ensureUploadDir();
       cb(null, UPLOAD_DIR);
     },
-    filename: (_req, file, cb) => {
+    filename: (_req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
       const ext = path.extname(file.originalname);
       cb(null, `ref-${uniqueSuffix}${ext}`);
@@ -129,7 +131,7 @@ async function uploadImageMiddleware(
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB max
     },
-    fileFilter: (_req, file, cb) => {
+    fileFilter: (_req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, acceptFile?: boolean) => void) => {
       const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
       if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);

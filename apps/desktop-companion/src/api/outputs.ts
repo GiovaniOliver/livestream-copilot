@@ -374,7 +374,7 @@ async function regenerateOutputHandler(req: Request, res: Response): Promise<voi
 
     // Check if AI is configured
     if (!isAIConfigured()) {
-      logger.warn({ outputId: id }, "Regenerate attempt without AI configured");
+      apiLogger.warn({ outputId: id }, "Regenerate attempt without AI configured");
       sendError(res, 503, "AI_NOT_CONFIGURED", "AI service is not configured.");
       return;
     }
@@ -386,7 +386,7 @@ async function regenerateOutputHandler(req: Request, res: Response): Promise<voi
       return;
     }
 
-    logger.info({
+    apiLogger.info({
       outputId: id,
       sessionId: existingOutput.sessionId,
       category: existingOutput.category,
@@ -413,7 +413,7 @@ async function regenerateOutputHandler(req: Request, res: Response): Promise<voi
 
     // Validate regenerated content is not empty
     if (!regeneratedText) {
-      logger.error({ outputId: id }, "AI returned empty content");
+      apiLogger.error({ outputId: id }, "AI returned empty content");
       sendError(res, 500, "AI_ERROR", "Failed to generate content.");
       return;
     }
@@ -436,7 +436,7 @@ async function regenerateOutputHandler(req: Request, res: Response): Promise<voi
 
     const durationMs = Date.now() - startTime;
 
-    logger.info({
+    apiLogger.info({
       outputId: id,
       sessionId: existingOutput.sessionId,
       durationMs,
@@ -454,7 +454,7 @@ async function regenerateOutputHandler(req: Request, res: Response): Promise<voi
   } catch (error) {
     const durationMs = Date.now() - startTime;
 
-    logger.error({
+    apiLogger.error({
       err: error,
       outputId: id,
       durationMs,

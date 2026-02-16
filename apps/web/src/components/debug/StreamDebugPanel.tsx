@@ -172,7 +172,10 @@ export function StreamDebugPanel({ sessionId, isStreaming }: StreamDebugPanelPro
                       <span>{new Date(event.ts).toLocaleTimeString()}</span>
                     </div>
                     <div className="mt-1 text-text-dim">
-                      {event.payload?.triggerSource ?? event.payload?.text ?? event.payload?.title ?? "—"}
+                      {(() => {
+                        const p = event.payload as Record<string, unknown>;
+                        return (p.triggerSource as string) ?? (p.text as string) ?? (p.title as string) ?? "—";
+                      })()}
                     </div>
                   </div>
                 ))

@@ -141,15 +141,17 @@ export function createMockSession(overrides = {}) {
 /**
  * Create a mock API session response
  */
-export function createMockApiSession(overrides = {}) {
+export function createMockApiSession(overrides: Record<string, unknown> = {}) {
   return {
     id: "test-session-id",
-    workflow: "streamer",
-    captureMode: "av",
+    workflow: "streamer" as const,
+    captureMode: "av" as const,
     title: "Test Session",
     participants: ["Host"],
     startedAt: new Date().toISOString(),
     endedAt: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     isActive: true,
     counts: {
       events: 100,

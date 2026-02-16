@@ -148,7 +148,7 @@ export function useMicStt(options: UseMicSttOptions = {}): UseMicSttResult {
         const rms = Math.sqrt(sumSquares / Math.max(1, downsampled.length));
         setLevel(rms);
 
-        const base64 = bufferToBase64(pcm16.buffer);
+        const base64 = bufferToBase64(pcm16.buffer as ArrayBuffer);
         apiClient.post("/api/stt/audio", { audio: base64 }).catch(() => {});
       };
 

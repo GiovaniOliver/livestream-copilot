@@ -43,8 +43,12 @@ vi.mock("@/lib/contexts/AuthContext", () => ({
     isAuthenticated: true,
     user: null,
     login: vi.fn(),
+    register: vi.fn(),
     logout: vi.fn(),
-    loading: false,
+    refreshSession: vi.fn(),
+    clearError: vi.fn(),
+    refreshToken: null,
+    isLoading: false,
     error: null,
   })),
 }));
@@ -62,9 +66,12 @@ vi.mock("@/contexts/WebSocketContext", () => ({
     disconnect: mockDisconnect,
     isConnected: true,
     events: [],
+    outputs: [],
+    clips: [],
+    moments: [],
+    transcripts: [],
     clearEvents: mockClearEvents,
-    send: vi.fn(),
-    lastEvent: null,
+    connectionState: "connected",
   })),
 }));
 
@@ -90,8 +97,12 @@ describe("useSessions Hook", () => {
       isAuthenticated: true,
       user: null,
       login: vi.fn(),
+      register: vi.fn(),
       logout: vi.fn(),
-      loading: false,
+      refreshSession: vi.fn(),
+      clearError: vi.fn(),
+      refreshToken: null,
+      isLoading: false,
       error: null,
     });
 
@@ -101,9 +112,12 @@ describe("useSessions Hook", () => {
       disconnect: mockDisconnect,
       isConnected: true,
       events: [],
+      outputs: [],
+      clips: [],
+      moments: [],
+      transcripts: [],
       clearEvents: mockClearEvents,
-      send: vi.fn(),
-      lastEvent: null,
+      connectionState: "connected",
     });
 
     // Default mock for getSessions
@@ -573,8 +587,12 @@ describe("useSession Hook", () => {
       isAuthenticated: true,
       user: null,
       login: vi.fn(),
+      register: vi.fn(),
       logout: vi.fn(),
-      loading: false,
+      refreshSession: vi.fn(),
+      clearError: vi.fn(),
+      refreshToken: null,
+      isLoading: false,
       error: null,
     });
 

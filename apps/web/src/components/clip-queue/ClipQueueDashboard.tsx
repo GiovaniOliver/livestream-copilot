@@ -329,7 +329,7 @@ export function ClipQueueDashboard({
         <div className="mx-4 mt-3 p-3 rounded-lg border border-stroke bg-bg-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Badge variant={replayBuffer.active ? "success" : "outline"} className="text-xs">
+              <Badge variant={replayBuffer.active ? "success" : "default"} className="text-xs">
                 Replay {replayBuffer.active ? "Active" : "Inactive"}
               </Badge>
               <span className="text-xs text-text-dim">

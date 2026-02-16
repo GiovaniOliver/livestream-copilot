@@ -19,6 +19,11 @@ type TestData = z.infer<typeof testSchema>;
  * When the signal fires abort, the promise rejects with an AbortError
  * (matching real fetch behavior).
  */
+// Helper to assign mock to global.fetch without type errors
+function setFetchMock(mock: ReturnType<typeof vi.fn>): void {
+  global.fetch = mock as typeof fetch;
+}
+
 function createAbortAwareFetchMock() {
   return vi.fn((_url: string | URL | Request, init?: RequestInit) =>
     new Promise((_resolve, reject) => {
@@ -65,7 +70,7 @@ describe("API Client - Timeout Handling", () => {
     it("should use default timeout of 30 seconds", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(apiClient.get<TestData>("/test"));
 
@@ -90,12 +95,12 @@ describe("API Client - Timeout Handling", () => {
     it("should clear timeout on successful request", async () => {
       const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-      global.fetch = vi.fn().mockResolvedValue({
+      setFetchMock(vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => ({ id: "1", name: "Test" }),
-      });
+      }));
 
       await apiClient.get<TestData>("/test", testSchema);
 
@@ -105,7 +110,7 @@ describe("API Client - Timeout Handling", () => {
     it("should clear timeout on request error", async () => {
       const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+      setFetchMock(vi.fn().mockRejectedValue(new Error("Network error")));
 
       await expect(apiClient.get<TestData>("/test")).rejects.toThrow();
 
@@ -117,7 +122,7 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for GET requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.get<TestData>("/test", { timeout: 5000, params: {} })
@@ -136,7 +141,7 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for POST requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.post<TestData>("/test", { data: "test" }, { timeout: 1000 })
@@ -154,7 +159,7 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for PUT requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.put<TestData>("/test", { data: "test" }, { timeout: 2000 })
@@ -170,7 +175,7 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for PATCH requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.patch<TestData>("/test", { data: "test" }, { timeout: 3000 })
@@ -186,7 +191,7 @@ describe("API Client - Timeout Handling", () => {
     it("should respect custom timeout value for DELETE requests", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.delete<TestData>("/test", { timeout: 4000 })
@@ -202,7 +207,7 @@ describe("API Client - Timeout Handling", () => {
 
   describe("Timeout with schema validation", () => {
     it("should timeout even when using schema validation", async () => {
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.get<TestData>("/test", testSchema, { timeout: 1000 })
@@ -220,12 +225,12 @@ describe("API Client - Timeout Handling", () => {
     it("should clear timeout after successful validation", async () => {
       const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-      global.fetch = vi.fn().mockResolvedValue({
+      setFetchMock(vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => ({ id: "1", name: "Test" }),
-      });
+      }));
 
       await apiClient.get<TestData>("/test", testSchema, { timeout: 5000 });
 
@@ -235,12 +240,12 @@ describe("API Client - Timeout Handling", () => {
     it("should clear timeout after validation error", async () => {
       const clearTimeoutSpy = vi.spyOn(global, "clearTimeout");
 
-      global.fetch = vi.fn().mockResolvedValue({
+      setFetchMock(vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => ({ invalid: "data" }), // Doesn't match schema
-      });
+      }));
 
       await expect(
         apiClient.get<TestData>("/test", testSchema, { timeout: 5000 })
@@ -254,7 +259,7 @@ describe("API Client - Timeout Handling", () => {
     it("should pass AbortController signal to fetch", async () => {
       let capturedSignal: AbortSignal | undefined;
 
-      global.fetch = vi.fn((url, options) => {
+      setFetchMock(vi.fn((url: any, options: any) => {
         capturedSignal = options?.signal as AbortSignal;
         return Promise.resolve({
           ok: true,
@@ -262,7 +267,7 @@ describe("API Client - Timeout Handling", () => {
           headers: new Headers({ "content-type": "application/json" }),
           json: async () => ({ id: "1", name: "Test" }),
         });
-      });
+      }));
 
       await apiClient.get<TestData>("/test", { timeout: 5000, params: {} });
 
@@ -273,7 +278,7 @@ describe("API Client - Timeout Handling", () => {
     it("should abort signal when timeout is reached", async () => {
       let capturedSignal: AbortSignal | undefined;
 
-      global.fetch = vi.fn((_url, init) => {
+      setFetchMock(vi.fn((_url: any, init: any) => {
         capturedSignal = init?.signal as AbortSignal;
         return new Promise((_resolve, reject) => {
           if (capturedSignal) {
@@ -284,7 +289,7 @@ describe("API Client - Timeout Handling", () => {
             });
           }
         });
-      });
+      }));
 
       const errorPromise = captureRejection(
         apiClient.get<TestData>("/test", { timeout: 1000, params: {} })
@@ -300,7 +305,7 @@ describe("API Client - Timeout Handling", () => {
 
   describe("Timeout error handling", () => {
     it("should throw ApiError with status 0 for timeout", async () => {
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.get<TestData>("/test", { timeout: 1000, params: {} })
@@ -317,7 +322,7 @@ describe("API Client - Timeout Handling", () => {
     });
 
     it("should include timeout duration in error message", async () => {
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const customTimeout = 12345;
       const errorPromise = captureRejection(
@@ -333,7 +338,7 @@ describe("API Client - Timeout Handling", () => {
     });
 
     it("should not confuse AbortError with other errors", async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error("Regular network error"));
+      setFetchMock(vi.fn().mockRejectedValue(new Error("Regular network error")));
 
       await expect(apiClient.get<TestData>("/test")).rejects.toMatchObject({
         statusText: "Network Error",
@@ -346,7 +351,7 @@ describe("API Client - Timeout Handling", () => {
     it("should handle timeout of 0 (immediate timeout)", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = createAbortAwareFetchMock();
+      setFetchMock(createAbortAwareFetchMock());
 
       const errorPromise = captureRejection(
         apiClient.get<TestData>("/test", { timeout: 0, params: {} })
@@ -360,12 +365,12 @@ describe("API Client - Timeout Handling", () => {
     });
 
     it("should handle very long timeout values", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
+      setFetchMock(vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => ({ id: "1", name: "Test" }),
-      });
+      }));
 
       const result = await apiClient.get<TestData>("/test", {
         timeout: 999999999,
@@ -378,7 +383,7 @@ describe("API Client - Timeout Handling", () => {
     it("should handle requests that complete just before timeout", async () => {
       const abortSpy = vi.spyOn(AbortController.prototype, "abort");
 
-      global.fetch = vi.fn(
+      setFetchMock(vi.fn(
         () =>
           new Promise((resolve) => {
             setTimeout(() => {
@@ -390,7 +395,7 @@ describe("API Client - Timeout Handling", () => {
               });
             }, 4999);
           })
-      );
+      ));
 
       const requestPromise = apiClient.get<TestData>("/test", { timeout: 5000, params: {} });
 
@@ -406,7 +411,7 @@ describe("API Client - Timeout Handling", () => {
     it("should work with custom headers and timeout", async () => {
       let capturedHeaders: Headers | undefined;
 
-      global.fetch = vi.fn((url, options) => {
+      setFetchMock(vi.fn((url: any, options: any) => {
         capturedHeaders = new Headers(options?.headers);
         return Promise.resolve({
           ok: true,
@@ -414,7 +419,7 @@ describe("API Client - Timeout Handling", () => {
           headers: new Headers({ "content-type": "application/json" }),
           json: async () => ({ id: "1", name: "Test" }),
         });
-      });
+      }));
 
       await apiClient.get<TestData>("/test", {
         headers: { "X-Custom": "value" },
@@ -427,7 +432,7 @@ describe("API Client - Timeout Handling", () => {
     it("should work with params and timeout", async () => {
       let capturedUrl: string | undefined;
 
-      global.fetch = vi.fn((url) => {
+      setFetchMock(vi.fn((url: any) => {
         capturedUrl = url as string;
         return Promise.resolve({
           ok: true,
@@ -435,7 +440,7 @@ describe("API Client - Timeout Handling", () => {
           headers: new Headers({ "content-type": "application/json" }),
           json: async () => ({ id: "1", name: "Test" }),
         });
-      });
+      }));
 
       await apiClient.get<TestData>("/test", {
         params: { page: 1, limit: 10 },
@@ -447,12 +452,12 @@ describe("API Client - Timeout Handling", () => {
     });
 
     it("should work with skipValidation and timeout", async () => {
-      global.fetch = vi.fn().mockResolvedValue({
+      setFetchMock(vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         headers: new Headers({ "content-type": "application/json" }),
         json: async () => ({ invalid: "data" }),
-      });
+      }));
 
       // Should not throw validation error when skipValidation is true
       const result = await apiClient.get<TestData>("/test", testSchema, {

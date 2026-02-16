@@ -157,7 +157,7 @@ router.get("/:sessionId/recordings", async (req, res) => {
       success: true,
       recordings,
       count: recordings.length,
-      totalSize: recordings.reduce((acc, r) => acc + r.size, 0),
+      totalSize: recordings.reduce((acc, r) => acc + Number(r.size), 0),
     });
   } catch (error) {
     logger.error({ err: error, sessionId: req.params.sessionId }, "Failed to list recordings");

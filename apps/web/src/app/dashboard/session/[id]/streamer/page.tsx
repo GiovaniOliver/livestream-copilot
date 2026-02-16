@@ -201,7 +201,7 @@ export default async function StreamerPage({ params }: StreamerPageProps) {
         </div>
 
         {/* Real-time Streamer Dashboard */}
-        <StreamerDashboard sessionId={id} wsUrl={wsUrl} />
+        <StreamerDashboard sessionId={id} />
 
         {/* Timeline Section */}
         <Card variant="elevated" className="mt-6">

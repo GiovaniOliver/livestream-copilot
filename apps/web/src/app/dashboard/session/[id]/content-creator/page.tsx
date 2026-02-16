@@ -1094,7 +1094,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
                   </CardDescription>
                   {replayBuffer && (
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-text-dim">
-                      <Badge variant={replayBuffer.active ? "success" : "outline"}>
+                      <Badge variant={replayBuffer.active ? "success" : "default"}>
                         Replay Buffer {replayBuffer.active ? "Active" : "Inactive"}
                       </Badge>
                       <span>Last save: {formatReplayTimestamp(replayBuffer.lastSavedAt)}</span>
