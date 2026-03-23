@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { Sidebar } from "@/components/dashboard";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";

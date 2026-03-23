@@ -10,7 +10,11 @@
  */
 
 import { Router, type Request, type Response } from "express";
-import { authService, AuthError } from "./service.js";
+import {
+  authService,
+  AuthError,
+  ensureDefaultOrganizationForUser,
+} from "./service.js";
 import {
   generateAuthorizationUrl,
   validateState,
@@ -27,6 +31,7 @@ import {
 import { config } from "../config/index.js";
 import { prisma } from "../db/index.js";
 import { generateAccessToken, generateRefreshToken, hashToken } from "./utils.js";
+import { encryptToken } from "../utils/crypto.js";
 
 import { logger } from '../logger/index.js';
 // =============================================================================
@@ -215,16 +220,23 @@ async function handleOAuthCallbackHandler(
     let user;
     let isNewUser = false;
 
+    // Encrypt OAuth tokens before storing at rest
+    const encryptedAccessToken = encryptToken(tokens.access_token);
+    const encryptedRefreshToken = tokens.refresh_token
+      ? encryptToken(tokens.refresh_token)
+      : null;
+    const oauthExpiresAt = tokens.expires_in
+      ? new Date(Date.now() + tokens.expires_in * 1000)
+      : null;
+
     if (existingConnection) {
       // Existing OAuth user - update tokens
       await prisma.oAuthConnection.update({
         where: { id: existingConnection.id },
         data: {
-          accessToken: tokens.access_token,
-          refreshToken: tokens.refresh_token,
-          expiresAt: tokens.expires_in
-            ? new Date(Date.now() + tokens.expires_in * 1000)
-            : null,
+          accessToken: encryptedAccessToken,
+          refreshToken: encryptedRefreshToken,
+          expiresAt: oauthExpiresAt,
         },
       });
       user = existingConnection.user;
@@ -241,11 +253,9 @@ async function handleOAuthCallbackHandler(
             userId: existingUser.id,
             provider,
             providerId: userInfo.id,
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token,
-            expiresAt: tokens.expires_in
-              ? new Date(Date.now() + tokens.expires_in * 1000)
-              : null,
+            accessToken: encryptedAccessToken,
+            refreshToken: encryptedRefreshToken,
+            expiresAt: oauthExpiresAt,
           },
         });
         user = existingUser;
@@ -262,11 +272,9 @@ async function handleOAuthCallbackHandler(
               create: {
                 provider,
                 providerId: userInfo.id,
-                accessToken: tokens.access_token,
-                refreshToken: tokens.refresh_token,
-                expiresAt: tokens.expires_in
-                  ? new Date(Date.now() + tokens.expires_in * 1000)
-                  : null,
+                accessToken: encryptedAccessToken,
+                refreshToken: encryptedRefreshToken,
+                expiresAt: oauthExpiresAt,
               },
             },
           },
@@ -280,14 +288,7 @@ async function handleOAuthCallbackHandler(
     const ipAddress = getClientIp(req);
 
     // Get user with organizations
-    const userWithOrgs = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: {
-        memberships: {
-          include: { organization: true },
-        },
-      },
-    });
+    const userWithOrgs = await ensureDefaultOrganizationForUser(user);
 
     if (!userWithOrgs) {
       sendError(res, 500, "USER_ERROR", "Failed to load user");

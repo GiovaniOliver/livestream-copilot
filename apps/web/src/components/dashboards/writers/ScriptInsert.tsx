@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { type FC } from "react";
 import { cn } from "@/lib/utils";
 import type { ScriptInsertProps, ScriptElement } from "./types";

@@ -1,3 +1,4 @@
+import type * as React from "react";
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 

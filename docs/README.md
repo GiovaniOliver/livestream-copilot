@@ -25,6 +25,8 @@ System architecture, design decisions, and technical specifications.
 Workflow definitions, agent actions, and automation processes.
 
 - **[WORKFLOWS.md](./workflows/WORKFLOWS.md)** - System workflows overview
+- **[FIRST_SUPPORTED_WORKFLOW.md](./workflows/FIRST_SUPPORTED_WORKFLOW.md)** - MVP-first workflow, capture mode, and output contract
+- **[FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md](./workflows/FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md)** - Canonical local demo runbook and checklist for the first supported `streamer` + `av` path
 - **[ai-agent-actions.md](./workflows/ai-agent-actions.md)** - AI agent action definitions (70+ actions spec)
 
 ### [API](./api/)
@@ -83,6 +85,8 @@ Next.js web dashboard documentation.
 - **Get started with the project** -> [Setup / START_HERE.md](./setup/START_HERE.md)
 - **Understand the system architecture** -> [Architecture / ARCHITECTURE.md](./architecture/ARCHITECTURE.md)
 - **Understand the AI agent system** -> [Architecture / AGENTIC_SYSTEM.md](./architecture/AGENTIC_SYSTEM.md)
+- **See the current MVP workflow contract** -> [Workflows / FIRST_SUPPORTED_WORKFLOW.md](./workflows/FIRST_SUPPORTED_WORKFLOW.md)
+- **Run the current MVP demo path** -> [Workflows / FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md](./workflows/FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md)
 - **Learn about a specific feature** -> [Features](./features/)
 - **Contribute to the project** -> [Guides / CONTRIB.md](./guides/CONTRIB.md)
 - **Deploy to production** -> [Guides / RUNBOOK.md](./guides/RUNBOOK.md)
@@ -104,4 +108,4 @@ These were one-time session artifacts, not living documentation. Their useful co
 
 ---
 
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-03-19

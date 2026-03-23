@@ -32,15 +32,39 @@ interface IdeaAnalysis {
 }
 
 /**
- * Connection detection result.
+ * Semantic relationship types between ideas.
+ */
+type ConnectionRelationType =
+  | "builds_on"
+  | "contradicts"
+  | "extends"
+  | "combines";
+
+/**
+ * A detected connection between two ideas with semantic metadata.
+ */
+interface IdeaConnection {
+  fromId: string;
+  fromConcept: string;
+  toId: string;
+  toConcept: string;
+  relationType: ConnectionRelationType;
+  description: string;
+  strength: number;
+}
+
+/**
+ * Connection detection result from LLM analysis.
  */
 interface ConnectionResult {
   hasConnections: boolean;
   connections: Array<{
     idea1: string;
     idea2: string;
+    relationType: ConnectionRelationType;
     relationship: string;
     strength: number;
+    sharedThemes?: string[];
   }>;
 }
 
@@ -58,10 +82,11 @@ export class BrainstormAgent extends BaseAgent {
   // Track brainstorm context
   private ideas: Map<string, { concept: string; author: string; category: string }> = new Map();
   private categories: Set<string> = new Set();
-  private ideaConnections: Array<{ from: string; to: string; relationship: string }> = [];
+  private ideaConnections: IdeaConnection[] = [];
 
   // Thresholds
   private readonly ideaConfidenceThreshold = 0.4;
+  private readonly connectionStrengthThreshold = 0.3;
   private readonly minTranscriptLength = 100;
 
   constructor(config?: Partial<AgentConfig>) {
@@ -119,6 +144,18 @@ export class BrainstormAgent extends BaseAgent {
           });
           this.categories.add(idea.category);
 
+          // Check if this idea references a previous one via buildOn
+          const buildOnConnection = idea.buildOn
+            ? this.findBuildOnConnection(ideaId, idea.concept, idea.buildOn)
+            : undefined;
+
+          if (buildOnConnection) {
+            this.ideaConnections = [...this.ideaConnections, buildOnConnection];
+          }
+
+          // Find existing connections for this new idea
+          const existingConnections = this.getConnectionsForIdea(ideaId, idea.concept);
+
           outputs.push({
             category: "IDEA_NODE",
             title: idea.concept,
@@ -131,6 +168,14 @@ export class BrainstormAgent extends BaseAgent {
               buildsOn: idea.buildOn,
               confidence: idea.confidence,
               position: this.ideas.size,
+              connections: existingConnections.map((conn) => ({
+                targetId: conn.fromId === ideaId ? conn.toId : conn.fromId,
+                targetConcept: conn.fromId === ideaId ? conn.toConcept : conn.fromConcept,
+                relationType: conn.relationType,
+                description: conn.description,
+                strength: conn.strength,
+              })),
+              connectionCount: existingConnections.length,
             },
           });
         }
@@ -139,15 +184,18 @@ export class BrainstormAgent extends BaseAgent {
 
     // Detect connections between ideas
     if (this.ideas.size > 1) {
-      const connections = await this.detectConnections(transcript, context);
-      if (connections.hasConnections) {
-        for (const conn of connections.connections) {
-          this.ideaConnections.push({
-            from: conn.idea1,
-            to: conn.idea2,
-            relationship: conn.relationship,
-          });
-        }
+      const newConnections = await this.detectConnections(transcript, context);
+      if (newConnections.hasConnections) {
+        const resolvedConnections = this.resolveConnections(newConnections.connections);
+        this.ideaConnections = [...this.ideaConnections, ...resolvedConnections];
+
+        this.agentLogger.debug(
+          {
+            newConnections: resolvedConnections.length,
+            totalConnections: this.ideaConnections.length,
+          },
+          "Idea connections updated"
+        );
       }
     }
 
@@ -186,6 +234,9 @@ export class BrainstormAgent extends BaseAgent {
       category: "highlighted",
     });
 
+    // Detect connections to existing ideas for the marked idea
+    const markerConnections = this.getConnectionsForIdea(ideaId, payload.label);
+
     outputs.push({
       category: "IDEA_NODE",
       title: payload.label,
@@ -197,6 +248,14 @@ export class BrainstormAgent extends BaseAgent {
         manuallyMarked: true,
         highlighted: true,
         position: this.ideas.size,
+        connections: markerConnections.map((conn) => ({
+          targetId: conn.fromId === ideaId ? conn.toId : conn.fromId,
+          targetConcept: conn.fromId === ideaId ? conn.toConcept : conn.fromConcept,
+          relationType: conn.relationType,
+          description: conn.description,
+          strength: conn.strength,
+        })),
+        connectionCount: markerConnections.length,
       },
     });
 
@@ -288,7 +347,8 @@ Only include genuinely new ideas with confidence > 0.4. If no new ideas, return 
   }
 
   /**
-   * Detect connections between ideas.
+   * Detect semantic connections between ideas.
+   * Classifies relationships as builds_on, contradicts, extends, or combines.
    */
   private async detectConnections(
     transcript: string,
@@ -297,45 +357,61 @@ Only include genuinely new ideas with confidence > 0.4. If no new ideas, return 
     try {
       const recentIdeas = Array.from(this.ideas.entries())
         .slice(-8)
-        .map(([id, idea]) => `${idea.concept} (${idea.category})`);
+        .map(([id, idea]) => `- "${idea.concept}" [${idea.category}] (id: ${id})`);
 
-      const prompt = `Identify connections between ideas in this brainstorming session.
+      const existingConnectionSummary = this.ideaConnections
+        .slice(-5)
+        .map((c) => `${c.fromConcept} --[${c.relationType}]--> ${c.toConcept}`)
+        .join("\n");
+
+      const prompt = `Identify semantic connections between ideas in this brainstorming session.
 
 CURRENT IDEAS:
-${recentIdeas.map((i, idx) => `${idx + 1}. ${i}`).join("\n")}
+${recentIdeas.join("\n")}
+
+EXISTING CONNECTIONS (already detected):
+${existingConnectionSummary || "None yet"}
 
 RECENT DISCUSSION:
 """
-${transcript.slice(-400)}
+${transcript.slice(-500)}
 """
 
-Find meaningful connections between ideas being discussed:
-- Complementary ideas that work together
-- Ideas that solve each other's problems
-- Ideas that share a common theme
-- Ideas that contradict (useful tension)
+Find meaningful NEW connections between ideas. Classify each connection with a relationship type:
+- "builds_on": idea2 directly builds upon or improves idea1
+- "contradicts": ideas are in tension or offer opposing approaches
+- "extends": idea2 takes idea1 into a new direction or domain
+- "combines": ideas can be merged into a stronger concept
+
+Also assess connection strength (0.0-1.0):
+- 1.0: Explicitly discussed connection between the ideas
+- 0.7-0.9: Strong implicit connection, shared concepts
+- 0.4-0.6: Moderate connection, related themes
+- 0.1-0.3: Weak/tangential connection
 
 Respond with JSON:
 {
   "hasConnections": boolean,
   "connections": [
     {
-      "idea1": "First idea name",
-      "idea2": "Second idea name",
-      "relationship": "How they connect",
-      "strength": 0.0-1.0
+      "idea1": "First idea name (exact match from list)",
+      "idea2": "Second idea name (exact match from list)",
+      "relationType": "builds_on" | "contradicts" | "extends" | "combines",
+      "relationship": "Brief description of how they connect",
+      "strength": 0.0-1.0,
+      "sharedThemes": ["theme1", "theme2"]
     }
   ]
 }
 
-Only include strong connections. Return hasConnections: false if no meaningful links.`;
+Only include connections with strength >= ${this.connectionStrengthThreshold}. Do NOT duplicate connections already listed above. Return hasConnections: false if no meaningful NEW links.`;
 
       const response = await complete({
         messages: [{ role: "user", content: prompt }],
         model: this.config.model,
-        maxTokens: 400,
+        maxTokens: 500,
         temperature: 0.4,
-        systemPrompt: "You identify meaningful connections between brainstorming ideas.",
+        systemPrompt: "You identify meaningful semantic connections between brainstorming ideas. Be precise about relationship types.",
       });
 
       const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -347,6 +423,170 @@ Only include strong connections. Return hasConnections: false if no meaningful l
     }
 
     return { hasConnections: false, connections: [] };
+  }
+
+  /**
+   * Resolve LLM connection results to tracked IdeaConnection objects.
+   * Matches idea names to stored idea IDs using fuzzy matching.
+   */
+  private resolveConnections(
+    rawConnections: ConnectionResult["connections"]
+  ): IdeaConnection[] {
+    const resolved: IdeaConnection[] = [];
+
+    for (const conn of rawConnections) {
+      if (conn.strength < this.connectionStrengthThreshold) {
+        continue;
+      }
+
+      const fromMatch = this.findIdeaByName(conn.idea1);
+      const toMatch = this.findIdeaByName(conn.idea2);
+
+      if (!fromMatch || !toMatch) {
+        this.agentLogger.debug(
+          { idea1: conn.idea1, idea2: conn.idea2 },
+          "Could not resolve idea names to IDs, skipping connection"
+        );
+        continue;
+      }
+
+      // Avoid duplicate connections
+      const isDuplicate = this.ideaConnections.some(
+        (existing) =>
+          (existing.fromId === fromMatch.id && existing.toId === toMatch.id) ||
+          (existing.fromId === toMatch.id && existing.toId === fromMatch.id)
+      );
+
+      if (isDuplicate) {
+        continue;
+      }
+
+      const validRelationType = this.validateRelationType(conn.relationType);
+
+      resolved.push({
+        fromId: fromMatch.id,
+        fromConcept: fromMatch.concept,
+        toId: toMatch.id,
+        toConcept: toMatch.concept,
+        relationType: validRelationType,
+        description: conn.relationship,
+        strength: Math.max(0, Math.min(1, conn.strength)),
+      });
+    }
+
+    return resolved;
+  }
+
+  /**
+   * Find an idea by name using fuzzy matching.
+   * Returns the best matching idea ID and concept, or null if no match.
+   */
+  private findIdeaByName(
+    name: string
+  ): { id: string; concept: string } | null {
+    const nameLower = name.toLowerCase().trim();
+
+    // Exact match first
+    for (const [id, idea] of this.ideas.entries()) {
+      if (idea.concept.toLowerCase() === nameLower) {
+        return { id, concept: idea.concept };
+      }
+    }
+
+    // Substring / partial match
+    let bestMatch: { id: string; concept: string; score: number } | null = null;
+
+    for (const [id, idea] of this.ideas.entries()) {
+      const conceptLower = idea.concept.toLowerCase();
+
+      // Check if one contains the other
+      if (conceptLower.includes(nameLower) || nameLower.includes(conceptLower)) {
+        const score = Math.min(nameLower.length, conceptLower.length) /
+          Math.max(nameLower.length, conceptLower.length);
+
+        if (!bestMatch || score > bestMatch.score) {
+          bestMatch = { id, concept: idea.concept, score };
+        }
+      }
+
+      // Word overlap check
+      const nameWords = new Set(nameLower.split(/\s+/).filter((w) => w.length > 2));
+      const conceptWords = new Set(conceptLower.split(/\s+/).filter((w) => w.length > 2));
+
+      let overlap = 0;
+      for (const word of nameWords) {
+        if (conceptWords.has(word)) {
+          overlap += 1;
+        }
+      }
+
+      if (nameWords.size > 0 && conceptWords.size > 0) {
+        const overlapScore = overlap / Math.max(nameWords.size, conceptWords.size);
+        if (overlapScore > 0.4 && (!bestMatch || overlapScore > bestMatch.score)) {
+          bestMatch = { id, concept: idea.concept, score: overlapScore };
+        }
+      }
+    }
+
+    return bestMatch ? { id: bestMatch.id, concept: bestMatch.concept } : null;
+  }
+
+  /**
+   * Validate and normalize a relationship type from LLM output.
+   */
+  private validateRelationType(raw: string): ConnectionRelationType {
+    const valid: ConnectionRelationType[] = ["builds_on", "contradicts", "extends", "combines"];
+    const normalized = raw.toLowerCase().trim() as ConnectionRelationType;
+
+    if (valid.includes(normalized)) {
+      return normalized;
+    }
+
+    // Map common variations
+    if (raw.includes("build") || raw.includes("improve")) return "builds_on";
+    if (raw.includes("contradict") || raw.includes("oppos") || raw.includes("tension")) return "contradicts";
+    if (raw.includes("extend") || raw.includes("expand")) return "extends";
+    if (raw.includes("combin") || raw.includes("merg") || raw.includes("synerg")) return "combines";
+
+    return "extends"; // Default fallback
+  }
+
+  /**
+   * Find a build-on connection when a new idea references a previous one.
+   */
+  private findBuildOnConnection(
+    newIdeaId: string,
+    newConcept: string,
+    buildsOnName: string
+  ): IdeaConnection | null {
+    const parentMatch = this.findIdeaByName(buildsOnName);
+
+    if (!parentMatch) {
+      return null;
+    }
+
+    return {
+      fromId: parentMatch.id,
+      fromConcept: parentMatch.concept,
+      toId: newIdeaId,
+      toConcept: newConcept,
+      relationType: "builds_on",
+      description: `"${newConcept}" builds on "${parentMatch.concept}"`,
+      strength: 0.8,
+    };
+  }
+
+  /**
+   * Get all connections involving a specific idea.
+   */
+  private getConnectionsForIdea(ideaId: string, concept: string): IdeaConnection[] {
+    return this.ideaConnections.filter(
+      (conn) =>
+        conn.fromId === ideaId ||
+        conn.toId === ideaId ||
+        conn.fromConcept.toLowerCase() === concept.toLowerCase() ||
+        conn.toConcept.toLowerCase() === concept.toLowerCase()
+    );
   }
 
   /**
@@ -556,7 +796,15 @@ Respond with ONLY the action item text, no explanation.`;
    */
   getIdeaMap(): {
     nodes: Array<{ id: string; concept: string; category: string; author: string }>;
-    edges: Array<{ from: string; to: string; relationship: string }>;
+    edges: Array<{
+      from: string;
+      to: string;
+      fromConcept: string;
+      toConcept: string;
+      relationType: ConnectionRelationType;
+      description: string;
+      strength: number;
+    }>;
   } {
     const nodes = Array.from(this.ideas.entries()).map(([id, idea]) => ({
       id,
@@ -565,9 +813,19 @@ Respond with ONLY the action item text, no explanation.`;
       author: idea.author,
     }));
 
+    const edges = this.ideaConnections.map((conn) => ({
+      from: conn.fromId,
+      to: conn.toId,
+      fromConcept: conn.fromConcept,
+      toConcept: conn.toConcept,
+      relationType: conn.relationType,
+      description: conn.description,
+      strength: conn.strength,
+    }));
+
     return {
       nodes,
-      edges: this.ideaConnections,
+      edges,
     };
   }
 

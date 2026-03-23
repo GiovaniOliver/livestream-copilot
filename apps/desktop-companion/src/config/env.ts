@@ -173,6 +173,14 @@ export const envSchema = z.object({
     .describe("Database connection URL (e.g., postgresql://user:pass@host:5432/db)"),
 
   // ===================
+  // Redis Configuration
+  // ===================
+  REDIS_URL: z
+    .string()
+    .optional()
+    .describe("Redis connection URL for distributed rate limiting (e.g., redis://user:pass@host:6379)"),
+
+  // ===================
   // STT (Speech-to-Text) Configuration
   // ===================
   STT_PROVIDER: z
@@ -364,6 +372,17 @@ export const envSchema = z.object({
     .enum(["live", "test"])
     .default("test")
     .describe("Environment prefix for generated API keys (live or test)"),
+
+  // ===================
+  // Token Encryption
+  // ===================
+  TOKEN_ENCRYPTION_KEY: z
+    .string()
+    .min(32)
+    .describe(
+      "Encryption key for OAuth tokens stored at rest (minimum 32 characters). " +
+        "Generate with: openssl rand -base64 32"
+    ),
 
   // ===================
   // Sentry Error Monitoring

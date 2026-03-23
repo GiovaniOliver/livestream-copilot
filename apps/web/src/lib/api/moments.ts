@@ -9,6 +9,7 @@ import { apiClient, type RequestOptions } from "./client";
 import {
   momentsListResponseSchema,
   createMomentResponseSchema,
+  deleteMomentResponseSchema,
   type MomentType,
   type MomentInfo,
   type PaginationInfo,
@@ -106,6 +107,24 @@ export async function getMoments(
   );
 
   return response.data;
+}
+
+/**
+ * Delete a moment marker
+ * @param sessionId - Session ID
+ * @param momentId - Moment ID to delete
+ * @param token - Optional auth token
+ */
+export async function deleteMoment(
+  sessionId: string,
+  momentId: string,
+  token?: string
+): Promise<void> {
+  await apiClient.delete(
+    `/api/sessions/${encodeURIComponent(sessionId)}/events/moments/${encodeURIComponent(momentId)}`,
+    deleteMomentResponseSchema,
+    withAuth(token)
+  );
 }
 
 // Re-export types for convenience

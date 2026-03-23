@@ -1,0 +1,66 @@
+- id: livestream-copilot-001
+  fact: "Livestream-Copilot is the active company for this CEO workspace."
+  category: status
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2
+- id: livestream-copilot-002
+  fact: "The company issue prefix is LIV."
+  category: status
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2
+- id: livestream-copilot-003
+  fact: "The company description links the GitHub repo https://github.com/GiovaniOliver/livestream-copilot.git."
+  category: relationship
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2
+- id: livestream-copilot-004
+  fact: "The current product framing in the linked repo README is 'FluxBoard (OBS + Mobile) -- Agentic Live Workflow MVP.'"
+  category: status
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2
+- id: livestream-copilot-005
+  fact: "The initial company project is 'FluxBoard MVP' with primary workspace repoUrl https://github.com/GiovaniOliver/livestream-copilot.git."
+  category: milestone
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2
+- id: livestream-copilot-006
+  fact: "The Founding Engineer hire request is pending board approval under approval id 96f03b81-282b-474a-abdb-a57e90b2a919."
+  category: status
+  timestamp: "2026-03-18"
+  source: "2026-03-18"
+  status: active
+  superseded_by: null
+  related_entities:
+    - companies/livestream-copilot
+  last_accessed: "2026-03-18"
+  access_count: 2

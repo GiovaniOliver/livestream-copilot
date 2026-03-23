@@ -20,6 +20,7 @@ import {
   type ExportJobStatus,
 } from "@/lib/api/export";
 import { ApiError } from "@/lib/api/client";
+import { useAuth } from "@/lib/contexts/AuthContext";
 import { logger } from "@/lib/logger";
 
 // ============================================================
@@ -61,6 +62,7 @@ export function useExport(options: UseExportOptions = {}) {
     progress: 0,
   });
   const [exportHistory, setExportHistory] = useState<ExportHistoryItem[]>([]);
+  const { accessToken } = useAuth();
 
   // Refs for cleanup
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -174,7 +176,7 @@ export function useExport(options: UseExportOptions = {}) {
           return;
         }
 
-        const status = await getExportStatus(exportId);
+        const status = await getExportStatus(exportId, accessToken || undefined);
 
         // Update progress
         setProgress({
@@ -196,7 +198,10 @@ export function useExport(options: UseExportOptions = {}) {
 
             if (!downloadUrl) {
               try {
-                const downloadInfo = await getExportDownloadUrl(exportId);
+                const downloadInfo = await getExportDownloadUrl(
+                  exportId,
+                  accessToken || undefined
+                );
                 downloadUrl = downloadInfo.downloadUrl;
                 filename = downloadInfo.filename;
                 fileSize = downloadInfo.fileSize;
@@ -212,7 +217,11 @@ export function useExport(options: UseExportOptions = {}) {
               contentId: request.contentId,
               platform: request.platforms[0],
               downloadUrl: downloadUrl || "",
-              filename: filename || `${request.customFilename || "export"}.${request.formatOptions.format}`,
+              filename:
+                filename ||
+                `${request.customFilename || "export"}.${
+                  currentContent?.type === "clip" ? request.formatOptions.format : "txt"
+                }`,
               fileSize: fileSize || 0,
               createdAt: new Date(),
             };
@@ -271,7 +280,7 @@ export function useExport(options: UseExportOptions = {}) {
         }
       }
     },
-    [options, stopPolling]
+    [accessToken, currentContent, options, stopPolling]
   );
 
   // Handle export request
@@ -291,12 +300,19 @@ export function useExport(options: UseExportOptions = {}) {
         try {
           // Step 1: Start the export job
           const response = await apiStartExport(request.contentId, {
+            ...(currentContent
+              ? {
+                  contentType: currentContent.type,
+                  sessionId: currentContent.sessionId,
+                  clipId: currentContent.clipId,
+                }
+              : {}),
             platforms: request.platforms,
             caption: request.caption,
             hashtags: request.hashtags,
             formatOptions: request.formatOptions,
             customFilename: request.customFilename,
-          });
+          }, accessToken || undefined);
 
           const exportId = response.exportId;
 
@@ -333,7 +349,7 @@ export function useExport(options: UseExportOptions = {}) {
         }
       });
     },
-    [options, pollExportStatus, stopPolling]
+    [accessToken, currentContent, options, pollExportStatus, stopPolling]
   );
 
   // Batch export multiple items

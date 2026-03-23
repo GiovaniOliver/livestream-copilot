@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   getSessionMoments,
   createMoment as apiCreateMoment,
+  deleteMoment as apiDeleteMoment,
   type MomentInfo,
   type MomentType,
   type PaginationInfo,
@@ -57,6 +58,7 @@ export interface UseMomentsReturn {
     timestamp: number;
     clipId?: string;
   }) => Promise<Moment>;
+  deleteMoment: (momentId: string) => Promise<void>;
   loadMore: () => Promise<void>;
   clearError: () => void;
 
@@ -236,6 +238,30 @@ export function useMoments(
   );
 
   /**
+   * Delete a moment by ID
+   */
+  const deleteMoment = useCallback(
+    async (momentId: string): Promise<void> => {
+      try {
+        setError(null);
+        await apiDeleteMoment(sessionId, momentId, accessToken || undefined);
+
+        // Remove from local state optimistically
+        setMoments((prev) => prev.filter((m) => m.id !== momentId));
+        setPagination((prev) => ({
+          ...prev,
+          total: Math.max(0, prev.total - 1),
+        }));
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Failed to delete moment";
+        setError(errorMsg);
+        throw new Error(errorMsg);
+      }
+    },
+    [sessionId, accessToken]
+  );
+
+  /**
    * Clear error state
    */
   const clearError = useCallback(() => {
@@ -296,6 +322,7 @@ export function useMoments(
     isConnected,
     refresh,
     createMoment,
+    deleteMoment,
     loadMore,
     clearError,
     momentsByType,

@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { useState } from "react";
 import type { AgentAction, ActionStatus, TokenEstimate } from "./types";
 import { TOKEN_ESTIMATE_RANGES } from "./types";

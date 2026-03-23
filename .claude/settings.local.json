@@ -1,0 +1,9 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "remote": {
+    "defaultEnvironmentId": "env_011CUoW5x7WYVucJY8CTsiBx"
+  }
+}

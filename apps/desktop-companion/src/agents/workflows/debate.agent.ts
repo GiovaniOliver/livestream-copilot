@@ -31,7 +31,24 @@ interface ClaimAnalysis {
 }
 
 /**
- * Evidence detection result.
+ * Raw evidence detection result from LLM analysis.
+ */
+interface RawEvidenceResult {
+  hasEvidence: boolean;
+  evidence: Array<{
+    citation: string;
+    type: "statistic" | "source" | "example" | "expert_opinion" | "anecdote";
+    supportsClaim: string;
+    sourceReliability?: number;
+    isRecent?: boolean;
+    recencyIndicator?: string;
+    hasCorroboration?: boolean;
+    corroboratingDetails?: string;
+  }>;
+}
+
+/**
+ * Evidence detection result with computed credibility scores.
  */
 interface EvidenceResult {
   hasEvidence: boolean;
@@ -40,8 +57,50 @@ interface EvidenceResult {
     type: "statistic" | "source" | "example" | "expert_opinion" | "anecdote";
     supportsClaim: string;
     credibilityScore: number;
+    credibilityBreakdown: CredibilityBreakdown;
   }>;
 }
+
+/**
+ * Breakdown of how the credibility score was computed.
+ */
+interface CredibilityBreakdown {
+  sourceReliability: number;
+  recencyScore: number;
+  relevanceScore: number;
+  corroborationScore: number;
+  evidenceTypeWeight: number;
+  rawScores: {
+    sourceReliability: number;
+    recency: number;
+    relevance: number;
+    corroboration: number;
+    typeWeight: number;
+  };
+}
+
+/**
+ * Weights for each credibility factor.
+ */
+const CREDIBILITY_WEIGHTS = {
+  sourceReliability: 0.30,
+  recency: 0.15,
+  relevance: 0.25,
+  corroboration: 0.15,
+  evidenceType: 0.15,
+} as const;
+
+/**
+ * Evidence type weight mapping.
+ * Statistics carry the most weight; anecdotes the least.
+ */
+const EVIDENCE_TYPE_WEIGHTS: Record<string, number> = {
+  statistic: 1.0,
+  source: 0.85,
+  expert_opinion: 0.7,
+  example: 0.5,
+  anecdote: 0.3,
+};
 
 /**
  * Agent specialized for debate workflows.
@@ -152,6 +211,14 @@ export class DebateAgent extends BaseAgent {
               evidenceType: evidence.type,
               supportsClaim: evidence.supportsClaim,
               credibilityScore: evidence.credibilityScore,
+              credibilityBreakdown: {
+                sourceReliability: evidence.credibilityBreakdown.rawScores.sourceReliability,
+                recency: evidence.credibilityBreakdown.rawScores.recency,
+                relevance: evidence.credibilityBreakdown.rawScores.relevance,
+                corroboration: evidence.credibilityBreakdown.rawScores.corroboration,
+                evidenceTypeWeight: evidence.credibilityBreakdown.rawScores.typeWeight,
+              },
+              weights: CREDIBILITY_WEIGHTS,
             },
           });
         }
@@ -280,11 +347,54 @@ Only include claims with confidence > 0.5. If no clear claims, return hasClaims:
 
   /**
    * Analyze transcript for evidence and citations.
+   * Extracts raw evidence factors from LLM, then computes credibility scores deterministically.
    */
   private async analyzeForEvidence(
     transcript: string,
     context: AgentContext
   ): Promise<EvidenceResult> {
+    try {
+      const activeClaims = Array.from(this.claims.values())
+        .slice(-5)
+        .map((c) => c.statement);
+
+      const rawResult = await this.extractRawEvidence(transcript, activeClaims);
+
+      if (!rawResult.hasEvidence || rawResult.evidence.length === 0) {
+        return { hasEvidence: false, evidence: [] };
+      }
+
+      const scoredEvidence = rawResult.evidence.map((raw) => {
+        const breakdown = this.computeCredibilityScore(raw, activeClaims);
+        return {
+          citation: raw.citation,
+          type: raw.type,
+          supportsClaim: raw.supportsClaim,
+          credibilityScore: this.computeFinalScore(breakdown),
+          credibilityBreakdown: breakdown,
+        };
+      });
+
+      return {
+        hasEvidence: true,
+        evidence: scoredEvidence,
+      };
+    } catch (error) {
+      this.agentLogger.error({ err: error }, "Failed to analyze for evidence");
+    }
+
+    return { hasEvidence: false, evidence: [] };
+  }
+
+  /**
+   * Extract raw evidence factors from the LLM.
+   * The LLM identifies evidence and provides qualitative assessments;
+   * credibility scoring is done deterministically afterward.
+   */
+  private async extractRawEvidence(
+    transcript: string,
+    activeClaims: string[]
+  ): Promise<RawEvidenceResult> {
     try {
       const prompt = `Identify evidence and citations in this debate transcript.
 
@@ -293,12 +403,22 @@ TRANSCRIPT:
 ${transcript.slice(-600)}
 """
 
+ACTIVE CLAIMS IN DEBATE:
+${activeClaims.length > 0 ? activeClaims.map((c) => `- ${c}`).join("\n") : "None identified yet"}
+
 Look for:
 - Statistics and data points
 - References to sources, studies, or experts
 - Specific examples given as evidence
 - Expert opinions cited
 - Personal anecdotes used as evidence
+
+For each piece of evidence, assess:
+1. sourceReliability (0.0-1.0): How reliable is the source? Named institutions/journals = high (0.8-1.0), named experts = medium-high (0.6-0.8), unnamed "studies show" = low (0.2-0.4), no source = very low (0.0-0.2)
+2. isRecent: Does the evidence reference recent data/events? true/false
+3. recencyIndicator: Any time reference mentioned (e.g., "2024 study", "last year", "decades ago")
+4. hasCorroboration: Is this evidence supported by other evidence or claims in the debate? true/false
+5. corroboratingDetails: Brief note on what corroborates it, if anything
 
 Respond with JSON:
 {
@@ -308,7 +428,11 @@ Respond with JSON:
       "citation": "The evidence as stated",
       "type": "statistic" | "source" | "example" | "expert_opinion" | "anecdote",
       "supportsClaim": "What claim this evidence supports",
-      "credibilityScore": 0.0-1.0
+      "sourceReliability": 0.0-1.0,
+      "isRecent": true/false,
+      "recencyIndicator": "time reference or null",
+      "hasCorroboration": true/false,
+      "corroboratingDetails": "what corroborates it or null"
     }
   ]
 }
@@ -318,9 +442,9 @@ Only include evidence that was actually cited. If no evidence, return hasEvidenc
       const response = await complete({
         messages: [{ role: "user", content: prompt }],
         model: this.config.model,
-        maxTokens: 500,
+        maxTokens: 600,
         temperature: 0.3,
-        systemPrompt: "You identify and evaluate evidence quality in debates.",
+        systemPrompt: "You identify and evaluate evidence quality in debates. Be precise about source reliability assessments.",
       });
 
       const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -328,10 +452,148 @@ Only include evidence that was actually cited. If no evidence, return hasEvidenc
         return JSON.parse(jsonMatch[0]);
       }
     } catch (error) {
-      this.agentLogger.error({ err: error }, "Failed to analyze for evidence");
+      this.agentLogger.error({ err: error }, "Failed to extract raw evidence");
     }
 
     return { hasEvidence: false, evidence: [] };
+  }
+
+  /**
+   * Compute the credibility breakdown for a piece of evidence.
+   * Each factor is scored 0-1 and weighted to produce a final composite score.
+   */
+  private computeCredibilityScore(
+    raw: RawEvidenceResult["evidence"][number],
+    activeClaims: string[]
+  ): CredibilityBreakdown {
+    // 1. Source reliability: use LLM assessment, clamp to 0-1
+    const sourceReliability = Math.max(0, Math.min(1, raw.sourceReliability ?? 0.3));
+
+    // 2. Recency score: recent evidence scores higher
+    const recencyScore = this.scoreRecency(raw.isRecent, raw.recencyIndicator);
+
+    // 3. Relevance: how well the evidence connects to active claims
+    const relevanceScore = this.scoreRelevance(raw.supportsClaim, activeClaims);
+
+    // 4. Corroboration: evidence supported by other evidence scores higher
+    const corroborationScore = raw.hasCorroboration ? 0.8 : 0.2;
+
+    // 5. Evidence type weight: statistics > expert_opinion > example > anecdote
+    const evidenceTypeWeight = EVIDENCE_TYPE_WEIGHTS[raw.type] ?? 0.5;
+
+    return {
+      sourceReliability: sourceReliability * CREDIBILITY_WEIGHTS.sourceReliability,
+      recencyScore: recencyScore * CREDIBILITY_WEIGHTS.recency,
+      relevanceScore: relevanceScore * CREDIBILITY_WEIGHTS.relevance,
+      corroborationScore: corroborationScore * CREDIBILITY_WEIGHTS.corroboration,
+      evidenceTypeWeight: evidenceTypeWeight * CREDIBILITY_WEIGHTS.evidenceType,
+      rawScores: {
+        sourceReliability,
+        recency: recencyScore,
+        relevance: relevanceScore,
+        corroboration: corroborationScore,
+        typeWeight: evidenceTypeWeight,
+      },
+    };
+  }
+
+  /**
+   * Compute the final credibility score from a breakdown.
+   * Returns a value between 0 and 1.
+   */
+  private computeFinalScore(breakdown: CredibilityBreakdown): number {
+    const raw =
+      breakdown.sourceReliability +
+      breakdown.recencyScore +
+      breakdown.relevanceScore +
+      breakdown.corroborationScore +
+      breakdown.evidenceTypeWeight;
+
+    return Math.round(raw * 100) / 100;
+  }
+
+  /**
+   * Score recency of evidence based on time indicators.
+   */
+  private scoreRecency(
+    isRecent: boolean | undefined,
+    recencyIndicator: string | undefined
+  ): number {
+    if (!recencyIndicator && isRecent === undefined) {
+      return 0.5; // Unknown recency gets neutral score
+    }
+
+    if (isRecent === false) {
+      return 0.3;
+    }
+
+    if (!recencyIndicator) {
+      return isRecent ? 0.7 : 0.5;
+    }
+
+    const indicator = recencyIndicator.toLowerCase();
+
+    // Very recent references
+    if (/\b(2025|2026|this year|this month|today|yesterday|last week)\b/.test(indicator)) {
+      return 1.0;
+    }
+
+    // Recent references
+    if (/\b(2024|2023|last year|recent|latest|new)\b/.test(indicator)) {
+      return 0.8;
+    }
+
+    // Moderately recent
+    if (/\b(2020|2021|2022|few years|past decade)\b/.test(indicator)) {
+      return 0.6;
+    }
+
+    // Older references
+    if (/\b(20[01]\d|decades? ago|historical|classic)\b/.test(indicator)) {
+      return 0.3;
+    }
+
+    return isRecent ? 0.7 : 0.4;
+  }
+
+  /**
+   * Score how relevant the evidence is to active claims in the debate.
+   */
+  private scoreRelevance(
+    supportsClaim: string,
+    activeClaims: string[]
+  ): number {
+    if (!supportsClaim || activeClaims.length === 0) {
+      return 0.5; // Neutral when no claims to compare against
+    }
+
+    const supportsLower = supportsClaim.toLowerCase();
+    const supportsWords = new Set(
+      supportsLower.split(/\s+/).filter((w) => w.length > 3)
+    );
+
+    let bestOverlap = 0;
+
+    for (const claim of activeClaims) {
+      const claimWords = new Set(
+        claim.toLowerCase().split(/\s+/).filter((w) => w.length > 3)
+      );
+
+      let overlap = 0;
+      for (const word of supportsWords) {
+        if (claimWords.has(word)) {
+          overlap += 1;
+        }
+      }
+
+      const unionSize = Math.max(1, new Set([...supportsWords, ...claimWords]).size);
+      const overlapRatio = overlap / unionSize;
+      bestOverlap = Math.max(bestOverlap, overlapRatio);
+    }
+
+    // Scale: 0 overlap = 0.2 (some baseline relevance since LLM matched it),
+    // perfect overlap = 1.0
+    return Math.min(1.0, 0.2 + bestOverlap * 3.2);
   }
 
   /**

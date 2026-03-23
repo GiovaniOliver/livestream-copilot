@@ -97,6 +97,7 @@ export class AutoClipManager {
   private autoClipEnabled: boolean = false;
   private autoClipDuration: number = 60; // seconds
   private workflow: string | null = null;
+  private eventSink: ((event: EventEnvelope) => void) | null = null;
 
   constructor(wss: WebSocketServer) {
     this.wss = wss;
@@ -130,6 +131,13 @@ export class AutoClipManager {
     if (this.workflow) {
       await this.initialize(this.workflow);
     }
+  }
+
+  /**
+   * Set the canonical event sink for emitted events.
+   */
+  setEventSink(eventSink: ((event: EventEnvelope) => void) | null): void {
+    this.eventSink = eventSink;
   }
 
   /**
@@ -368,7 +376,7 @@ export class AutoClipManager {
       },
     };
 
-    this.broadcast(event);
+    this.dispatchEvent(event);
     logger.info(`[auto-clip] Emitted CLIP_INTENT_START for ${triggerSource}`);
   }
 
@@ -397,7 +405,7 @@ export class AutoClipManager {
       },
     };
 
-    this.broadcast(event);
+    this.dispatchEvent(event);
     logger.info(`[auto-clip] Emitted CLIP_INTENT_END at t=${t.toFixed(2)}s`);
   }
 
@@ -423,6 +431,22 @@ export class AutoClipManager {
         errorMessage: queueItem.errorMessage ?? undefined,
       },
     };
+
+    this.dispatchEvent(event);
+  }
+
+  /**
+   * Prefer the canonical event sink, with WebSocket broadcast fallback.
+   */
+  private dispatchEvent(event: EventEnvelope): void {
+    if (this.eventSink) {
+      try {
+        this.eventSink(event);
+        return;
+      } catch (error) {
+        logger.error({ err: error, eventType: event.type }, "[auto-clip] Failed to emit canonical event");
+      }
+    }
 
     this.broadcast(event);
   }

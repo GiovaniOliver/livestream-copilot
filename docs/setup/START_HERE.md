@@ -1,4 +1,12 @@
-# 🚀 FluxBoard - Ready to Launch!
+# FluxBoard - Ready to Launch!
+
+> Note
+>
+> This file is an older startup snapshot and is not the canonical Phase 1 demo path.
+>
+> For the current first supported `streamer` + `av` workflow, use:
+> - [../workflows/FIRST_SUPPORTED_WORKFLOW.md](../workflows/FIRST_SUPPORTED_WORKFLOW.md)
+> - [../workflows/FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md](../workflows/FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md)
 
 **Date:** 2026-01-21  
 **Your Mission:** Get the backend running and connect the frontend
@@ -185,9 +193,9 @@ taskkill /F /PID <pid>
 
 ### Issue: 404 Not Found on API calls
 
-**This is expected!** The backend is missing some REST endpoints.
+**Check your URL prefix.** The backend has both legacy `/session/*` and RESTful `/api/sessions/*` endpoints.
 
-**Next task:** Implement the missing endpoints (see TASK_CHECKLIST.md Task 1.3)
+**Next task:** Ensure frontend and mobile consistently use the RESTful API. (see TASK_CHECKLIST.md)
 
 ---
 

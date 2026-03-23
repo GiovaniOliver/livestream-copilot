@@ -15,6 +15,12 @@ import { useExport } from "@/hooks/useExport";
 import * as exportApi from "@/lib/api/export";
 import type { ExportContent, ExportRequest } from "@/components/export/types";
 
+vi.mock("@/lib/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    accessToken: "test-access-token",
+  }),
+}));
+
 // Mock the export API module
 vi.mock("@/lib/api/export", () => ({
   startExport: vi.fn(),
@@ -156,17 +162,21 @@ describe("useExport Hook", () => {
         await vi.advanceTimersByTimeAsync(100);
       });
 
-      expect(exportApi.startExport).toHaveBeenCalledWith("content-123", {
-        platforms: ["youtube", "tiktok"],
-        caption: "Test caption",
-        hashtags: ["test", "viral"],
-        formatOptions: {
-          format: "mp4",
-          quality: "1080p",
-          aspectRatio: "9:16",
+      expect(exportApi.startExport).toHaveBeenCalledWith(
+        "content-123",
+        {
+          platforms: ["youtube", "tiktok"],
+          caption: "Test caption",
+          hashtags: ["test", "viral"],
+          formatOptions: {
+            format: "mp4",
+            quality: "1080p",
+            aspectRatio: "9:16",
+          },
+          customFilename: "my-export",
         },
-        customFilename: "my-export",
-      });
+        "test-access-token"
+      );
 
       // Advance through poll interval
       await act(async () => {
@@ -179,6 +189,85 @@ describe("useExport Hook", () => {
       expect(exportResult.downloadUrl).toBe("https://example.com/download/export-456");
       expect(result.current.progress.status).toBe("completed");
       expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it("should pass post export context when exporting post content", async () => {
+      vi.useFakeTimers();
+
+      const mockStartResponse = {
+        exportId: "export-post-456",
+        status: "pending" as const,
+        createdAt: new Date().toISOString(),
+      };
+
+      const mockStatusCompleted = {
+        exportId: "export-post-456",
+        status: "completed" as const,
+        progress: 100,
+        message: "Export complete!",
+        downloadUrl: "https://example.com/download/export-post-456",
+        filename: "post-export.txt",
+        fileSize: 2048,
+      };
+
+      vi.mocked(exportApi.startExport).mockResolvedValue(mockStartResponse);
+      vi.mocked(exportApi.getExportStatus).mockResolvedValue(mockStatusCompleted);
+
+      const { result } = renderHook(() => useExport());
+
+      act(() => {
+        result.current.openExport({
+          id: "post-123",
+          type: "post",
+          title: "Test Post",
+          caption: "Post body",
+          sessionId: "session-123",
+          createdAt: new Date(),
+        });
+      });
+
+      let exportPromise: Promise<any>;
+
+      await act(async () => {
+        exportPromise = result.current.handleExport({
+          contentId: "post-123",
+          platforms: ["linkedin"],
+          caption: "Post body",
+          hashtags: ["launch"],
+          formatOptions: {
+            format: "mp4",
+            quality: "1080p",
+            aspectRatio: "16:9",
+          },
+          customFilename: "post-export",
+        });
+        await vi.advanceTimersByTimeAsync(100);
+      });
+
+      expect(exportApi.startExport).toHaveBeenCalledWith(
+        "post-123",
+        {
+          contentType: "post",
+          sessionId: "session-123",
+          clipId: undefined,
+          platforms: ["linkedin"],
+          caption: "Post body",
+          hashtags: ["launch"],
+          formatOptions: {
+            format: "mp4",
+            quality: "1080p",
+            aspectRatio: "16:9",
+          },
+          customFilename: "post-export",
+        },
+        "test-access-token"
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2500);
+      });
+
+      await exportPromise!;
     });
   });
 

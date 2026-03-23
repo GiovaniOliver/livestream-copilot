@@ -39,6 +39,7 @@ import path from "path";
 import net from "net";
 import OBSWebSocket from "obs-websocket-js";
 import { config } from "./config/index.js";
+import { initRedis, disconnectRedis } from "./utils/redis.js";
 import { withOpikTrace } from "./observability/opik.js";
 import {
   EventEnvelopeSchema,
@@ -62,7 +63,12 @@ import {
   isSTTProviderAvailable,
   listSTTProviders,
   type STTStartConfig,
+  type STTEvent,
 } from "./stt/index.js";
+import {
+  createTranscriptSegmentEvent,
+  isFinalTranscriptEvent,
+} from "./stt/event-bridge.js";
 import {
   trimClip,
   initializeFFmpeg,
@@ -89,9 +95,15 @@ import {
   BrainstormAgent,
 } from "./agents/index.js";
 import { authRouter, oauthRouter } from "./auth/index.js";
-import { sessionsRouter, setActiveSessionGetter, setActiveSessionClearer } from "./api/sessions.js";
+import {
+  sessionsRouter,
+  setActiveSessionGetter,
+  setActiveSessionClearer,
+  setSessionActions,
+} from "./api/sessions.js";
 import { clipsRouter, sessionClipsRouter } from "./api/clips.js";
 import { outputsRouter, sessionOutputsRouter } from "./api/outputs.js";
+import { postsRouter } from "./api/posts.js";
 import { eventsRouter, sessionEventsRouter } from "./api/events.js";
 import { recordingsRouter } from "./api/recordings.js";
 // Note: triggersRouter requires multer - will be loaded dynamically if available
@@ -107,6 +119,7 @@ import { getVisualTriggerService } from "./triggers/visual-trigger.service.js";
 import { getAudioTriggerService } from "./triggers/audio-trigger.service.js";
 import { getAutoClipManager } from "./triggers/auto-clip-manager.js";
 import { getClipQueueProcessor } from "./triggers/clip-queue-processor.js";
+import { findLatestReplayBuffer } from "./replay-buffer.js";
 
 // Use validated config values
 const OBS_WS_URL = config.OBS_WS_URL;
@@ -380,6 +393,17 @@ async function connectOBS() {
     } catch (err) {
       replayBufferState.lastError = "SaveReplayBuffer failed";
       obsLogger.warn({ err }, "SaveReplayBuffer failed");
+
+      if (OBS_REPLAY_OUTPUT_DIR) {
+        const latest = findLatestReplayBuffer(OBS_REPLAY_OUTPUT_DIR);
+        if (latest) {
+          replayBufferState.lastSavedAt = Date.now();
+          replayBufferState.lastSavedPath = latest;
+          obsLogger.info({ path: latest }, "Using replay buffer file from directory scan after SaveReplayBuffer failure");
+          return latest;
+        }
+      }
+
       return null;
     }
   }
@@ -403,37 +427,6 @@ async function takeScreenshot(sceneOrSourceName: string, outputPath: string) {
   } catch (err) {
     obsLogger.warn({ err, sourceName: sceneOrSourceName, outputPath }, "GetSourceScreenshot failed");
     return false;
-  }
-}
-
-/**
- * Find the most recent replay buffer file in the OBS output directory.
- * Fallback method when we can't get the path from OBS events.
- */
-function findLatestReplayBuffer(directory: string, maxAgeMs: number = 30000): string | null {
-  if (!directory || !fs.existsSync(directory)) {
-    return null;
-  }
-
-  try {
-    const files = fs.readdirSync(directory);
-    const now = Date.now();
-
-    // Filter for video files and sort by modification time (newest first)
-    const videoFiles = files
-      .filter((f) => /\.(mp4|mkv|flv|mov|ts)$/i.test(f))
-      .map((f) => {
-        const fullPath = path.join(directory, f);
-        const stats = fs.statSync(fullPath);
-        return { path: fullPath, mtime: stats.mtimeMs };
-      })
-      .filter((f) => now - f.mtime < maxAgeMs) // Only recent files
-      .sort((a, b) => b.mtime - a.mtime);
-
-    return videoFiles.length > 0 ? videoFiles[0].path : null;
-  } catch (err) {
-    ffmpegLogger.warn({ err, directory }, "Failed to scan for replay buffer files");
-    return null;
   }
 }
 
@@ -502,6 +495,9 @@ async function attemptClipTrim(
 }
 
 async function main() {
+  // Initialize Redis for distributed rate limiting (silent fallback to in-memory)
+  initRedis(config.REDIS_URL);
+
   // Initialize FFmpeg with custom paths if provided
   initializeFFmpeg({
     ffmpegPath: FFMPEG_PATH,
@@ -569,7 +565,9 @@ async function main() {
       "AI agent router initialized with workflow agents"
     );
   } else {
-    agentLogger.warn("AI agent router disabled - set ANTHROPIC_API_KEY to enable");
+    agentLogger.warn(
+      "AI agent router disabled - configure ANTHROPIC_API_KEY or OPENAI_API_KEY to enable"
+    );
   }
 
   // Log startup configuration (config is already validated at import time)
@@ -676,6 +674,12 @@ async function main() {
   app.use("/api/outputs", outputsRouter);
   app.use("/api/sessions/:sessionId/outputs", sessionOutputsRouter);
   apiLogger.info("Outputs routes mounted at /api/outputs and /api/sessions/:sessionId/outputs");
+
+  // =============================================================================
+  // Posts Routes
+  // =============================================================================
+  app.use("/api/posts", postsRouter);
+  apiLogger.info("Posts routes mounted at /api/posts");
 
   // =============================================================================
   // Events Routes
@@ -818,6 +822,24 @@ async function main() {
         }
       });
     });
+
+    // Initialize session actions for the RESTful API router
+    setSessionActions({
+      startSession: async (body) => {
+        const result = await startSessionInternal(body);
+        // We need a dummy request object or just simulate buildWsUrl
+        const protocol = config.NODE_ENV === "production" ? "wss" : "ws";
+        // Default to localhost if we can't determine host
+        const ws = `${protocol}://localhost:${wsPort}`;
+        return { ...result, ws };
+      },
+      stopSession: async () => {
+        return await stopSessionInternal();
+      },
+      getActiveSession: () => {
+        return session as any;
+      },
+    });
   } catch (err: any) {
     logger.error({ err, port: wsPort }, "Failed to start WebSocket server");
     // If WebSocket fails, we can't really function as a real-time service
@@ -828,8 +850,15 @@ async function main() {
   // =============================================================================
   // Clip Queue Routes (requires wss)
   // =============================================================================
+  const emitRuntimeEvent = (event: EventEnvelope) => emitEvent(wss, event);
+
+  agentRouter.setEventSink(emitRuntimeEvent);
   app.use("/api/clip-queue", clipQueueRouter);
-  app.use("/api/sessions/:sessionId/clip-queue", createSessionClipQueueRouter({ wss, saveReplayBuffer }));
+  app.use("/api/sessions/:sessionId/clip-queue", createSessionClipQueueRouter({
+    wss,
+    saveReplayBuffer,
+    emitEvent: emitRuntimeEvent,
+  }));
   apiLogger.info("Clip queue routes mounted at /api/clip-queue and /api/sessions/:sessionId/clip-queue");
 
   // Initialize STT Manager with WebSocket server
@@ -839,12 +868,24 @@ async function main() {
 
   // Initialize clip queue processor
   const clipQueueProcessor = getClipQueueProcessor(wss);
+  clipQueueProcessor.setEventSink(emitRuntimeEvent);
   clipQueueProcessor.start();
 
   // Initialize trigger services + auto-clip manager
   const autoClipManager = getAutoClipManager(wss);
+  autoClipManager.setEventSink(emitRuntimeEvent);
   const audioTriggerService = getAudioTriggerService(wss);
   const visualTriggerService = getVisualTriggerService(wss);
+  const handleSTTEvent = (event: STTEvent): void => {
+    if (!session || !isFinalTranscriptEvent(event)) {
+      return;
+    }
+
+    emitEvent(
+      wss,
+      createTranscriptSegmentEvent(session.config.sessionId!, event.segment)
+    );
+  };
 
   audioTriggerService.onTrigger((event) => {
     void autoClipManager.handleTrigger({ type: "audio", event });
@@ -871,6 +912,20 @@ async function main() {
     const host = req.hostname || "localhost";
     const protocol = req.secure ? "wss" : "ws";
     return `${protocol}://${host}:${wsPort}`;
+  }
+
+  function resolveSessionTimestamp(input: unknown): number {
+    if (typeof input !== "number" || Number.isNaN(input)) {
+      return nowMs();
+    }
+
+    // Accept canonical event-style timestamps as seconds from session start,
+    // while still allowing legacy absolute Unix millisecond callers.
+    if (session && input < 1_000_000_000_000) {
+      return session.t0UnixMs + input * 1000;
+    }
+
+    return input;
   }
 
   async function startSessionInternal(body: Record<string, unknown>): Promise<{
@@ -1177,14 +1232,14 @@ async function main() {
     if (!session) {
       return res.status(404).json({ ok: false, error: "No active session" });
     }
-    const now = typeof req.body?.t === "number" ? req.body.t : nowMs();
-    session.clipStartT = now;
-    return res.json({ ok: true, t: now });
+    const clipStartT = resolveSessionTimestamp(req.body?.t);
+    session.clipStartT = clipStartT;
+    return res.json({ ok: true, t: clipStartT });
   });
 
   app.post("/clip/end", async (req, res) => {
     try {
-      const now = typeof req.body?.t === "number" ? req.body.t : nowMs();
+      const now = resolveSessionTimestamp(req.body?.t);
       const result = await createClipInternal(now);
       return res.json(result);
     } catch (err: any) {
@@ -1243,6 +1298,105 @@ async function main() {
   // =============================================================================
   // Speech-to-Text Routes
   // =============================================================================
+  const injectTranscriptHandler: express.RequestHandler = async (req, res) => {
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
+
+    const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
+    if (!text) {
+      return res.status(400).json({ ok: false, error: "text is required" });
+    }
+
+    const t0 = typeof req.body?.t0 === "number"
+      ? req.body.t0
+      : Math.max(0, (nowMs() - session.t0UnixMs) / 1000);
+    const t1 = typeof req.body?.t1 === "number" ? req.body.t1 : t0;
+
+    if (t1 < t0) {
+      return res.status(400).json({ ok: false, error: "t1 must be greater than or equal to t0" });
+    }
+
+    const speakerId = typeof req.body?.speakerId === "string" ? req.body.speakerId : null;
+
+    const transcriptEvent = createTranscriptSegmentEvent(
+      session.config.sessionId!,
+      {
+        speakerId,
+        text,
+        t0,
+        t1,
+      },
+      {
+        ts: session.t0UnixMs + Math.round(t1 * 1000),
+      }
+    );
+
+    emitEvent(wss, transcriptEvent);
+    sttLogger.info(
+      {
+        sessionId: session.config.sessionId,
+        speakerId,
+        t0,
+        t1,
+        injected: true,
+      },
+      "Transcript segment injected via debug route"
+    );
+
+    return res.json({ ok: true, event: transcriptEvent });
+  };
+
+  const injectMomentHandler: express.RequestHandler = async (req, res) => {
+    if (!session) {
+      return res.status(404).json({ ok: false, error: "No active session" });
+    }
+
+    const label = typeof req.body?.label === "string" ? req.body.label.trim() : "";
+    if (!label) {
+      return res.status(400).json({ ok: false, error: "label is required" });
+    }
+
+    const t = typeof req.body?.t === "number"
+      ? req.body.t
+      : Math.max(0, (nowMs() - session.t0UnixMs) / 1000);
+    const confidence = typeof req.body?.confidence === "number"
+      ? req.body.confidence
+      : undefined;
+    if (confidence !== undefined && (confidence < 0 || confidence > 1)) {
+      return res.status(400).json({ ok: false, error: "confidence must be between 0 and 1" });
+    }
+
+    const notes = typeof req.body?.notes === "string" ? req.body.notes : undefined;
+
+    const momentEvent: EventEnvelope = {
+      id: uuidv4(),
+      sessionId: session.config.sessionId!,
+      ts: session.t0UnixMs + Math.round(t * 1000),
+      type: "MOMENT_MARKER",
+      payload: {
+        label,
+        t,
+        ...(confidence !== undefined ? { confidence } : {}),
+        ...(notes ? { notes } : {}),
+      },
+    };
+
+    emitEvent(wss, momentEvent);
+    apiLogger.info(
+      {
+        sessionId: session.config.sessionId,
+        label,
+        t,
+        confidence,
+        injected: true,
+      },
+      "Moment marker injected via debug route"
+    );
+
+    return res.json({ ok: true, event: momentEvent });
+  };
+
   const startSttHandler: express.RequestHandler = async (req, res) => {
     try {
       if (!session) {
@@ -1262,6 +1416,8 @@ async function main() {
 
       const provider = sttManager.getProvider();
       if (provider) {
+        provider.off(handleSTTEvent);
+        provider.on(handleSTTEvent);
         await audioTriggerService.start(sttConfig.sessionId, session.config.workflow, provider);
       }
 
@@ -1275,6 +1431,11 @@ async function main() {
 
   const stopSttHandler: express.RequestHandler = async (_req, res) => {
     try {
+      const provider = sttManager.getProvider();
+      if (provider) {
+        provider.off(handleSTTEvent);
+      }
+
       await sttManager.stop();
       audioTriggerService.stop();
       sttLogger.info("STT stopped");
@@ -1327,12 +1488,16 @@ async function main() {
   app.post("/stt/start", startSttHandler);
   app.post("/stt/stop", stopSttHandler);
   app.post("/stt/audio", sendSttAudioHandler);
+  app.post("/event/transcript", injectTranscriptHandler);
+  app.post("/event/moment", injectMomentHandler);
   app.get("/stt/status", sttStatusHandler);
 
   // API aliases for frontend compatibility
   app.post("/api/stt/start", startSttHandler);
   app.post("/api/stt/stop", stopSttHandler);
   app.post("/api/stt/audio", sendSttAudioHandler);
+  app.post("/api/event/transcript", injectTranscriptHandler);
+  app.post("/api/event/moment", injectMomentHandler);
   app.get("/api/stt/status", sttStatusHandler);
 
   // =============================================================================
@@ -1463,6 +1628,9 @@ async function main() {
       videoLogger.info("Stopping MediaMTX server...");
       await mediamtxManager.cleanup();
     }
+
+    // Disconnect Redis
+    await disconnectRedis();
 
     // Flush Sentry events before shutdown
     await flushSentry(2000);

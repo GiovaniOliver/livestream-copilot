@@ -28,6 +28,8 @@ import {
 import { PlatformRole, OrgRole } from "../generated/prisma/enums.js";
 
 import { logger } from '../logger/index.js';
+import { rateLimiter } from '../utils/rateLimiter.js';
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -306,43 +308,9 @@ export function optionalAuth(
 // =============================================================================
 
 /**
- * In-memory rate limit tracking for API keys.
- * In production, use Redis or similar for distributed rate limiting.
- */
-const apiKeyRateLimits = new Map<
-  string,
-  { count: number; windowStart: number }
->();
-
-/**
  * Rate limit window in milliseconds (1 minute).
  */
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-
-/**
- * Checks if an API key has exceeded its rate limit.
- *
- * @param keyId - The API key ID
- * @param limit - The rate limit per minute
- * @returns True if rate limited, false otherwise
- */
-function isRateLimited(keyId: string, limit: number): boolean {
-  const now = Date.now();
-  const entry = apiKeyRateLimits.get(keyId);
-
-  if (!entry || now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) {
-    // New window
-    apiKeyRateLimits.set(keyId, { count: 1, windowStart: now });
-    return false;
-  }
-
-  if (entry.count >= limit) {
-    return true;
-  }
-
-  entry.count++;
-  return false;
-}
 
 /**
  * Middleware that authenticates requests using API keys.
@@ -415,9 +383,23 @@ export async function authenticateApiKey(
       return;
     }
 
-    // Check rate limit
-    if (isRateLimited(apiKeyRecord.id, apiKeyRecord.rateLimit)) {
-      res.setHeader("Retry-After", "60");
+    // Check rate limit (distributed via Redis, in-memory fallback)
+    const rateLimitResult = await rateLimiter.checkLimit(
+      `apikey:${apiKeyRecord.id}`,
+      apiKeyRecord.rateLimit,
+      RATE_LIMIT_WINDOW_MS
+    );
+
+    // Always attach rate-limit headers so callers can self-throttle
+    res.setHeader("X-RateLimit-Limit", String(apiKeyRecord.rateLimit));
+    res.setHeader("X-RateLimit-Remaining", String(rateLimitResult.remaining));
+    res.setHeader("X-RateLimit-Reset", String(rateLimitResult.resetAt));
+
+    if (!rateLimitResult.allowed) {
+      const retryAfterSeconds = Math.ceil(
+        (rateLimitResult.resetAt - Date.now()) / 1000
+      );
+      res.setHeader("Retry-After", String(Math.max(retryAfterSeconds, 1)));
       sendAuthError(
         res,
         429,

@@ -1,4 +1,12 @@
 import { ffmpegLogger } from '../logger/index.js';
+import {
+  configureFfprobe,
+  isFFprobeAvailable,
+} from './probe.js';
+import {
+  configureFfmpeg,
+  isFFmpegAvailable,
+} from './trimmer.js';
 
 /**
  * FFmpeg module for clip trimming pipeline.
@@ -86,11 +94,9 @@ export function initializeFFmpeg(config?: {
   ffprobePath?: string;
 }): void {
   if (config?.ffmpegPath) {
-    const { configureFfmpeg } = require('./trimmer.js');
     configureFfmpeg(config.ffmpegPath);
   }
   if (config?.ffprobePath) {
-    const { configureFfprobe } = require('./probe.js');
     configureFfprobe(config.ffprobePath);
   }
 }
@@ -105,9 +111,6 @@ export async function checkFFmpegAvailability(): Promise<{
   ffprobe: boolean;
   ready: boolean;
 }> {
-  const { isFFmpegAvailable } = await import('./trimmer.js');
-  const { isFFprobeAvailable } = await import('./probe.js');
-
   const [ffmpegAvail, ffprobeAvail] = await Promise.all([
     isFFmpegAvailable(),
     isFFprobeAvailable(),

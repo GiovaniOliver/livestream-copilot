@@ -32,6 +32,7 @@ export class AgentRouter {
   private eventBuffer: Map<string, EventEnvelope[]> = new Map();
   private enabled: boolean = false;
   private validationEnabled: boolean = true;
+  private eventSink: ((event: EventEnvelope) => void) | null = null;
 
   /**
    * Initialize the router.
@@ -89,6 +90,13 @@ export class AgentRouter {
   configureValidation(config: ValidationConfig): void {
     outputValidator.configure(config);
     routerLogger.info("Validation configured");
+  }
+
+  /**
+   * Set the canonical event sink used for derived events.
+   */
+  setEventSink(eventSink: ((event: EventEnvelope) => void) | null): void {
+    this.eventSink = eventSink;
   }
 
   /**
@@ -332,18 +340,48 @@ export class AgentRouter {
           }
         }
 
+        const outputMeta = {
+          ...finalOutput.meta,
+          validation: validationStatus,
+        };
+
         const dbOutput = await OutputService.createOutput({
           sessionId: context.dbSessionId,
           category: finalOutput.category,
           title: finalOutput.title,
           text: finalOutput.text,
           refs: finalOutput.refs,
-          meta: {
-            ...finalOutput.meta,
-            validation: validationStatus,
-          },
+          meta: outputMeta,
           status: "draft",
         });
+
+        if (this.eventSink) {
+          try {
+            this.eventSink({
+              id: uuid(),
+              sessionId: context.sessionId,
+              ts: Date.now(),
+              type: "OUTPUT_CREATED",
+              payload: {
+                outputId: dbOutput.id,
+                category: finalOutput.category,
+                title: finalOutput.title,
+                text: finalOutput.text,
+                refs: finalOutput.refs ?? [],
+                meta: outputMeta,
+              },
+            });
+          } catch (error) {
+            routerLogger.error(
+              {
+                err: error,
+                outputId: dbOutput.id,
+                category: finalOutput.category,
+              },
+              "Failed to emit output event"
+            );
+          }
+        }
 
         routerLogger.debug(
           {

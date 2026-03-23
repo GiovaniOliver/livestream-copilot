@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ClipBin } from "./ClipBin";

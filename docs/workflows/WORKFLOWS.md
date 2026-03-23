@@ -2,6 +2,8 @@
 
 Users select a workflow at session start. Each workflow activates a different agent set and a different dashboard skin.
 
+Current MVP priority: the first supported end-to-end slice is the live streamer flow documented in [FIRST_SUPPORTED_WORKFLOW.md](./FIRST_SUPPORTED_WORKFLOW.md). The repeatable demo path and checklist now live in [FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md](./FIRST_SUPPORTED_WORKFLOW_RUNBOOK.md).
+
 All workflows support `captureMode`:
 
 - **audio**: transcript-first; no clips/screenshots required.

@@ -31,6 +31,24 @@ import { logger } from "../logger/index.js";
 // ACTIVE SESSION STATE
 // =============================================================================
 
+export interface StartSessionResponse {
+  sessionId: string;
+  startedAt: number;
+  ws?: string;
+}
+
+export interface SessionState {
+  config: any; // SessionConfig from shared
+  dbId: string;
+  t0UnixMs: number;
+}
+
+export interface SessionActions {
+  startSession: (body: any) => Promise<StartSessionResponse>;
+  stopSession: () => Promise<{ ok: boolean; t1: number; duration: number }>;
+  getActiveSession: () => SessionState | null;
+}
+
 /**
  * Getter function to retrieve the current in-memory active session's database ID.
  * This is set by the main server module to allow the API to determine
@@ -38,6 +56,7 @@ import { logger } from "../logger/index.js";
  */
 let getActiveSessionDbId: (() => string | null) | null = null;
 let clearActiveSession: (() => void) | null = null;
+let sessionActions: SessionActions | null = null;
 
 /**
  * Set the active session getter function.
@@ -53,6 +72,13 @@ export function setActiveSessionGetter(getter: () => string | null): void {
  */
 export function setActiveSessionClearer(clearer: () => void): void {
   clearActiveSession = clearer;
+}
+
+/**
+ * Set the session actions (start/stop/get) from the main server.
+ */
+export function setSessionActions(actions: SessionActions): void {
+  sessionActions = actions;
 }
 
 /**
@@ -210,6 +236,87 @@ function transformSession(session: SessionWithCounts) {
 // =============================================================================
 // ROUTE HANDLERS
 // =============================================================================
+
+/**
+ * POST /api/sessions/start
+ * Start a new active session.
+ */
+async function startActiveSessionHandler(req: Request, res: Response): Promise<void> {
+  try {
+    if (!sessionActions) {
+      sendError(res, 500, "NOT_INITIALIZED", "Session manager not initialized.");
+      return;
+    }
+
+    if (sessionActions.getActiveSession()) {
+      sendError(res, 409, "ALREADY_ACTIVE", "A session is already active.");
+      return;
+    }
+
+    const result = await sessionActions.startSession(req.body);
+    sendSuccess(res, result, 201);
+  } catch (error: any) {
+    logger.error({ err: error }, "[api/sessions] Error starting active session");
+    sendError(res, 400, "START_FAILED", error.message || "Failed to start session.");
+  }
+}
+
+/**
+ * GET /api/sessions/active
+ * Get the currently active session metadata.
+ */
+async function getActiveSessionHandler(req: Request, res: Response): Promise<void> {
+  try {
+    if (!sessionActions) {
+      sendError(res, 500, "NOT_INITIALIZED", "Session manager not initialized.");
+      return;
+    }
+
+    const session = sessionActions.getActiveSession();
+    if (!session) {
+      sendSuccess(res, { active: false });
+      return;
+    }
+
+    sendSuccess(res, {
+      active: true,
+      sessionId: session.config.sessionId,
+      workflow: session.config.workflow,
+      captureMode: session.config.captureMode,
+      title: session.config.title,
+      participants: session.config.participants,
+      startedAt: session.t0UnixMs,
+      elapsed: Date.now() - session.t0UnixMs,
+    });
+  } catch (error) {
+    logger.error({ err: error }, "[api/sessions] Error getting active session");
+    sendError(res, 500, "INTERNAL_ERROR", "Failed to get active session.");
+  }
+}
+
+/**
+ * POST /api/sessions/active/stop
+ * Stop the currently active session.
+ */
+async function stopActiveSessionHandler(req: Request, res: Response): Promise<void> {
+  try {
+    if (!sessionActions) {
+      sendError(res, 500, "NOT_INITIALIZED", "Session manager not initialized.");
+      return;
+    }
+
+    if (!sessionActions.getActiveSession()) {
+      sendError(res, 404, "NOT_ACTIVE", "No active session to stop.");
+      return;
+    }
+
+    const result = await sessionActions.stopSession();
+    sendSuccess(res, result);
+  } catch (error: any) {
+    logger.error({ err: error }, "[api/sessions] Error stopping active session");
+    sendError(res, 500, "STOP_FAILED", error.message || "Failed to stop session.");
+  }
+}
 
 /**
  * GET /api/sessions
@@ -600,23 +707,23 @@ async function deleteSessionHandler(req: Request, res: Response): Promise<void> 
  * Creates the sessions router with all endpoints.
  *
  * Security considerations:
- * - Read endpoints have rate limiting but no auth (for development/demo)
- * - In production, consider adding authentication to read endpoints
- * - Write endpoints always require authentication
+ * - All endpoints require authentication via JWT or API key
+ * - Rate limiting prevents DoS and data scraping
  * - All endpoints have input validation and sanitization
  * - CUID format validation prevents injection attacks
- * - Rate limiting prevents DoS and data scraping
- *
- * TODO: Enable authentication on read endpoints for production deployment
  */
 export function createSessionsRouter(): Router {
   const router = Router();
 
-  // Read endpoints - rate limited, no auth for development
-  // SECURITY: In production, add authenticateToken middleware
-  router.get("/", sessionListRateLimiter, listSessionsHandler);
-  router.get("/:id", sessionReadRateLimiter, getSessionHandler);
-  router.get("/:id/outputs", sessionReadRateLimiter, getSessionOutputsHandler);
+  // Active session management
+  router.post("/start", authenticateToken, startActiveSessionHandler);
+  router.get("/active", authenticateToken, getActiveSessionHandler);
+  router.post("/active/stop", authenticateToken, stopActiveSessionHandler);
+
+  // Read endpoints - require auth + rate limiting
+  router.get("/", authenticateToken, sessionListRateLimiter, listSessionsHandler);
+  router.get("/:id", authenticateToken, sessionReadRateLimiter, getSessionHandler);
+  router.get("/:id/outputs", authenticateToken, sessionReadRateLimiter, getSessionOutputsHandler);
 
   // Write endpoints require authentication
   router.patch("/:id", authenticateToken, updateSessionHandler);

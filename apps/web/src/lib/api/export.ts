@@ -7,8 +7,9 @@
  * - Retrieving download URLs
  */
 
-import { apiClient } from "./client";
+import { apiClient, type RequestOptions } from "./client";
 import type {
+  ExportContent,
   SocialPlatform,
   ExportFormatOptions,
 } from "@/components/export/types";
@@ -53,12 +54,35 @@ function toApiFormat(format: string): string {
   return FORMAT_API_MAP[format.toLowerCase()] || format.toUpperCase();
 }
 
+function normalizeContentType(
+  contentType?: ExportContent["type"]
+): "clip" | "post" {
+  return contentType === "clip" ? "clip" : "post";
+}
+
+function buildPostExportText(
+  caption?: string,
+  hashtags: string[] = []
+): string {
+  const normalizedCaption = caption?.trim() ?? "";
+  const hashtagSuffix = hashtags.length > 0
+    ? hashtags.map((tag) => `#${tag.replace(/^#/, "")}`).join(" ")
+    : "";
+
+  if (normalizedCaption && hashtagSuffix) {
+    return `${normalizedCaption}\n\n${hashtagSuffix}`;
+  }
+
+  return normalizedCaption || hashtagSuffix;
+}
+
 /**
  * Request body for starting an export job
  */
 export interface StartExportRequest {
-  sessionId: string;
   contentId?: string;
+  contentType?: ExportContent["type"];
+  sessionId?: string;
   clipId?: string;
   platforms: SocialPlatform[];
   caption?: string;
@@ -155,11 +179,32 @@ interface ExportApiResponse {
     status: string;
     createdAt?: string;
     progress?: number;
+    downloadUrl?: string;
+    filename?: string;
     filePath?: string;
     fileSize?: number;
     completedAt?: string;
     errorMessage?: string;
     metadata?: Record<string, unknown>;
+  };
+}
+
+const EXPORT_API_BASE = "/api/v1/export";
+
+function withAuth(
+  accessToken?: string,
+  options: RequestOptions = {}
+): RequestOptions {
+  if (!accessToken) {
+    return options;
+  }
+
+  return {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    },
   };
 }
 
@@ -184,18 +229,66 @@ interface ExportApiResponse {
  */
 export async function startExport(
   contentId: string,
-  options: Omit<StartExportRequest, "sessionId" | "contentId">
+  options: Omit<StartExportRequest, "contentId">,
+  accessToken?: string
 ): Promise<StartExportResponse> {
-  const { platforms, caption, hashtags, formatOptions, customFilename } = options;
+  const {
+    platforms,
+    formatOptions,
+    contentType,
+    caption,
+    hashtags,
+    sessionId,
+    clipId,
+  } = options;
+  const primaryPlatform = platforms[0];
+  const normalizedContentType = normalizeContentType(contentType);
 
-  // TODO: Implement post export support when content type detection is added.
-  // Currently only clip exports are supported.
+  if (!primaryPlatform) {
+    throw new Error("At least one export platform is required");
+  }
+
+  if (normalizedContentType === "post") {
+    const text = buildPostExportText(caption, hashtags);
+
+    if (!text.trim()) {
+      throw new Error("Post export requires text content");
+    }
+
+    const apiRequest: ApiExportPostRequest = {
+      text,
+      platform: toApiPlatform(primaryPlatform),
+      sessionId,
+      clipId,
+      options: {
+        copyToClipboard: true,
+        saveToFile: true,
+        optimizeHashtags: false,
+        addTimestamps: false,
+        createThread: false,
+      },
+    };
+
+    logger.debug("[export API] Sending post export request:", apiRequest);
+
+    const response = await apiClient.post<ExportApiResponse>(
+      `${EXPORT_API_BASE}/post`,
+      apiRequest,
+      withAuth(accessToken)
+    );
+
+    return {
+      exportId: response.data.id,
+      status: mapBackendStatus(response.data.status),
+      createdAt: response.data.createdAt || new Date().toISOString(),
+    };
+  }
 
   // Prepare clip export request with enum transformations
   const apiRequest: ApiExportClipRequest = {
-    clipId: contentId,
+    clipId: clipId || contentId,
     format: toApiFormat(formatOptions.format),
-    platform: platforms.length > 0 ? toApiPlatform(platforms[0]) : undefined,
+    platform: primaryPlatform ? toApiPlatform(primaryPlatform) : undefined,
     options: {
       quality: formatOptions.quality === "1080p" ? "high" :
                formatOptions.quality === "720p" ? "medium" : "high",
@@ -210,8 +303,9 @@ export async function startExport(
 
   // Call backend clip export endpoint
   const response = await apiClient.post<ExportApiResponse>(
-    "/api/export/clip",
-    apiRequest
+    `${EXPORT_API_BASE}/clip`,
+    apiRequest,
+    withAuth(accessToken)
   );
 
   // Transform response to match expected format
@@ -250,10 +344,12 @@ function mapBackendStatus(status: string): ExportJobStatus {
  * ```
  */
 export async function getExportStatus(
-  exportId: string
+  exportId: string,
+  accessToken?: string
 ): Promise<ExportStatusResponse> {
   const response = await apiClient.get<ExportApiResponse>(
-    `/api/export/${exportId}/status`
+    `${EXPORT_API_BASE}/${exportId}/status`,
+    withAuth(accessToken)
   );
 
   const data = response.data;
@@ -276,8 +372,8 @@ export async function getExportStatus(
     progress,
     message: data.metadata?.message as string | undefined,
     error: data.errorMessage,
-    downloadUrl: data.filePath ? `/api/export/${exportId}/download` : undefined,
-    filename: data.filePath ? data.filePath.split("/").pop() : undefined,
+    downloadUrl: data.downloadUrl,
+    filename: data.filename,
     fileSize: data.fileSize != null ? Number(data.fileSize) : undefined,
     completedAt: data.completedAt,
   };
@@ -297,10 +393,11 @@ export async function getExportStatus(
  * ```
  */
 export async function getExportDownloadUrl(
-  exportId: string
+  exportId: string,
+  accessToken?: string
 ): Promise<ExportDownloadResponse> {
   // Get export status first to validate completion
-  const status = await getExportStatus(exportId);
+  const status = await getExportStatus(exportId, accessToken);
 
   if (status.status !== "completed") {
     throw new Error("Export is not ready for download");

@@ -109,6 +109,8 @@ export interface ExportContent {
   videoUrl?: string;
   thumbnailUrl?: string;
   duration?: number;
+  sessionId?: string;
+  clipId?: string;
   createdAt: Date;
 }
 

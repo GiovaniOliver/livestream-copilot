@@ -14,6 +14,7 @@ import crypto from "crypto";
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = crypto.randomBytes(32).toString("base64");
 process.env.JWT_REFRESH_SECRET = crypto.randomBytes(32).toString("base64");
+process.env.TOKEN_ENCRYPTION_KEY = crypto.randomBytes(32).toString("base64");
 process.env.DATABASE_URL = "file:./test.db";
 process.env.PORT = "3123";
 process.env.WS_PORT = "3124";

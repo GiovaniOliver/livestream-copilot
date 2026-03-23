@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { ModeratorAction } from "./ModeratorAction";

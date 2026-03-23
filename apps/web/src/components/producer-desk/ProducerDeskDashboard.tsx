@@ -4,11 +4,15 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useWebSocket } from "@/contexts/WebSocketContext";
 import { useMoments } from "@/hooks/useMoments";
 import { usePosts } from "@/hooks/usePosts";
+import { useExport } from "@/hooks/useExport";
 import { ClipBin, type ClipData } from "./ClipBin";
 import { PostQueue, type SocialPost, type Platform } from "./PostQueue";
 import { MomentRail, type Moment, type MomentType } from "./MomentRail";
 import { ClipPreviewModal } from "@/components/video";
+import { ExportModal } from "@/components/export";
+import type { ExportContent } from "@/components/export/types";
 import { getClipMediaUrl } from "@/lib/api/clips";
+import { useAuth } from "@/lib/contexts/AuthContext";
 import type { Clip } from "@/components/dashboards/streamer/types";
 import { logger } from "@/lib/logger";
 
@@ -61,12 +65,15 @@ export function ProducerDeskDashboard({
   sessionStartTime = Date.now(),
 }: ProducerDeskDashboardProps) {
   const { connect, disconnect, clips, outputs, moments: wsMoments, isConnected } = useWebSocket();
+  const { accessToken } = useAuth();
 
   // Fetch historical moments from API
   const {
     moments: apiMoments,
     isLoading: momentsLoading,
     createMoment,
+    deleteMoment,
+    refresh: refreshMoments,
   } = useMoments(sessionId);
 
   // Post operations hook
@@ -80,8 +87,26 @@ export function ProducerDeskDashboard({
     clearError: clearPostError,
   } = usePosts();
 
+  // Export hook
+  const {
+    isModalOpen: isExportModalOpen,
+    currentContent: exportContent,
+    openExport,
+    closeExport,
+    handleExport,
+    generateHashtagSuggestions,
+  } = useExport();
+
   const [previewClip, setPreviewClip] = useState<Clip | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Inline editing state for hook variants
+  const [editingHook, setEditingHook] = useState<{ clipId: string; hookIndex: number } | null>(null);
+  const [editingHookText, setEditingHookText] = useState("");
+
+  // Post editing state
+  const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
+  const [editingPostText, setEditingPostText] = useState("");
 
   // Track optimistically updated posts
   const [optimisticUpdates, setOptimisticUpdates] = useState<Map<string, Partial<SocialPost>>>(new Map());
@@ -218,14 +243,26 @@ export function ProducerDeskDashboard({
   }, []);
 
   const handleExportClip = useCallback((clip: ClipData) => {
-    logger.debug("Export clip:", clip.id);
-    // TODO: Open export modal with clip data
-  }, []);
+    const content: ExportContent = {
+      id: clip.artifactId,
+      type: "clip",
+      title: clip.title,
+      caption: clip.hookVariants[0] || "",
+      videoUrl: getClipMediaUrl(clip.artifactId),
+      thumbnailUrl: clip.thumbnailUrl || undefined,
+      duration: clip.duration,
+      createdAt: clip.createdAt,
+    };
+    openExport(content);
+  }, [openExport]);
 
   const handleEditHook = useCallback((clipId: string, hookIndex: number) => {
-    logger.debug("Edit hook:", clipId, hookIndex);
-    // TODO: Open inline editor for hook variant
-  }, []);
+    const clip = clipList.find((c) => c.id === clipId);
+    if (!clip) return;
+
+    setEditingHook({ clipId, hookIndex });
+    setEditingHookText(clip.hookVariants[hookIndex] || "");
+  }, [clipList]);
 
   const handleClosePreview = useCallback(() => {
     setIsPreviewOpen(false);
@@ -267,7 +304,8 @@ export function ProducerDeskDashboard({
 
   // Post handlers
   const handleEditPost = useCallback((post: SocialPost) => {
-    // TODO: Open post editor modal
+    setEditingPost(post);
+    setEditingPostText(post.text);
   }, []);
 
   const handleApprovePost = useCallback(
@@ -347,14 +385,20 @@ export function ProducerDeskDashboard({
 
   // Moment handlers
   const handleMomentClick = useCallback((moment: Moment) => {
-    logger.debug("Jump to moment:", moment.id, moment.timestamp);
-    // TODO: Seek to moment timestamp in video player
+    window.dispatchEvent(
+      new CustomEvent("fluxboard:seek", {
+        detail: { timestamp: moment.timestamp, momentId: moment.id },
+      })
+    );
   }, []);
 
-  const handleMomentDelete = useCallback((momentId: string) => {
-    logger.debug("Delete moment:", momentId);
-    // TODO: Call API to delete moment
-  }, []);
+  const handleMomentDelete = useCallback(async (momentId: string) => {
+    try {
+      await deleteMoment(momentId);
+    } catch (error) {
+      logger.error("Failed to delete moment:", error);
+    }
+  }, [deleteMoment]);
 
   const handleAddMoment = useCallback(async (timestamp: number) => {
     logger.debug("Add moment at:", timestamp);
@@ -431,6 +475,15 @@ export function ProducerDeskDashboard({
             : false
         }
         videoSrc={previewClip ? getClipMediaUrl(previewClip.id) : undefined}
+      />
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={closeExport}
+        content={exportContent}
+        onExport={handleExport}
+        hashtagSuggestions={exportContent ? generateHashtagSuggestions(exportContent) : []}
       />
     </div>
   );

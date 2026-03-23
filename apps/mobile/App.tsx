@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavigationContainer, DarkTheme } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { View, ActivityIndicator, StyleSheet, AppState } from "react-native";
+import { View, ActivityIndicator, Pressable, StyleSheet, AppState } from "react-native";
 
 // Auth screens
 import LoginScreen from "./src/screens/LoginScreen";
@@ -17,6 +17,7 @@ import PodcastDashboard from "./src/screens/PodcastDashboard";
 import CaptureScreen from "./src/screens/CaptureScreen";
 import OBSControlScreen from "./src/screens/OBSControlScreen";
 import VideoSourceScreen from "./src/screens/VideoSourceScreen";
+import SettingsScreen from "./src/screens/SettingsScreen";
 
 // Stores
 import { useAuthStore } from "./src/stores/authStore";
@@ -46,6 +47,7 @@ export type MainStackParamList = {
   Capture: { workflowId: string; baseUrl: string };
   OBSControl: { baseUrl: string };
   VideoSource: { baseUrl: string };
+  Settings: undefined;
 };
 
 export type RootStackParamList = AuthStackParamList & MainStackParamList;
@@ -73,6 +75,44 @@ const navTheme = {
     notification: colors.purple,
   },
 };
+
+// =============================================================================
+// SETTINGS GEAR ICON COMPONENT
+// =============================================================================
+
+function SettingsGearIcon({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} hitSlop={12} style={gearStyles.container}>
+      <View style={gearStyles.gearOuter}>
+        <View style={gearStyles.gearInner} />
+      </View>
+    </Pressable>
+  );
+}
+
+const gearStyles = StyleSheet.create({
+  container: {
+    width: 32,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gearOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2.5,
+    borderColor: colors.muted,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  gearInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.muted,
+  },
+});
 
 // =============================================================================
 // AUTH NAVIGATOR
@@ -124,7 +164,12 @@ function MainNavigator() {
       <MainStack.Screen
         name="SessionPicker"
         component={SessionPickerScreen}
-        options={{ title: "Choose workflow" }}
+        options={({ navigation }) => ({
+          title: "Choose workflow",
+          headerRight: () => (
+            <SettingsGearIcon onPress={() => navigation.navigate("Settings")} />
+          ),
+        })}
       />
       <MainStack.Screen
         name="SessionSetup"
@@ -160,6 +205,11 @@ function MainNavigator() {
         name="VideoSource"
         component={VideoSourceScreen}
         options={{ headerShown: false, presentation: "fullScreenModal" }}
+      />
+      <MainStack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: "Settings" }}
       />
     </MainStack.Navigator>
   );

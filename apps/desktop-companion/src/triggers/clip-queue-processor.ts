@@ -51,6 +51,7 @@ export class ClipQueueProcessor {
   private isRunning: boolean = false;
   private processingCount: number = 0;
   private pollTimeout: NodeJS.Timeout | null = null;
+  private eventSink: ((event: EventEnvelope) => void) | null = null;
 
   constructor(wss: WebSocketServer, options?: Partial<ProcessorOptions>) {
     this.wss = wss;
@@ -83,6 +84,13 @@ export class ClipQueueProcessor {
     }
 
     logger.info("[clip-processor] Stopped");
+  }
+
+  /**
+   * Set the canonical event sink for queue and artifact events.
+   */
+  setEventSink(eventSink: ((event: EventEnvelope) => void) | null): void {
+    this.eventSink = eventSink;
   }
 
   /**
@@ -302,7 +310,7 @@ export class ClipQueueProcessor {
       },
     };
 
-    this.broadcast(event);
+    this.dispatchEvent(event);
   }
 
   /**
@@ -328,8 +336,24 @@ export class ClipQueueProcessor {
       },
     };
 
-    this.broadcast(event);
+    this.dispatchEvent(event);
     logger.info(`[clip-processor] Emitted ARTIFACT_CLIP_CREATED for ${artifactId}`);
+  }
+
+  /**
+   * Prefer the canonical event sink, with WebSocket broadcast fallback.
+   */
+  private dispatchEvent(event: EventEnvelope): void {
+    if (this.eventSink) {
+      try {
+        this.eventSink(event);
+        return;
+      } catch (error) {
+        logger.error({ err: error, eventType: event.type }, "[clip-processor] Failed to emit canonical event");
+      }
+    }
+
+    this.broadcast(event);
   }
 
   /**

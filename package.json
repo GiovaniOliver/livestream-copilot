@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "kill:ports": "powershell -NoProfile -Command \"$ErrorActionPreference='SilentlyContinue'; $ports=3125,3126,3000,1935,8888,8889,9997; foreach($p in $ports){ Get-NetTCPConnection -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; exit 0\"",
+    "kill:ports": "powershell -NoProfile -Command \"$ErrorActionPreference='SilentlyContinue'; $ports=3123,3124,3125,3126,3000,1935,8888,8889,9997; foreach($p in $ports){ Get-NetTCPConnection -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; exit 0\"",
     "dev": "concurrently --names \"API,WEB\" -c \"cyan,magenta\" \"pnpm dev:api\" \"pnpm dev:web\"",
     "dev:api": "pnpm --filter desktop-companion dev",
     "dev:web": "pnpm --filter @livestream-copilot/web dev",
@@ -21,7 +21,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit -p apps/desktop-companion/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.json",
-    "lint": "eslint apps/web/src --ext .ts,.tsx"
+    "lint": "pnpm --dir apps/web exec eslint src --ext .ts,.tsx"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.9",

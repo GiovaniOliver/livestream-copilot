@@ -138,8 +138,17 @@ function toTriggerSource(triggerType: string): "audio" | "visual" | "manual" {
   }
 }
 
-function emitQueueUpdated(wss: WebSocketServer | undefined, queueItem: ClipQueueService.ClipQueueItem | null): void {
-  if (!wss || !queueItem) return;
+interface ClipQueueRouteDeps {
+  wss?: WebSocketServer;
+  saveReplayBuffer?: () => Promise<string | null>;
+  emitEvent?: (event: EventEnvelope) => void;
+}
+
+function emitQueueUpdated(
+  deps: Pick<ClipQueueRouteDeps, "wss" | "emitEvent"> | undefined,
+  queueItem: ClipQueueService.ClipQueueItem | null
+): void {
+  if (!queueItem) return;
 
   const event: EventEnvelope = {
     id: uuidv4(),
@@ -160,8 +169,21 @@ function emitQueueUpdated(wss: WebSocketServer | undefined, queueItem: ClipQueue
     },
   };
 
+  if (deps?.emitEvent) {
+    try {
+      deps.emitEvent(event);
+      return;
+    } catch (error) {
+      apiLogger.error({ err: error, queueItemId: queueItem.id }, "[api/clip-queue] Failed to emit canonical event");
+    }
+  }
+
+  if (!deps?.wss) {
+    return;
+  }
+
   const message = JSON.stringify(event);
-  wss.clients.forEach((client) => {
+  deps.wss.clients.forEach((client) => {
     if (client.readyState === 1) {
       client.send(message);
     }
@@ -228,7 +250,7 @@ async function listSessionClipQueueHandler(req: Request, res: Response): Promise
 async function createManualClipHandler(
   req: Request,
   res: Response,
-  deps?: { wss?: WebSocketServer; saveReplayBuffer?: () => Promise<string | null> }
+  deps?: ClipQueueRouteDeps
 ): Promise<void> {
   try {
     const { sessionId } = req.params;
@@ -271,7 +293,7 @@ async function createManualClipHandler(
 
     const finalized = await ClipQueueService.endRecording(queueItem.id, t1);
 
-    emitQueueUpdated(deps?.wss, finalized);
+    emitQueueUpdated(deps, finalized);
 
     const itemWithDuration: ClipQueueService.ClipQueueItemWithDuration = {
       ...finalized,
@@ -461,7 +483,7 @@ export function createClipQueueRouter(): Router {
 }
 
 export function createSessionClipQueueRouter(
-  deps?: { wss?: WebSocketServer; saveReplayBuffer?: () => Promise<string | null> }
+  deps?: ClipQueueRouteDeps
 ): Router {
   const router = Router({ mergeParams: true });
 

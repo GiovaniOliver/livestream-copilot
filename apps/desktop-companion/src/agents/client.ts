@@ -6,6 +6,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { logger } from "../logger/index.js";
 import { config } from "../config/index.js";
 import { getOpikClient } from "../observability/opik.js";
@@ -16,11 +17,76 @@ import type {
 } from "./types.js";
 
 const aiLogger = logger.child({ module: "ai-client" });
+const DEFAULT_MODELS: Record<AIProvider, string> = {
+  anthropic: "claude-sonnet-4-20250514",
+  openai: "gpt-4o-mini",
+};
 
 /**
  * AI client instance (singleton).
  */
 let anthropicClient: Anthropic | null = null;
+let openaiClient: OpenAI | null = null;
+
+type ResolvedProvider = {
+  provider: AIProvider | null;
+  fallbackFrom?: AIProvider;
+};
+
+function looksLikeAnthropicModel(model: string): boolean {
+  return /^claude/i.test(model);
+}
+
+function looksLikeOpenAIModel(model: string): boolean {
+  return /^(gpt|o\d|chatgpt)/i.test(model);
+}
+
+function resolveProvider(): ResolvedProvider {
+  const preferred = config.AI_PROVIDER as AIProvider;
+
+  if (preferred === "anthropic") {
+    if (config.ANTHROPIC_API_KEY) {
+      return { provider: "anthropic" };
+    }
+    if (config.OPENAI_API_KEY) {
+      return { provider: "openai", fallbackFrom: "anthropic" };
+    }
+    return { provider: null };
+  }
+
+  if (preferred === "openai") {
+    if (config.OPENAI_API_KEY) {
+      return { provider: "openai" };
+    }
+    if (config.ANTHROPIC_API_KEY) {
+      return { provider: "anthropic", fallbackFrom: "openai" };
+    }
+    return { provider: null };
+  }
+
+  return { provider: null };
+}
+
+function resolveModel(
+  requestedModel: string | undefined,
+  provider: AIProvider
+): string {
+  const configuredModel = (requestedModel || config.AI_MODEL || "").trim();
+
+  if (!configuredModel) {
+    return DEFAULT_MODELS[provider];
+  }
+
+  if (provider === "anthropic" && looksLikeOpenAIModel(configuredModel)) {
+    return DEFAULT_MODELS.anthropic;
+  }
+
+  if (provider === "openai" && looksLikeAnthropicModel(configuredModel)) {
+    return DEFAULT_MODELS.openai;
+  }
+
+  return configuredModel;
+}
 
 /**
  * Get or create the Anthropic client.
@@ -39,12 +105,29 @@ function getAnthropicClient(): Anthropic {
 }
 
 /**
+ * Get or create the OpenAI client.
+ */
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    if (!config.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is required for AI agent operations");
+    }
+    openaiClient = new OpenAI({
+      apiKey: config.OPENAI_API_KEY,
+    });
+    aiLogger.info("OpenAI client initialized");
+  }
+  return openaiClient;
+}
+
+/**
  * Complete a chat using Anthropic Claude.
  */
 async function completeWithAnthropic(
   request: CompletionRequest
 ): Promise<CompletionResponse> {
   const client = getAnthropicClient();
+  const model = resolveModel(request.model, "anthropic");
 
   // Convert messages - separate system from user/assistant
   const systemMessage = request.systemPrompt || request.messages.find(m => m.role === "system")?.content;
@@ -56,7 +139,7 @@ async function completeWithAnthropic(
     }));
 
   const response = await client.messages.create({
-    model: request.model,
+    model,
     max_tokens: request.maxTokens,
     temperature: request.temperature ?? 0.7,
     system: systemMessage,
@@ -78,6 +161,44 @@ async function completeWithAnthropic(
 }
 
 /**
+ * Complete a chat using OpenAI chat completions.
+ */
+async function completeWithOpenAI(
+  request: CompletionRequest
+): Promise<CompletionResponse> {
+  const client = getOpenAIClient();
+  const model = resolveModel(request.model, "openai");
+  const systemMessage =
+    request.systemPrompt || request.messages.find((m) => m.role === "system")?.content;
+  const chatMessages: OpenAI.Chat.ChatCompletionMessageParam[] = request.messages
+    .filter((m) => m.role !== "system")
+    .map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.content,
+    }));
+
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = systemMessage
+    ? [{ role: "system", content: systemMessage }, ...chatMessages]
+    : chatMessages;
+
+  const response = await client.chat.completions.create({
+    model,
+    max_tokens: request.maxTokens,
+    temperature: request.temperature ?? 0.7,
+    messages,
+  });
+
+  return {
+    content: response.choices[0]?.message?.content ?? "",
+    usage: {
+      inputTokens: response.usage?.prompt_tokens ?? 0,
+      outputTokens: response.usage?.completion_tokens ?? 0,
+    },
+    finishReason: response.choices[0]?.finish_reason || "stop",
+  };
+}
+
+/**
  * Complete a chat using the configured AI provider.
  * Currently supports Anthropic Claude.
  * Includes Opik tracing when configured.
@@ -85,12 +206,30 @@ async function completeWithAnthropic(
 export async function complete(
   request: CompletionRequest
 ): Promise<CompletionResponse> {
-  const provider = config.AI_PROVIDER as AIProvider;
+  const resolved = resolveProvider();
+  const provider = resolved.provider;
+  const model = provider ? resolveModel(request.model, provider) : request.model;
+
+  if (!provider) {
+    throw new Error(
+      "No supported AI provider is configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY."
+    );
+  }
+
+  if (resolved.fallbackFrom) {
+    aiLogger.warn(
+      {
+        preferredProvider: resolved.fallbackFrom,
+        fallbackProvider: provider,
+      },
+      "Preferred AI provider is unavailable, using configured fallback"
+    );
+  }
 
   aiLogger.debug(
     {
       provider,
-      model: request.model,
+      model,
       messageCount: request.messages.length,
       maxTokens: request.maxTokens,
     },
@@ -105,13 +244,13 @@ export async function complete(
     name: "ai.completion",
     input: {
       provider,
-      model: request.model,
+      model,
       messageCount: request.messages.length,
       maxTokens: request.maxTokens,
     },
     metadata: {
       provider,
-      model: request.model,
+      model,
     },
   });
 
@@ -120,11 +259,11 @@ export async function complete(
 
     switch (provider) {
       case "anthropic":
-        response = await completeWithAnthropic(request);
+        response = await completeWithAnthropic({ ...request, model });
         break;
       case "openai":
-        // OpenAI support can be added later
-        throw new Error("OpenAI provider not yet implemented");
+        response = await completeWithOpenAI({ ...request, model });
+        break;
       default:
         throw new Error(`Unknown AI provider: ${provider}`);
     }
@@ -134,7 +273,7 @@ export async function complete(
     aiLogger.info(
       {
         provider,
-        model: request.model,
+        model,
         durationMs,
         inputTokens: response.usage.inputTokens,
         outputTokens: response.usage.outputTokens,
@@ -166,7 +305,7 @@ export async function complete(
       {
         err: error,
         provider,
-        model: request.model,
+        model,
         durationMs,
       },
       "AI completion failed"
@@ -192,23 +331,15 @@ export async function complete(
  * Check if the AI client is configured and ready.
  */
 export function isAIConfigured(): boolean {
-  const provider = config.AI_PROVIDER as AIProvider;
-
-  switch (provider) {
-    case "anthropic":
-      return !!config.ANTHROPIC_API_KEY;
-    case "openai":
-      return !!config.OPENAI_API_KEY;
-    default:
-      return false;
-  }
+  return resolveProvider().provider !== null;
 }
 
 /**
  * Get the default model for the configured provider.
  */
 export function getDefaultModel(): string {
-  return config.AI_MODEL;
+  const provider = resolveProvider().provider ?? (config.AI_PROVIDER as AIProvider);
+  return resolveModel(config.AI_MODEL, provider);
 }
 
 /**

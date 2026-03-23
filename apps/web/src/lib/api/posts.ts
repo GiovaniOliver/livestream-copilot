@@ -55,6 +55,15 @@ export interface PostInfo extends Omit<OutputInfo, 'status'> {
   scheduledFor?: string;
 }
 
+export interface PublishPostRequest {
+  connectionId: string;
+  platform?: string;
+  text?: string;
+  title?: string;
+  hashtags?: string[];
+  visibility?: "public" | "private" | "unlisted";
+}
+
 /**
  * Create request options with optional auth header
  */
@@ -96,11 +105,28 @@ export async function approvePost(postId: string, token?: string): Promise<PostI
  * @param postId - Post/Output ID
  * @param token - Optional auth token
  */
-export async function publishPost(postId: string, token?: string): Promise<PostInfo> {
+export async function publishPost(postId: string, token?: string): Promise<PostInfo>;
+export async function publishPost(
+  postId: string,
+  request: PublishPostRequest,
+  token?: string
+): Promise<PostInfo>;
+export async function publishPost(
+  postId: string,
+  requestOrToken?: PublishPostRequest | string,
+  maybeToken?: string
+): Promise<PostInfo> {
+  const requestBody =
+    typeof requestOrToken === "string" || requestOrToken === undefined
+      ? {}
+      : requestOrToken;
+  const token =
+    typeof requestOrToken === "string" ? requestOrToken : maybeToken;
+
   const response = await apiClient.post(
     `/api/posts/${encodeURIComponent(postId)}/publish`,
     postMutationResponseSchema,
-    {},
+    requestBody,
     withAuth(token)
   );
 

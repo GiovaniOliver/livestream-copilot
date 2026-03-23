@@ -27,7 +27,11 @@ import type {
   Organization,
   Prisma,
 } from "../generated/prisma/client.js";
-import { UserStatus, PlatformRole } from "../generated/prisma/enums.js";
+import {
+  UserStatus,
+  PlatformRole,
+  OrgRole,
+} from "../generated/prisma/enums.js";
 import {
   hashPassword,
   verifyPassword,
@@ -271,6 +275,118 @@ async function logAuditEvent(
   }
 }
 
+function buildDefaultOrganizationName(
+  name: string | null,
+  email: string
+): string {
+  const label = name?.trim() || email.split("@")[0]?.trim() || "User";
+  return `${label}'s Workspace`;
+}
+
+function slugifyOrganizationLabel(value: string): string {
+  const slug = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+
+  return slug || "workspace";
+}
+
+function buildDefaultOrganizationSlug(
+  userId: string,
+  name: string | null,
+  email: string
+): string {
+  const baseLabel = name?.trim() || email.split("@")[0]?.trim() || "workspace";
+  const userSuffix = userId.slice(-8).toLowerCase();
+  return `${slugifyOrganizationLabel(baseLabel)}-workspace-${userSuffix}`;
+}
+
+async function loadUserWithOrganizations(
+  userId: string
+): Promise<UserWithOrgs | null> {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      memberships: {
+        include: {
+          organization: true,
+        },
+      },
+    },
+  }) as Promise<UserWithOrgs | null>;
+}
+
+export async function ensureDefaultOrganizationForUser(
+  user: Pick<User, "id" | "email" | "name">
+): Promise<UserWithOrgs> {
+  const existingUser = await loadUserWithOrganizations(user.id);
+
+  if (!existingUser) {
+    throw AuthError.userNotFound();
+  }
+
+  if (existingUser.memberships.length > 0) {
+    return existingUser;
+  }
+
+  const organizationName = buildDefaultOrganizationName(
+    existingUser.name,
+    existingUser.email
+  );
+  const organizationSlug = buildDefaultOrganizationSlug(
+    existingUser.id,
+    existingUser.name,
+    existingUser.email
+  );
+
+  const organization = await prisma.organization.upsert({
+    where: { slug: organizationSlug },
+    update: {
+      name: organizationName,
+      ownerId: existingUser.id,
+    },
+    create: {
+      name: organizationName,
+      slug: organizationSlug,
+      ownerId: existingUser.id,
+    },
+  });
+
+  await prisma.organizationMember.upsert({
+    where: {
+      organizationId_userId: {
+        organizationId: organization.id,
+        userId: existingUser.id,
+      },
+    },
+    update: {
+      role: OrgRole.OWNER,
+      joinedAt: new Date(),
+    },
+    create: {
+      organizationId: organization.id,
+      userId: existingUser.id,
+      role: OrgRole.OWNER,
+      joinedAt: new Date(),
+    },
+  });
+
+  await logAuditEvent("auth.organization_bootstrap.success", existingUser.id, {
+    organizationId: organization.id,
+    organizationSlug,
+  });
+
+  const hydratedUser = await loadUserWithOrganizations(existingUser.id);
+
+  if (!hydratedUser) {
+    throw AuthError.userNotFound();
+  }
+
+  return hydratedUser;
+}
+
 // =============================================================================
 // AUTHENTICATION SERVICE
 // =============================================================================
@@ -497,12 +613,14 @@ export const authService = {
       logger.info(`[auth] Password rehashed for user ${user.id}`);
     }
 
+    const userWithOrgs = await ensureDefaultOrganizationForUser(user);
+
     // Generate tokens
     const accessTokenPayload: AccessTokenPayload = {
-      sub: user.id,
-      email: user.email,
-      platformRole: user.platformRole,
-      organizations: user.memberships.map((m) => ({
+      sub: userWithOrgs.id,
+      email: userWithOrgs.email,
+      platformRole: userWithOrgs.platformRole,
+      organizations: userWithOrgs.memberships.map((m) => ({
         id: m.organization.id,
         role: m.role,
       })),
@@ -511,16 +629,16 @@ export const authService = {
 
     const accessToken = generateAccessToken(accessTokenPayload);
     const { token: refreshToken, jti } = generateRefreshToken({
-      sub: user.id,
-      email: user.email,
-      platformRole: user.platformRole,
+      sub: userWithOrgs.id,
+      email: userWithOrgs.email,
+      platformRole: userWithOrgs.platformRole,
     });
 
     // Store refresh token hash in database
     const tokenExpiry = getRefreshTokenExpiry();
     await prisma.refreshToken.create({
       data: {
-        userId: user.id,
+        userId: userWithOrgs.id,
         tokenHash: hashToken(refreshToken),
         deviceInfo: deviceInfo ?? null,
         ipAddress: ipAddress ?? null,
@@ -539,7 +657,7 @@ export const authService = {
       accessToken,
       refreshToken,
       expiresIn: env.JWT_ACCESS_EXPIRY,
-      user: user as UserWithOrgs,
+      user: userWithOrgs,
     };
   },
 
@@ -623,18 +741,14 @@ export const authService = {
       throw AuthError.accountDeleted();
     }
 
-    // Get user's organization memberships for the new token
-    const memberships = await prisma.organizationMember.findMany({
-      where: { userId: user.id },
-      include: { organization: true },
-    });
+    const userWithOrgs = await ensureDefaultOrganizationForUser(user);
 
     // Generate new access token
     const accessTokenPayload: AccessTokenPayload = {
-      sub: user.id,
-      email: user.email,
-      platformRole: user.platformRole,
-      organizations: memberships.map((m) => ({
+      sub: userWithOrgs.id,
+      email: userWithOrgs.email,
+      platformRole: userWithOrgs.platformRole,
+      organizations: userWithOrgs.memberships.map((m) => ({
         id: m.organization.id,
         role: m.role,
       })),
@@ -1148,16 +1262,17 @@ export const authService = {
    * @returns User with organizations or null if not found
    */
   async getUserWithOrgs(userId: string): Promise<UserWithOrgs | null> {
-    return prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        memberships: {
-          include: {
-            organization: true,
-          },
-        },
-      },
-    }) as Promise<UserWithOrgs | null>;
+    const user = await loadUserWithOrganizations(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    if (user.memberships.length > 0) {
+      return user;
+    }
+
+    return ensureDefaultOrganizationForUser(user);
   },
 
   /**

@@ -11,6 +11,7 @@
 import crypto from 'crypto';
 import { prisma } from '../db/index.js';
 import { getClient, isPlatformConfigured, getSupportedPlatforms } from './clients/index.js';
+import { encryptToken, decryptToken } from '../utils/crypto.js';
 import type {
   SocialPlatform,
   SocialOAuthState,
@@ -28,42 +29,6 @@ const socialLogger = logger.child({ module: 'social' });
 
 // In-memory state storage for OAuth (use Redis in production)
 const pendingStates = new Map<string, SocialOAuthState>();
-
-// =============================================================================
-// ENCRYPTION HELPERS
-// =============================================================================
-
-const ENCRYPTION_KEY = process.env.SOCIAL_ENCRYPTION_KEY || process.env.JWT_SECRET || 'default-key-change-me';
-const ALGORITHM = 'aes-256-gcm';
-
-function encrypt(text: string): string {
-  const iv = crypto.randomBytes(16);
-  const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-
-  const authTag = cipher.getAuthTag();
-
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
-}
-
-function decrypt(encrypted: string): string {
-  const [ivHex, authTagHex, encryptedText] = encrypted.split(':');
-
-  const iv = Buffer.from(ivHex, 'hex');
-  const authTag = Buffer.from(authTagHex, 'hex');
-  const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-
-  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-  decipher.setAuthTag(authTag);
-
-  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-
-  return decrypted;
-}
 
 // =============================================================================
 // CONNECTION MANAGEMENT
@@ -201,8 +166,8 @@ export async function completeConnection(
       platform,
       platformUserId: userInfo.id,
       platformUsername: userInfo.username,
-      accessToken: encrypt(tokens.access_token),
-      refreshToken: tokens.refresh_token ? encrypt(tokens.refresh_token) : null,
+      accessToken: encryptToken(tokens.access_token),
+      refreshToken: tokens.refresh_token ? encryptToken(tokens.refresh_token) : null,
       tokenExpiresAt,
       scopes: tokens.scope?.split(' ') || [],
       accountName: userInfo.displayName,
@@ -210,8 +175,8 @@ export async function completeConnection(
       isActive: true,
     },
     update: {
-      accessToken: encrypt(tokens.access_token),
-      refreshToken: tokens.refresh_token ? encrypt(tokens.refresh_token) : null,
+      accessToken: encryptToken(tokens.access_token),
+      refreshToken: tokens.refresh_token ? encryptToken(tokens.refresh_token) : null,
       tokenExpiresAt,
       scopes: tokens.scope?.split(' ') || [],
       accountName: userInfo.displayName,
@@ -310,7 +275,7 @@ export async function disconnectAccount(
   const client = getClient(connection.platform as SocialPlatform);
   if (client && client.revokeToken) {
     try {
-      const accessToken = decrypt(connection.accessToken);
+      const accessToken = decryptToken(connection.accessToken);
       await client.revokeToken(accessToken);
     } catch (err) {
       socialLogger.warn(
@@ -355,7 +320,7 @@ async function getValidAccessToken(connectionId: string): Promise<string> {
   }
 
   const platform = connection.platform as SocialPlatform;
-  let accessToken = decrypt(connection.accessToken);
+  let accessToken = decryptToken(connection.accessToken);
 
   // Check if token is expired or expiring soon
   const isExpired =
@@ -375,16 +340,16 @@ async function getValidAccessToken(connectionId: string): Promise<string> {
     }
 
     try {
-      const refreshToken = decrypt(connection.refreshToken);
+      const refreshToken = decryptToken(connection.refreshToken);
       const tokens = await client.refreshAccessToken(refreshToken);
 
       // Update stored tokens
       await prisma.socialConnection.update({
         where: { id: connectionId },
         data: {
-          accessToken: encrypt(tokens.access_token),
+          accessToken: encryptToken(tokens.access_token),
           refreshToken: tokens.refresh_token
-            ? encrypt(tokens.refresh_token)
+            ? encryptToken(tokens.refresh_token)
             : connection.refreshToken,
           tokenExpiresAt: tokens.expires_in
             ? new Date(Date.now() + tokens.expires_in * 1000)

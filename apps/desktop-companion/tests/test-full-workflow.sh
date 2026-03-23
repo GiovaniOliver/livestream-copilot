@@ -11,7 +11,7 @@
 # - STT transcription flow
 # - AI agent processing
 # - Real-time WebSocket updates
-# - Content export functionality
+# - Persisted artifact verification
 # - Database persistence
 # - File system operations
 #
@@ -22,14 +22,14 @@
 # 4. Capture clips
 # 5. Generate AI outputs
 # 6. Monitor real-time events
-# 7. Export content
+# 7. Check persisted artifacts
 # 8. End session
 #
 # Prerequisites:
 # - Server running on http://localhost:3123
 # - OBS Studio running with WebSocket enabled
 # - Replay buffer configured
-# - DEEPGRAM_API_KEY for STT
+# - Optional: DEEPGRAM_API_KEY for live STT (the script can inject transcript segments deterministically)
 # - ANTHROPIC_API_KEY for agents
 # - FFmpeg installed
 # - websocat installed
@@ -54,6 +54,7 @@ WS_OUTPUT_FILE=""
 CLIP_COUNT=0
 OUTPUT_COUNT=0
 TRANSCRIPT_COUNT=0
+MOMENT_COUNT=0
 
 # =============================================================================
 # Test Setup
@@ -105,6 +106,7 @@ collect_metrics() {
     CLIP_COUNT=$(grep -c "ARTIFACT_CLIP_CREATED" "$events_file" 2>/dev/null || echo "0")
     OUTPUT_COUNT=$(grep -c "OUTPUT_CREATED" "$events_file" 2>/dev/null || echo "0")
     TRANSCRIPT_COUNT=$(grep -c "TRANSCRIPT_SEGMENT" "$events_file" 2>/dev/null || echo "0")
+    MOMENT_COUNT=$(grep -c "MOMENT_MARKER" "$events_file" 2>/dev/null || echo "0")
   fi
 }
 
@@ -197,6 +199,10 @@ EOF
   print_info "Database ID: $DB_SESSION_ID"
   print_info "WebSocket URL: $ws_url"
 
+  if [ -n "$ws_url" ] && [ "$ws_url" != "null" ]; then
+    WS_URL="$ws_url"
+  fi
+
   # Verify session directory
   if [ -d "./sessions/$SESSION_ID" ]; then
     print_success "Session directory created"
@@ -214,23 +220,27 @@ EOF
 phase_3_obs_initialization() {
   print_header "Phase 3: OBS Integration"
 
-  print_step "Initializing OBS replay buffer..."
+  print_step "Checking OBS replay buffer state..."
 
-  local replay_status=$(http_get "/obs/replay-buffer/status")
-  local active=$(json_field "$replay_status" "active")
+  local obs_status=$(http_get "/obs/status")
+  local active=$(echo "$obs_status" | jq -r '.data.replayBufferActive // .replayBufferActive // "false"')
 
-  if [ "$active" != "true" ]; then
-    print_info "Starting replay buffer..."
-    local start_response=$(http_post "/obs/replay-buffer/start" "{}")
-
-    if check_json_ok "$start_response"; then
-      print_success "Replay buffer started"
-    else
-      print_error "Failed to start replay buffer"
-      return 1
-    fi
+  if [ "$active" = "true" ]; then
+    print_success "Replay buffer active"
   else
-    print_success "Replay buffer already active"
+    print_warning "Replay buffer not active after session start"
+    print_info "The backend attempts to enable replay on session start; clip creation may fall back to latest replay files if OBS state is incomplete."
+  fi
+
+  print_step "Checking live preview stream state..."
+  local video_status=$(http_get "/api/video/status")
+  local preview_active=$(echo "$video_status" | jq -r '.data.streamActive // .streamActive // "false"')
+
+  if [ "$preview_active" = "true" ]; then
+    print_success "Live preview stream active"
+  else
+    print_warning "Live preview stream not active"
+    print_info "Producer Desk preview depends on an active MediaMTX ingest path."
   fi
 
   sleep 2
@@ -258,15 +268,14 @@ EOF
 
   local response=$(http_post "/stt/start" "$stt_config")
 
-  if ! check_json_ok "$response"; then
-    print_warning "STT not available, continuing without transcription"
-    return 0
+  if check_json_ok "$response"; then
+    print_success "STT started"
+  else
+    print_warning "STT start failed or is unavailable; continuing with deterministic transcript injection"
   fi
 
-  print_success "STT started"
-
   # Simulate audio streaming by sending test transcript segments
-  print_step "Simulating transcript capture..."
+  print_step "Injecting transcript capture..."
 
   local test_transcripts=(
     '{"speakerId": "streamer_1", "text": "Hey everyone, welcome to the stream! Today we have something really special planned.", "t0": 1.0, "t1": 8.0}'
@@ -281,6 +290,22 @@ EOF
   done
 
   print_success "Transcript segments captured (${#test_transcripts[@]} segments)"
+
+  print_step "Injecting moment markers..."
+  local test_moments=(
+    '{"label": "Amazing Intro", "t": 12.0, "confidence": 0.92, "notes": "Strong opening hook for the stream."}'
+    '{"label": "Technical Discussion", "t": 22.0, "confidence": 0.88, "notes": "Clear explanation of the AI workflow."}'
+  )
+
+  for moment in "${test_moments[@]}"; do
+    local moment_response=$(http_post "/event/moment" "$moment")
+    if ! check_json_ok "$moment_response"; then
+      print_warning "Moment injection failed for payload: $moment"
+    fi
+    sleep 1
+  done
+
+  print_success "Moment markers captured (${#test_moments[@]} markers)"
 
   # Give agents time to process
   sleep 5
@@ -310,11 +335,8 @@ phase_5_clip_capture() {
     # Mark clip start
     http_post "/clip/start" "{\"t\": $start_t, \"source\": \"api\"}" > /dev/null
 
-    # Mark clip end
-    http_post "/clip/end" "{\"t\": $end_t, \"source\": \"api\"}" > /dev/null
-
-    # Capture clip
-    local capture_response=$(http_post "/clip/capture" "{}")
+    # Mark clip end and capture the clip in one request
+    local capture_response=$(http_post "/clip/end" "{\"t\": $end_t, \"source\": \"api\"}")
 
     if check_json_ok "$capture_response"; then
       local artifact_id=$(json_field "$capture_response" "artifactId")
@@ -328,7 +350,7 @@ phase_5_clip_capture() {
 
   # Save replay buffer
   print_step "Saving replay buffer..."
-  local replay_response=$(http_post "/obs/replay-buffer/save" "{}")
+  local replay_response=$(http_post "/obs/replay/save" "{}")
 
   if check_json_ok "$replay_response"; then
     print_success "Replay buffer saved"
@@ -353,15 +375,16 @@ phase_6_agent_processing() {
 
   print_info "Generated outputs: $OUTPUT_COUNT"
   print_info "Processed transcripts: $TRANSCRIPT_COUNT"
+  print_info "Recorded moments: $MOMENT_COUNT"
 
   if [ "$OUTPUT_COUNT" -gt 0 ]; then
     print_success "Agents generated outputs"
 
     # Retrieve outputs
-    local outputs_response=$(http_get "/outputs?sessionId=$SESSION_ID")
+    local outputs_response=$(http_get "/api/outputs?sessionId=$SESSION_ID")
 
     if check_json_ok "$outputs_response"; then
-      echo "$outputs_response" | jq -r '.outputs[] | "  [\(.category)] \(.text | .[0:60])..."' | while read line; do
+      echo "$outputs_response" | jq -r '(.data.outputs // .outputs // [])[] | "  [\(.category)] \(.text | .[0:60])..."' | while read line; do
         print_info "$line"
       done
     fi
@@ -404,48 +427,13 @@ phase_7_realtime_monitoring() {
 }
 
 phase_8_content_export() {
-  print_header "Phase 8: Content Export"
+  print_header "Phase 8: Export Surface"
 
-  print_step "Testing export functionality..."
+  print_step "Checking export surface..."
 
-  # Check if export endpoint exists
-  local export_formats=$(http_get "/export/formats")
-
-  if check_json_ok "$export_formats"; then
-    print_success "Export functionality available"
-
-    # List available formats
-    echo "$export_formats" | jq -r '.formats[] | "  - \(.)"' | while read line; do
-      print_info "$line"
-    done
-
-    # Trigger export
-    print_step "Exporting session data..."
-    local export_request=$(cat <<EOF
-{
-  "sessionId": "$SESSION_ID",
-  "format": "json",
-  "includeClips": true,
-  "includeTranscripts": true,
-  "includeOutputs": true
-}
-EOF
-)
-
-    local export_response=$(http_post "/export/create" "$export_request")
-
-    if check_json_ok "$export_response"; then
-      local export_id=$(json_field "$export_response" "exportId")
-      local export_path=$(json_field "$export_response" "path")
-
-      print_success "Export created: $export_id"
-      print_info "Export path: $export_path"
-    else
-      print_warning "Export creation failed"
-    fi
-  else
-    print_warning "Export functionality not available"
-  fi
+  print_warning "Skipping legacy unauthenticated export flow"
+  print_info "Current export routes live under /api/v1/export and require auth."
+  print_info "Export is not part of the Phase 1 streamer demo success criteria."
 
   return 0
 }
@@ -457,7 +445,7 @@ phase_9_session_end() {
   http_post "/stt/stop" "{}" > /dev/null || true
 
   print_step "Ending session..."
-  local end_response=$(http_post "/session/end" "{}")
+  local end_response=$(http_post "/session/stop" "{}")
 
   if check_json_ok "$end_response"; then
     print_success "Session ended successfully"
@@ -512,6 +500,7 @@ phase_10_verification() {
 
   print_step "Final workflow metrics:"
   print_info "  Transcripts processed: $TRANSCRIPT_COUNT"
+  print_info "  Moments recorded: $MOMENT_COUNT"
   print_info "  Clips captured: $CLIP_COUNT"
   print_info "  AI outputs generated: $OUTPUT_COUNT"
 

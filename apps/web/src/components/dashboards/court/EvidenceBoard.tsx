@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { forwardRef, useState, type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";

@@ -215,12 +215,14 @@ export async function startSession(
     participants: config.participants || [],
   };
 
-  return apiClient.post(
-    "/session/start",
+  const response = await apiClient.post(
+    "/api/sessions/start",
     startSessionResponseSchema,
     backendConfig,
     withAuth(accessToken)
   );
+
+  return response;
 }
 
 /**
@@ -262,12 +264,14 @@ export async function endSession(
 export async function forceStopSession(
   accessToken?: string
 ): Promise<{ ok: boolean; message: string }> {
-  return apiClient.post(
-    "/session/force-stop",
+  const response = await apiClient.post(
+    "/api/sessions/active/stop",
     forceStopSessionResponseSchema,
     {},
     withAuth(accessToken)
   );
+
+  return response;
 }
 
 /**
@@ -279,22 +283,20 @@ export async function getActiveSession(
 ): Promise<SessionDetails | null> {
   try {
     const response = await apiClient.get(
-      "/session/status",
+      "/api/sessions/active",
       sessionStatusResponseSchema,
       withAuth(accessToken)
     );
 
-    if (!response.ok || !response.active || !response.sessionId) {
+    if (!response.active || !response.sessionId) {
       return null;
     }
 
-    // Use the new top-level fields from the backend response
-    // Fall back to legacy nested fields if needed
-    const workflow = response.workflow || response.session?.workflow || "streamer";
-    const captureMode = response.captureMode || response.session?.captureMode || "av";
-    const title = response.title || response.session?.title || "Active Session";
-    const startedAt = response.startedAt || response.t0 || Date.now();
-    const participants = response.participants || response.session?.participants || [];
+    const workflow = response.workflow || "streamer";
+    const captureMode = response.captureMode || "av";
+    const title = response.title || "Active Session";
+    const startedAt = response.startedAt || Date.now();
+    const participants = response.participants || [];
 
     return {
       sessionId: response.sessionId,
@@ -304,7 +306,7 @@ export async function getActiveSession(
       startedAt,
       clipCount: 0,
       outputCount: 0,
-      participants: participants.map((p, index) =>
+      participants: participants.map((p: any, index: number) =>
         typeof p === "string"
           ? { id: `participant-${index}`, name: p }
           : p

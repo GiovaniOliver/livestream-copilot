@@ -1,0 +1,3335 @@
+openapi: 3.1.0
+info:
+  title: FluxBoard Livestream Copilot API
+  description: |
+    REST API for the FluxBoard Livestream Copilot desktop companion service.
+
+    FluxBoard provides real-time livestream capture, AI-powered content generation,
+    OBS Studio integration, clip management, social media export, and video streaming
+    for content creators.
+
+    ## Authentication
+
+    Most endpoints require authentication via one of two methods:
+
+    1. **Bearer JWT** - Pass an access token in the `Authorization` header.
+    2. **API Key** - Pass an API key in the `x-api-key` header.
+
+    Public endpoints (health checks, OBS status, event reads) do not require authentication
+    during development.
+
+    ## WebSocket Events
+
+    The server exposes a WebSocket on a configurable port (default 9001). Clients receive
+    real-time `EventEnvelope` messages for session lifecycle, transcripts, clips, outputs,
+    and trigger detections. Connect and listen for JSON messages.
+
+    Event types: `SESSION_START`, `SESSION_END`, `TRANSCRIPT_SEGMENT`, `MOMENT_MARKER`,
+    `CLIP_INTENT_START`, `CLIP_INTENT_END`, `ARTIFACT_CLIP_CREATED`, `ARTIFACT_FRAME_CREATED`,
+    `OUTPUT_CREATED`, `OUTPUT_VALIDATED`, `AUTO_TRIGGER_DETECTED`, `CLIP_QUEUE_UPDATED`.
+
+    ## Rate Limiting
+
+    Rate-limited endpoints return standard `RateLimit-*` headers. When exceeded, the server
+    responds with `429 Too Many Requests`.
+
+    | Endpoint Group        | Limit              |
+    |-----------------------|--------------------|
+    | Session list          | 30 req/min per IP  |
+    | Session read          | 100 req/min per IP |
+    | Output regenerate     | 10 req/min per user|
+    | Auth login            | 5 per 15min per IP:email |
+    | Auth register         | 3 per hour per IP  |
+    | Auth password reset   | 3 per hour per IP  |
+    | Auth token refresh    | 10 per min per IP  |
+
+  version: 1.0.0
+  contact:
+    name: FluxBoard Engineering
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:4555
+    description: Local development server
+  - url: http://localhost:{port}
+    description: Custom port
+    variables:
+      port:
+        default: "4555"
+
+tags:
+  - name: Health
+    description: Service health and status endpoints
+  - name: Auth
+    description: User registration, login, token management, and password flows
+  - name: OAuth
+    description: OAuth provider authentication (Google, GitHub, Twitch)
+  - name: Sessions
+    description: Livestream session lifecycle management
+  - name: Events
+    description: Session event and moment marker management
+  - name: Outputs
+    description: AI-generated content output management
+  - name: Clips
+    description: Video clip management
+  - name: ClipQueue
+    description: Clip processing queue management
+  - name: OBS
+    description: OBS Studio WebSocket control (scenes, streaming, recording, replay)
+  - name: Recordings
+    description: Mobile recording uploads
+  - name: Triggers
+    description: Auto-trigger configuration (audio phrases, visual references)
+  - name: Billing
+    description: Subscription plans, checkout, and usage
+  - name: Export
+    description: Social media post and clip export
+  - name: Branding
+    description: Video branding overlays, intros, outros, and presets
+  - name: Social
+    description: Social media platform connections and posting
+  - name: Video
+    description: MediaMTX video streaming server control
+  - name: Agents
+    description: AI agent observability and status
+  - name: STT
+    description: Speech-to-text transcription control
+  - name: FFmpeg
+    description: FFmpeg availability status
+  - name: Legacy
+    description: Legacy session and clip endpoints (non-prefixed)
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from /api/v1/auth/login or /api/v1/auth/refresh
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Static API key for service-to-service communication
+
+  schemas:
+    # ── Common ─────────────────────────────────────────────────────────────
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+      required: [success]
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: "field: Invalid value"
+          required: [code, message]
+      required: [success, error]
+
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+      required: [ok]
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          example: 50
+        offset:
+          type: integer
+          example: 0
+        total:
+          type: integer
+          example: 12
+
+    # ── Auth ───────────────────────────────────────────────────────────────
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        emailVerified:
+          type: boolean
+        name:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        platformRole:
+          type: string
+        status:
+          type: string
+        organizations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              role:
+                type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Token lifetime in seconds
+        tokenType:
+          type: string
+          example: Bearer
+        user:
+          $ref: '#/components/schemas/AuthUser'
+
+    # ── Session ────────────────────────────────────────────────────────────
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          description: CUID primary key
+          example: cmlbcgemg0000i7b80ufgh3ko
+        workflow:
+          type: string
+          enum: [streamer, writers_room, brainstorm, debate, podcast]
+        captureMode:
+          type: string
+          enum: [audio, video, av]
+        title:
+          type: string
+          nullable: true
+        participants:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+          description: Whether the session is currently running in memory
+        counts:
+          type: object
+          properties:
+            events:
+              type: integer
+            outputs:
+              type: integer
+            clips:
+              type: integer
+
+    # ── Event ──────────────────────────────────────────────────────────────
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - SESSION_START
+            - SESSION_END
+            - TRANSCRIPT_SEGMENT
+            - MOMENT_MARKER
+            - CLIP_INTENT_START
+            - CLIP_INTENT_END
+            - ARTIFACT_CLIP_CREATED
+            - ARTIFACT_FRAME_CREATED
+            - OUTPUT_CREATED
+            - OUTPUT_VALIDATED
+            - AUTO_TRIGGER_DETECTED
+            - CLIP_QUEUE_UPDATED
+        payload:
+          type: object
+        ts:
+          type: string
+          description: Unix timestamp as string (BigInt)
+        timestamp:
+          type: number
+          description: Unix timestamp as number
+        traceId:
+          type: string
+          nullable: true
+        spanId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Moment:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        type:
+          type: string
+          enum: [hype, qa, sponsor, clip, highlight, marker]
+        label:
+          type: string
+        description:
+          type: string
+          nullable: true
+        timestamp:
+          type: number
+          description: Seconds from session start
+        clipId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── Output ─────────────────────────────────────────────────────────────
+    Output:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+          nullable: true
+        text:
+          type: string
+        refs:
+          type: array
+          items:
+            type: string
+        meta:
+          type: object
+          nullable: true
+        status:
+          type: string
+          enum: [draft, approved, published, archived]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ── Clip ───────────────────────────────────────────────────────────────
+    Clip:
+      type: object
+      properties:
+        id:
+          type: string
+        artifactId:
+          type: string
+        sessionId:
+          type: string
+        path:
+          type: string
+        t0:
+          type: number
+          description: Start time in seconds from session start
+        t1:
+          type: number
+          description: End time in seconds from session start
+        duration:
+          type: number
+          description: Duration in seconds (t1 - t0)
+        thumbnailId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── ClipQueueItem ──────────────────────────────────────────────────────
+    ClipQueueItem:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        clipId:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, recording, processing, completed, failed]
+        triggerType:
+          type: string
+          enum: [audio, visual, manual]
+        triggerSource:
+          type: string
+          nullable: true
+        triggerConfidence:
+          type: number
+          nullable: true
+        t0:
+          type: number
+        t1:
+          type: number
+          nullable: true
+        duration:
+          type: number
+          nullable: true
+        thumbnailPath:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ── Recording ──────────────────────────────────────────────────────────
+    MobileRecording:
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        size:
+          type: integer
+        uploadedAt:
+          type: string
+          format: date-time
+
+    # ── Billing ────────────────────────────────────────────────────────────
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        monthlyPriceId:
+          type: string
+        yearlyPriceId:
+          type: string
+
+    # ── Social ─────────────────────────────────────────────────────────────
+    SocialPlatform:
+      type: string
+      enum: [YOUTUBE, TWITTER, TIKTOK, LINKEDIN, INSTAGRAM, FACEBOOK, THREADS, BLUESKY]
+
+  parameters:
+    SessionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^c[a-z0-9]{24,}$'
+      description: Session CUID
+    SessionIdParam:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Session ID
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 50
+        maximum: 100
+        minimum: 1
+    OffsetParam:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+
+# =============================================================================
+# PATHS
+# =============================================================================
+paths:
+  # ── Health ─────────────────────────────────────────────────────────────
+  /health:
+    get:
+      tags: [Health]
+      summary: Service health check
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: Service status with component health
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  service:
+                    type: string
+                    example: desktop-companion
+                  version:
+                    type: string
+                  uptime:
+                    type: number
+                  timestamp:
+                    type: string
+                    format: date-time
+                  database:
+                    type: boolean
+                  ffmpeg:
+                    type: boolean
+                  agents:
+                    type: boolean
+                  sessionId:
+                    type: string
+                    nullable: true
+                  components:
+                    type: object
+                  session:
+                    type: object
+
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Service health check (API-prefixed alias)
+      operationId: getHealthApi
+      security: []
+      responses:
+        "200":
+          description: Same as /health
+
+  /ffmpeg/status:
+    get:
+      tags: [FFmpeg]
+      summary: FFmpeg availability status
+      operationId: getFFmpegStatus
+      security: []
+      responses:
+        "200":
+          description: FFmpeg and FFprobe availability
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      ready:
+                        type: boolean
+                      ffmpeg:
+                        type: object
+                      ffprobe:
+                        type: object
+                      clipOutputFormat:
+                        type: string
+                      ffmpegPath:
+                        type: string
+                      ffprobePath:
+                        type: string
+
+  # ── Auth ─────────────────────────────────────────────────────────────────
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user account
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 128
+                name:
+                  type: string
+                  maxLength: 100
+            example:
+              email: creator@example.com
+              password: SecurePass123!@
+              name: Stream Creator
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "409":
+          description: Email already registered
+        "429":
+          description: Rate limit exceeded (3 per hour per IP)
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate and receive tokens
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+            example:
+              email: creator@example.com
+              password: SecurePass123!@
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/LoginResponse'
+        "401":
+          description: Invalid credentials
+        "429":
+          description: Rate limit exceeded (5 per 15min per IP:email)
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: New access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      expiresIn:
+                        type: integer
+                      tokenType:
+                        type: string
+                        example: Bearer
+        "401":
+          description: Invalid or expired refresh token
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke a refresh token
+      operationId: logoutUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Logged out (always succeeds to prevent token enumeration)
+
+  /api/v1/auth/logout-all:
+    post:
+      tags: [Auth]
+      summary: Revoke all refresh tokens for the current user
+      operationId: logoutAllSessions
+      responses:
+        "200":
+          description: All sessions terminated
+
+  /api/v1/auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Verify email address
+      operationId: verifyEmail
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  maxLength: 256
+      responses:
+        "200":
+          description: Email verified
+        "400":
+          description: Invalid or expired token
+
+  /api/v1/auth/resend-verification:
+    post:
+      tags: [Auth]
+      summary: Resend verification email
+      operationId: resendVerification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "200":
+          description: Always succeeds (prevents email enumeration)
+
+  /api/v1/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset link
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        "200":
+          description: Always succeeds (prevents email enumeration)
+        "429":
+          description: Rate limit exceeded
+
+  /api/v1/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset password using token
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token:
+                  type: string
+                  maxLength: 256
+                password:
+                  type: string
+                  minLength: 12
+                  maxLength: 128
+      responses:
+        "200":
+          description: Password reset successful
+        "400":
+          description: Invalid or expired token
+
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current authenticated user
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: Current user with organization memberships
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/AuthUser'
+        "401":
+          description: Not authenticated
+
+  # ── OAuth ────────────────────────────────────────────────────────────────
+  /api/v1/auth/oauth/providers:
+    get:
+      tags: [OAuth]
+      summary: List configured OAuth providers
+      operationId: getOAuthProviders
+      security: []
+      responses:
+        "200":
+          description: List of available providers (google, github, twitch)
+
+  /api/v1/auth/oauth/{provider}:
+    get:
+      tags: [OAuth]
+      summary: Initiate OAuth flow (redirects to provider)
+      operationId: initiateOAuth
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, github, twitch]
+      responses:
+        "302":
+          description: Redirect to OAuth provider
+        "400":
+          description: Invalid or unconfigured provider
+    delete:
+      tags: [OAuth]
+      summary: Unlink OAuth account
+      operationId: unlinkOAuth
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, github, twitch]
+      responses:
+        "200":
+          description: Account unlinked
+        "400":
+          description: Cannot unlink last auth method
+
+  /api/v1/auth/oauth/{provider}/callback:
+    get:
+      tags: [OAuth]
+      summary: OAuth callback handler (redirects to frontend)
+      operationId: oauthCallback
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to frontend with tokens
+
+  /api/v1/auth/oauth/{provider}/link:
+    post:
+      tags: [OAuth]
+      summary: Link OAuth account to current user
+      operationId: linkOAuth
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, github, twitch]
+      responses:
+        "200":
+          description: Authorization URL for linking
+        "400":
+          description: Already linked
+
+  /api/v1/auth/oauth/connections:
+    get:
+      tags: [OAuth]
+      summary: List linked OAuth accounts
+      operationId: getOAuthConnections
+      responses:
+        "200":
+          description: User OAuth connections
+
+  # ── Sessions ─────────────────────────────────────────────────────────────
+  /api/sessions:
+    get:
+      tags: [Sessions]
+      summary: List sessions with filtering and pagination
+      operationId: listSessions
+      parameters:
+        - name: workflow
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+        - name: captureMode
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+        - name: active
+          in: query
+          schema:
+            type: string
+            enum: ["true", "false"]
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            enum: [startedAt, createdAt, updatedAt]
+            default: startedAt
+        - name: orderDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: Paginated session list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      sessions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Session'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+        "429":
+          description: Rate limit exceeded (30 req/min)
+
+  /api/sessions/{id}:
+    get:
+      tags: [Sessions]
+      summary: Get session by ID
+      operationId: getSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: include
+          in: query
+          schema:
+            type: string
+            enum: [relations]
+          description: Set to "relations" to include events, outputs, and clips
+      responses:
+        "200":
+          description: Session details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      session:
+                        $ref: '#/components/schemas/Session'
+        "400":
+          description: Invalid session ID format
+        "404":
+          description: Session not found
+    patch:
+      tags: [Sessions]
+      summary: Update session metadata
+      operationId: updateSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 200
+                participants:
+                  type: array
+                  maxItems: 50
+                  items:
+                    type: string
+                    maxLength: 100
+      responses:
+        "200":
+          description: Session updated
+        "404":
+          description: Session not found
+    delete:
+      tags: [Sessions]
+      summary: Delete session and all related data
+      operationId: deleteSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        "200":
+          description: Session deleted
+        "400":
+          description: Cannot delete active session
+        "404":
+          description: Session not found
+
+  /api/sessions/{id}/end:
+    post:
+      tags: [Sessions]
+      summary: End a session
+      operationId: endSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        "200":
+          description: Session ended with duration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      session:
+                        $ref: '#/components/schemas/Session'
+                      message:
+                        type: string
+        "400":
+          description: Session already ended
+        "404":
+          description: Session not found
+
+  /api/sessions/{id}/outputs:
+    get:
+      tags: [Sessions, Outputs]
+      summary: List outputs for a session
+      operationId: getSessionOutputs
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: category
+          in: query
+          schema:
+            type: string
+            maxLength: 50
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, approved, published, archived]
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Paginated output list
+
+  /api/sessions/{sessionId}/outputs/approve-all:
+    post:
+      tags: [Sessions, Outputs]
+      summary: Approve all draft outputs for a session
+      operationId: approveAllDrafts
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      responses:
+        "200":
+          description: Count of approved drafts
+        "404":
+          description: Session not found
+
+  # ── Events ───────────────────────────────────────────────────────────────
+  /api/events:
+    get:
+      tags: [Events]
+      summary: List events with filtering
+      operationId: listEvents
+      security: []
+      parameters:
+        - name: sessionId
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: types
+          in: query
+          schema:
+            type: string
+          description: Comma-separated event types
+        - name: afterTs
+          in: query
+          schema:
+            type: string
+          description: Filter events after this unix timestamp
+        - name: beforeTs
+          in: query
+          schema:
+            type: string
+          description: Filter events before this unix timestamp
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 500
+        - $ref: '#/components/parameters/OffsetParam'
+        - name: orderDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: Paginated event list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      events:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Event'
+                      pagination:
+                        $ref: '#/components/schemas/Pagination'
+
+  /api/events/{id}:
+    get:
+      tags: [Events]
+      summary: Get event by ID
+      operationId: getEvent
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event details
+        "404":
+          description: Event not found
+
+  /api/events/moments:
+    get:
+      tags: [Events]
+      summary: List moment markers
+      operationId: listMoments
+      security: []
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Moment markers for session
+    post:
+      tags: [Events]
+      summary: Create a moment marker
+      operationId: createMoment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sessionId, label, timestamp]
+              properties:
+                sessionId:
+                  type: string
+                type:
+                  type: string
+                  enum: [hype, qa, sponsor, clip, highlight, marker]
+                  default: marker
+                label:
+                  type: string
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 1000
+                timestamp:
+                  type: number
+                  minimum: 0
+                clipId:
+                  type: string
+            example:
+              sessionId: cmlbcgemg0000i7b80ufgh3ko
+              type: hype
+              label: Big reaction
+              timestamp: 342.5
+      responses:
+        "201":
+          description: Moment created
+        "404":
+          description: Session not found
+
+  /api/events/moments/{momentId}:
+    delete:
+      tags: [Events]
+      summary: Delete a moment marker
+      operationId: deleteMoment
+      parameters:
+        - name: momentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Moment deleted
+        "400":
+          description: Event is not a moment marker
+        "404":
+          description: Moment not found
+
+  /api/sessions/{sessionId}/events:
+    get:
+      tags: [Sessions, Events]
+      summary: List events for a session
+      operationId: getSessionEvents
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Session events
+        "404":
+          description: Session not found
+
+  /api/sessions/{sessionId}/events/moments:
+    get:
+      tags: [Sessions, Events]
+      summary: List moments for a session
+      operationId: getSessionMoments
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      responses:
+        "200":
+          description: Session moments
+    post:
+      tags: [Sessions, Events]
+      summary: Create moment for a session
+      operationId: createSessionMoment
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [label, timestamp]
+              properties:
+                type:
+                  type: string
+                  enum: [hype, qa, sponsor, clip, highlight, marker]
+                label:
+                  type: string
+                description:
+                  type: string
+                timestamp:
+                  type: number
+                clipId:
+                  type: string
+      responses:
+        "201":
+          description: Moment created
+
+  /api/sessions/{sessionId}/events/moments/{momentId}:
+    delete:
+      tags: [Sessions, Events]
+      summary: Delete moment from a session
+      operationId: deleteSessionMoment
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+        - name: momentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Moment deleted
+        "403":
+          description: Moment does not belong to session
+
+  # ── Outputs ──────────────────────────────────────────────────────────────
+  /api/outputs:
+    get:
+      tags: [Outputs]
+      summary: List outputs with filtering
+      operationId: listOutputs
+      security: []
+      parameters:
+        - name: sessionId
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, approved, published, archived]
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, updatedAt]
+            default: createdAt
+        - name: orderDir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: Paginated output list
+
+  /api/outputs/{id}:
+    get:
+      tags: [Outputs]
+      summary: Get output by ID (includes session info)
+      operationId: getOutput
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Output with session context
+        "404":
+          description: Output not found
+    patch:
+      tags: [Outputs]
+      summary: Update output content and metadata
+      operationId: updateOutput
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 500
+                text:
+                  type: string
+                  maxLength: 10000
+                refs:
+                  type: array
+                  items:
+                    type: string
+                meta:
+                  type: object
+                status:
+                  type: string
+                  enum: [draft, approved, published, archived]
+      responses:
+        "200":
+          description: Output updated
+        "404":
+          description: Output not found
+    delete:
+      tags: [Outputs]
+      summary: Delete an output
+      operationId: deleteOutput
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Output deleted
+        "404":
+          description: Output not found
+
+  /api/outputs/{id}/status:
+    patch:
+      tags: [Outputs]
+      summary: Update output status only
+      operationId: updateOutputStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [draft, approved, published, archived]
+      responses:
+        "200":
+          description: Status updated
+
+  /api/outputs/{id}/regenerate:
+    post:
+      tags: [Outputs]
+      summary: Regenerate output content using AI
+      operationId: regenerateOutput
+      description: |
+        Uses AI to regenerate the output text with a fresh perspective.
+        Rate limited to 10 requests per minute per user.
+        Returns regeneration metadata including token usage and duration.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instructions:
+                  type: string
+                  maxLength: 1000
+                  description: Optional custom instructions for regeneration
+      responses:
+        "200":
+          description: Output regenerated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      output:
+                        $ref: '#/components/schemas/Output'
+                      regenerationMetadata:
+                        type: object
+                        properties:
+                          durationMs:
+                            type: integer
+                          tokensUsed:
+                            type: integer
+        "404":
+          description: Output not found
+        "429":
+          description: Rate limit exceeded (10 req/min)
+        "503":
+          description: AI service not configured
+
+  # ── Clips ────────────────────────────────────────────────────────────────
+  /api/clips/{id}:
+    get:
+      tags: [Clips]
+      summary: Get clip by ID or artifact ID
+      operationId: getClip
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Clip database ID or artifact ID
+      responses:
+        "200":
+          description: Clip details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      clip:
+                        $ref: '#/components/schemas/Clip'
+        "404":
+          description: Clip not found
+    delete:
+      tags: [Clips]
+      summary: Delete a clip
+      operationId: deleteClip
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Clip deleted
+        "404":
+          description: Clip not found
+
+  /api/sessions/{sessionId}/clips:
+    get:
+      tags: [Sessions, Clips]
+      summary: List clips for a session
+      operationId: listSessionClips
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Paginated clip list
+        "404":
+          description: Session not found
+
+  # ── Clip Queue ───────────────────────────────────────────────────────────
+  /api/clip-queue/stats:
+    get:
+      tags: [ClipQueue]
+      summary: Get overall clip queue statistics
+      operationId: getClipQueueStats
+      security: []
+      responses:
+        "200":
+          description: Queue statistics across all sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      stats:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          pending:
+                            type: integer
+                          recording:
+                            type: integer
+                          processing:
+                            type: integer
+                          completed:
+                            type: integer
+                          failed:
+                            type: integer
+
+  /api/clip-queue/{id}:
+    get:
+      tags: [ClipQueue]
+      summary: Get clip queue item
+      operationId: getClipQueueItem
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Queue item details
+        "404":
+          description: Item not found
+    patch:
+      tags: [ClipQueue]
+      summary: Update clip queue item title
+      operationId: updateClipQueueItem
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+      responses:
+        "200":
+          description: Item updated
+    delete:
+      tags: [ClipQueue]
+      summary: Delete/cancel a clip queue item
+      operationId: deleteClipQueueItem
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item deleted
+        "400":
+          description: Cannot delete item currently processing
+
+  /api/clip-queue/{id}/retry:
+    post:
+      tags: [ClipQueue]
+      summary: Retry a failed clip queue item
+      operationId: retryClipQueueItem
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Item reset to pending for reprocessing
+        "400":
+          description: Can only retry failed items
+
+  /api/sessions/{sessionId}/clip-queue:
+    get:
+      tags: [Sessions, ClipQueue]
+      summary: List clip queue items for a session
+      operationId: listSessionClipQueue
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, RECORDING, PROCESSING, COMPLETED, FAILED]
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Queue items with stats and pagination
+
+  /api/sessions/{sessionId}/clip-queue/manual:
+    post:
+      tags: [Sessions, ClipQueue]
+      summary: Create a manual clip from last N seconds
+      operationId: createManualClip
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                durationSeconds:
+                  type: integer
+                  minimum: 5
+                  maximum: 300
+                  default: 30
+                title:
+                  type: string
+                  maxLength: 200
+      responses:
+        "201":
+          description: Manual clip queued
+        "404":
+          description: Session not found
+
+  # ── OBS ──────────────────────────────────────────────────────────────────
+  /api/obs/status:
+    get:
+      tags: [OBS]
+      summary: Get OBS connection and streaming status
+      operationId: getObsStatus
+      security: []
+      responses:
+        "200":
+          description: OBS status including connection, streaming, recording, scenes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      connected:
+                        type: boolean
+                      streaming:
+                        type: boolean
+                      recording:
+                        type: boolean
+                      replayBufferActive:
+                        type: boolean
+                      currentScene:
+                        type: string
+                        nullable: true
+                      scenes:
+                        type: array
+                        items:
+                          type: string
+                      wsUrl:
+                        type: string
+                      hasPassword:
+                        type: boolean
+                      help:
+                        type: object
+                        nullable: true
+
+  /api/obs/reconnect:
+    post:
+      tags: [OBS]
+      summary: Reconnect to OBS WebSocket
+      operationId: reconnectObs
+      security: []
+      responses:
+        "200":
+          description: Reconnected
+        "500":
+          description: Connection failed (includes troubleshooting steps)
+
+  /api/obs/scenes:
+    get:
+      tags: [OBS]
+      summary: List OBS scenes
+      operationId: listScenes
+      security: []
+      responses:
+        "200":
+          description: Scene list with current scene
+        "503":
+          description: OBS not connected
+
+  /api/obs/scenes/switch:
+    post:
+      tags: [OBS]
+      summary: Switch active scene
+      operationId: switchScene
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sceneName]
+              properties:
+                sceneName:
+                  type: string
+      responses:
+        "200":
+          description: Scene switched
+
+  /api/obs/sources:
+    get:
+      tags: [OBS]
+      summary: List sources in a scene
+      operationId: listSources
+      security: []
+      parameters:
+        - name: sceneName
+          in: query
+          schema:
+            type: string
+          description: Scene name (defaults to current scene)
+      responses:
+        "200":
+          description: Source list
+
+  /api/obs/sources/toggle:
+    post:
+      tags: [OBS]
+      summary: Toggle source visibility
+      operationId: toggleSource
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sceneName, sourceName]
+              properties:
+                sceneName:
+                  type: string
+                sourceName:
+                  type: string
+                visible:
+                  type: boolean
+                  description: Force visibility state (omit to toggle)
+      responses:
+        "200":
+          description: Source toggled
+
+  /api/obs/stream/start:
+    post:
+      tags: [OBS]
+      summary: Start streaming
+      operationId: startStream
+      security: []
+      responses:
+        "200":
+          description: Streaming started
+
+  /api/obs/stream/stop:
+    post:
+      tags: [OBS]
+      summary: Stop streaming
+      operationId: stopStream
+      security: []
+      responses:
+        "200":
+          description: Streaming stopped
+
+  /api/obs/stream/toggle:
+    post:
+      tags: [OBS]
+      summary: Toggle streaming
+      operationId: toggleStream
+      security: []
+      responses:
+        "200":
+          description: Stream toggled
+
+  /api/obs/record/start:
+    post:
+      tags: [OBS]
+      summary: Start recording
+      operationId: startRecording
+      security: []
+      responses:
+        "200":
+          description: Recording started
+
+  /api/obs/record/stop:
+    post:
+      tags: [OBS]
+      summary: Stop recording
+      operationId: stopRecording
+      security: []
+      responses:
+        "200":
+          description: Recording stopped with output path
+
+  /api/obs/record/toggle:
+    post:
+      tags: [OBS]
+      summary: Toggle recording
+      operationId: toggleRecording
+      security: []
+      responses:
+        "200":
+          description: Recording toggled
+
+  /api/obs/replay/save:
+    post:
+      tags: [OBS]
+      summary: Save replay buffer
+      operationId: saveReplay
+      security: []
+      responses:
+        "200":
+          description: Replay buffer saved with file path
+
+  /api/obs/quicklaunch:
+    post:
+      tags: [OBS]
+      summary: Start session + stream + recording + replay in one call
+      operationId: quicklaunch
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow:
+                  type: string
+                  default: solo
+                title:
+                  type: string
+                  default: Untitled Stream
+                captureMode:
+                  type: string
+                  default: obs
+                participants:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                  default: [{name: Host}]
+                startStream:
+                  type: boolean
+                  default: true
+                startRecord:
+                  type: boolean
+                  default: true
+                startReplay:
+                  type: boolean
+                  default: true
+      responses:
+        "200":
+          description: All components started
+        "207":
+          description: Partially successful (some components failed)
+
+  /api/obs/quickstop:
+    post:
+      tags: [OBS]
+      summary: Stop stream + recording + session in one call
+      operationId: quickstop
+      security: []
+      responses:
+        "200":
+          description: All components stopped
+        "207":
+          description: Partially successful
+
+  # ── Recordings ───────────────────────────────────────────────────────────
+  /api/sessions/{sessionId}/recordings/upload:
+    post:
+      tags: [Recordings]
+      summary: Upload a mobile recording
+      operationId: uploadRecording
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [video]
+              properties:
+                video:
+                  type: string
+                  format: binary
+                  description: Video or audio file (max 500MB)
+                deviceId:
+                  type: string
+                timestamp:
+                  type: string
+                captureMode:
+                  type: string
+      responses:
+        "200":
+          description: Recording uploaded
+        "400":
+          description: No file uploaded
+        "404":
+          description: Session not found
+
+  /api/sessions/{sessionId}/recordings:
+    get:
+      tags: [Recordings]
+      summary: List recordings for a session
+      operationId: listRecordings
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+      responses:
+        "200":
+          description: Recording list with total size
+
+  /api/sessions/{sessionId}/recordings/{recordingId}:
+    delete:
+      tags: [Recordings]
+      summary: Delete a recording
+      operationId: deleteRecording
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SessionIdParam'
+        - name: recordingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Recording deleted
+        "404":
+          description: Recording not found
+
+  # ── Triggers ─────────────────────────────────────────────────────────────
+  /api/workflows/{workflow}/triggers:
+    get:
+      tags: [Triggers]
+      summary: Get trigger configuration for a workflow
+      operationId: getTriggerConfig
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trigger config with reference images
+    put:
+      tags: [Triggers]
+      summary: Update trigger configuration
+      operationId: updateTriggerConfig
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                audioEnabled:
+                  type: boolean
+                visualEnabled:
+                  type: boolean
+                frameSampleRate:
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                autoClipEnabled:
+                  type: boolean
+                autoClipDuration:
+                  type: integer
+                  minimum: 15
+                  maximum: 300
+                triggerCooldown:
+                  type: integer
+                  minimum: 5
+                  maximum: 300
+      responses:
+        "200":
+          description: Config updated
+
+  /api/workflows/{workflow}/triggers/audio:
+    post:
+      tags: [Triggers]
+      summary: Add audio trigger phrase
+      operationId: addAudioTrigger
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phrase]
+              properties:
+                phrase:
+                  type: string
+                  maxLength: 100
+                caseSensitive:
+                  type: boolean
+                  default: false
+      responses:
+        "201":
+          description: Audio trigger added
+
+  /api/workflows/{workflow}/triggers/audio/{triggerId}:
+    patch:
+      tags: [Triggers]
+      summary: Toggle audio trigger enabled state
+      operationId: toggleAudioTrigger
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: triggerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        "200":
+          description: Trigger toggled
+    delete:
+      tags: [Triggers]
+      summary: Remove audio trigger phrase
+      operationId: removeAudioTrigger
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: triggerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trigger removed
+
+  /api/workflows/{workflow}/triggers/visual:
+    get:
+      tags: [Triggers]
+      summary: List visual trigger reference images
+      operationId: listVisualTriggers
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reference image list
+    post:
+      tags: [Triggers]
+      summary: Upload visual trigger reference image
+      operationId: addVisualTrigger
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image, label]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG, PNG, GIF, or WebP (max 5MB)
+                label:
+                  type: string
+                  maxLength: 50
+                threshold:
+                  type: number
+                  minimum: 0
+                  maximum: 1
+                  default: 0.8
+      responses:
+        "201":
+          description: Visual trigger added
+
+  /api/workflows/{workflow}/triggers/visual/{triggerId}:
+    delete:
+      tags: [Triggers]
+      summary: Remove visual trigger reference image
+      operationId: removeVisualTrigger
+      security: []
+      parameters:
+        - name: workflow
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: triggerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trigger removed
+
+  # ── Billing ──────────────────────────────────────────────────────────────
+  /api/v1/billing/plans:
+    get:
+      tags: [Billing]
+      summary: Get available subscription plans
+      operationId: getPlans
+      security: []
+      responses:
+        "200":
+          description: Plan list
+
+  /api/v1/billing/checkout-session:
+    post:
+      tags: [Billing]
+      summary: Create Stripe checkout session
+      operationId: createCheckoutSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [priceId, organizationId]
+              properties:
+                priceId:
+                  type: string
+                organizationId:
+                  type: string
+      responses:
+        "200":
+          description: Checkout session URL
+
+  /api/v1/billing/portal:
+    post:
+      tags: [Billing]
+      summary: Create Stripe customer portal session
+      operationId: createPortalSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [organizationId]
+              properties:
+                organizationId:
+                  type: string
+      responses:
+        "200":
+          description: Portal session URL
+
+  /api/v1/billing/subscription/{organizationId}:
+    get:
+      tags: [Billing]
+      summary: Get subscription info for organization
+      operationId: getSubscription
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Subscription details
+
+  /api/v1/billing/usage/{organizationId}:
+    get:
+      tags: [Billing]
+      summary: Get usage limits and current usage
+      operationId: getUsage
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usage data (sessions, storage, duration)
+
+  /api/v1/billing/webhook:
+    post:
+      tags: [Billing]
+      summary: Stripe webhook handler
+      operationId: handleStripeWebhook
+      security: []
+      description: Receives Stripe webhook events. Requires raw body and Stripe-Signature header.
+      parameters:
+        - name: Stripe-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Webhook processed
+        "400":
+          description: Invalid signature or processing error
+
+  # ── Export ────────────────────────────────────────────────────────────────
+  /api/v1/export/post:
+    post:
+      tags: [Export]
+      summary: Export a social media post
+      operationId: exportPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, platform]
+              properties:
+                text:
+                  type: string
+                  maxLength: 10000
+                platform:
+                  $ref: '#/components/schemas/SocialPlatform'
+                sessionId:
+                  type: string
+                clipId:
+                  type: string
+                options:
+                  type: object
+                  properties:
+                    copyToClipboard:
+                      type: boolean
+                    saveToFile:
+                      type: boolean
+                    optimizeHashtags:
+                      type: boolean
+                    addTimestamps:
+                      type: boolean
+                    createThread:
+                      type: boolean
+      responses:
+        "201":
+          description: Post exported
+
+  /api/v1/export/clip:
+    post:
+      tags: [Export]
+      summary: Export a video clip with format conversion
+      operationId: exportClip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clipId, format]
+              properties:
+                clipId:
+                  type: string
+                format:
+                  type: string
+                  enum: [MP4, WEBM, GIF, MOV]
+                platform:
+                  $ref: '#/components/schemas/SocialPlatform'
+                options:
+                  type: object
+                  properties:
+                    quality:
+                      type: string
+                      enum: [low, medium, high, original]
+                    generateThumbnail:
+                      type: boolean
+                    addWatermark:
+                      type: boolean
+                    optimizeForPlatform:
+                      type: boolean
+                    targetAspectRatio:
+                      type: string
+      responses:
+        "201":
+          description: Clip export started
+
+  /api/v1/export/batch:
+    post:
+      tags: [Export]
+      summary: Batch export multiple items
+      operationId: exportBatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [post, clip]
+                      data:
+                        type: object
+                options:
+                  type: object
+                  properties:
+                    zipOutput:
+                      type: boolean
+                    includeMetadata:
+                      type: boolean
+      responses:
+        "201":
+          description: Batch export started
+
+  /api/v1/export/preview:
+    post:
+      tags: [Export]
+      summary: Preview formatted post for multiple platforms
+      operationId: previewPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, platforms]
+              properties:
+                text:
+                  type: string
+                  maxLength: 10000
+                platforms:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SocialPlatform'
+      responses:
+        "200":
+          description: Formatted previews per platform
+
+  /api/v1/export/history:
+    get:
+      tags: [Export]
+      summary: Get export history
+      operationId: getExportHistory
+      parameters:
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Export history list
+
+  /api/v1/export/stats:
+    get:
+      tags: [Export]
+      summary: Get export statistics
+      operationId: getExportStats
+      responses:
+        "200":
+          description: Export statistics
+
+  /api/v1/export/{id}/status:
+    get:
+      tags: [Export]
+      summary: Get export job status
+      operationId: getExportStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Export status with progress
+        "403":
+          description: Unauthorized
+        "404":
+          description: Export not found
+
+  /api/v1/export/{id}/download:
+    get:
+      tags: [Export]
+      summary: Download export file
+      operationId: downloadExport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File stream download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Export not ready
+        "404":
+          description: Export or file not found
+
+  /api/v1/export/{id}:
+    delete:
+      tags: [Export]
+      summary: Delete an export
+      operationId: deleteExport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Export deleted
+
+  # ── Branding ─────────────────────────────────────────────────────────────
+  /api/v1/branding/export:
+    post:
+      tags: [Branding]
+      summary: Export clip with branding (logo, intro, outro, lower thirds)
+      operationId: brandedExport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clipId]
+              properties:
+                clipId:
+                  type: string
+                format:
+                  type: string
+                  enum: [MP4, WEBM, MOV]
+                  default: MP4
+                quality:
+                  type: string
+                  enum: [low, medium, high, original]
+                targetAspectRatio:
+                  type: string
+                brandingPresetId:
+                  type: string
+                branding:
+                  type: object
+                  description: Inline branding configuration
+                generateThumbnail:
+                  type: boolean
+                  default: true
+      responses:
+        "201":
+          description: Branded export completed
+
+  /api/v1/branding/preview:
+    post:
+      tags: [Branding]
+      summary: Generate branding preview (first 10 seconds)
+      operationId: previewBranding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clipId, branding]
+              properties:
+                clipId:
+                  type: string
+                branding:
+                  type: object
+      responses:
+        "200":
+          description: Preview generated
+
+  /api/v1/branding/presets:
+    get:
+      tags: [Branding]
+      summary: List branding presets
+      operationId: listBrandingPresets
+      responses:
+        "200":
+          description: User branding presets
+    post:
+      tags: [Branding]
+      summary: Create branding preset
+      operationId: createBrandingPreset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, config]
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                config:
+                  type: object
+                isDefault:
+                  type: boolean
+                  default: false
+      responses:
+        "201":
+          description: Preset created
+
+  /api/v1/branding/presets/{id}:
+    put:
+      tags: [Branding]
+      summary: Update branding preset
+      operationId: updateBrandingPreset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                config:
+                  type: object
+                isDefault:
+                  type: boolean
+      responses:
+        "200":
+          description: Preset updated
+    delete:
+      tags: [Branding]
+      summary: Delete branding preset
+      operationId: deleteBrandingPreset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Preset deleted
+
+  # ── Social ───────────────────────────────────────────────────────────────
+  /api/v1/social/platforms:
+    get:
+      tags: [Social]
+      summary: List available social platforms
+      operationId: getSocialPlatforms
+      responses:
+        "200":
+          description: Platform list with config status
+
+  /api/v1/social/connect:
+    post:
+      tags: [Social]
+      summary: Initiate OAuth connection to a social platform
+      operationId: connectSocial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform]
+              properties:
+                platform:
+                  $ref: '#/components/schemas/SocialPlatform'
+                redirectUri:
+                  type: string
+                  format: uri
+      responses:
+        "200":
+          description: Authorization URL
+
+  /api/v1/social/callback:
+    get:
+      tags: [Social]
+      summary: OAuth callback handler (redirects to frontend)
+      operationId: socialCallback
+      security: []
+      responses:
+        "302":
+          description: Redirect to frontend
+
+  /api/v1/social/connections:
+    get:
+      tags: [Social]
+      summary: List connected social accounts
+      operationId: getSocialConnections
+      responses:
+        "200":
+          description: Connection list
+
+  /api/v1/social/connections/{id}:
+    get:
+      tags: [Social]
+      summary: Get a specific social connection
+      operationId: getSocialConnection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Connection details
+        "404":
+          description: Connection not found
+    delete:
+      tags: [Social]
+      summary: Disconnect a social account
+      operationId: disconnectSocial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Account disconnected
+
+  /api/v1/social/post:
+    post:
+      tags: [Social]
+      summary: Create a post on a connected platform
+      operationId: createSocialPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [connectionId, content]
+              properties:
+                connectionId:
+                  type: string
+                content:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                      maxLength: 10000
+                    title:
+                      type: string
+                      maxLength: 500
+                    description:
+                      type: string
+                      maxLength: 5000
+                    hashtags:
+                      type: array
+                      maxItems: 30
+                      items:
+                        type: string
+                    mediaFiles:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            enum: [image, video, gif]
+                          path:
+                            type: string
+                          mimeType:
+                            type: string
+                          altText:
+                            type: string
+                options:
+                  type: object
+                  properties:
+                    scheduledFor:
+                      type: string
+                      format: date-time
+                    visibility:
+                      type: string
+                      enum: [public, private, unlisted]
+                    replyToId:
+                      type: string
+                    threadContinuation:
+                      type: boolean
+      responses:
+        "201":
+          description: Post created
+
+  /api/v1/social/post/multi:
+    post:
+      tags: [Social]
+      summary: Post to multiple platforms simultaneously
+      operationId: createMultiPost
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [connectionIds, content]
+              properties:
+                connectionIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: string
+                content:
+                  type: object
+                options:
+                  type: object
+      responses:
+        "200":
+          description: Results per platform with success/fail summary
+
+  /api/v1/social/posts:
+    get:
+      tags: [Social]
+      summary: Get post history
+      operationId: getSocialPosts
+      parameters:
+        - name: connectionId
+          in: query
+          schema:
+            type: string
+        - name: platform
+          in: query
+          schema:
+            $ref: '#/components/schemas/SocialPlatform'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 100
+        - $ref: '#/components/parameters/OffsetParam'
+      responses:
+        "200":
+          description: Post history
+
+  # ── Video ────────────────────────────────────────────────────────────────
+  /api/video/status:
+    get:
+      tags: [Video]
+      summary: Get MediaMTX video streaming status
+      operationId: getVideoStatus
+      security: []
+      responses:
+        "200":
+          description: Video streaming status
+
+  /api/video/config:
+    get:
+      tags: [Video]
+      summary: Get MediaMTX configuration
+      operationId: getVideoConfig
+      security: []
+      responses:
+        "200":
+          description: Video configuration
+
+  /api/video/paths:
+    get:
+      tags: [Video]
+      summary: Get active stream paths
+      operationId: getVideoPaths
+      security: []
+      responses:
+        "200":
+          description: Active stream paths
+        "503":
+          description: MediaMTX not running
+
+  /api/video/start:
+    post:
+      tags: [Video]
+      summary: Start MediaMTX server
+      operationId: startVideoServer
+      security: []
+      responses:
+        "200":
+          description: Server started
+        "503":
+          description: MediaMTX binary not available
+
+  /api/video/stop:
+    post:
+      tags: [Video]
+      summary: Stop MediaMTX server
+      operationId: stopVideoServer
+      security: []
+      responses:
+        "200":
+          description: Server stopped
+
+  # ── Agents ───────────────────────────────────────────────────────────────
+  /api/agents/stats:
+    get:
+      tags: [Agents]
+      summary: Get AI agent router stats and configuration
+      operationId: getAgentStats
+      security: []
+      responses:
+        "200":
+          description: Agent stats with Opik observability and AI config
+
+  /agents/status:
+    get:
+      tags: [Agents]
+      summary: Get agent status (legacy endpoint)
+      operationId: getAgentStatus
+      security: []
+      responses:
+        "200":
+          description: Agent enabled/disabled status
+
+  # ── STT ──────────────────────────────────────────────────────────────────
+  /api/stt/start:
+    post:
+      tags: [STT]
+      summary: Start speech-to-text transcription
+      operationId: startSTT
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language:
+                  type: string
+                  default: en-US
+                diarization:
+                  type: boolean
+                  default: true
+                interimResults:
+                  type: boolean
+                  default: true
+                keywords:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: STT started
+        "404":
+          description: No active session
+
+  /api/stt/stop:
+    post:
+      tags: [STT]
+      summary: Stop speech-to-text transcription
+      operationId: stopSTT
+      security: []
+      responses:
+        "200":
+          description: STT stopped
+
+  /api/stt/audio:
+    post:
+      tags: [STT]
+      summary: Send audio data for transcription
+      operationId: sendSTTAudio
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  description: Base64-encoded audio data
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Audio received
+        "400":
+          description: Audio data required
+
+  /api/stt/status:
+    get:
+      tags: [STT]
+      summary: Get STT status and available providers
+      operationId: getSTTStatus
+      security: []
+      responses:
+        "200":
+          description: STT status
+
+  # ── Legacy Session Management ────────────────────────────────────────────
+  /session/start:
+    post:
+      tags: [Legacy]
+      summary: Start a new livestream session
+      operationId: startSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workflow, captureMode]
+              properties:
+                workflow:
+                  type: string
+                  enum: [streamer, writers_room, brainstorm, debate, podcast]
+                captureMode:
+                  type: string
+                  enum: [audio, video, av]
+                title:
+                  type: string
+                participants:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+            example:
+              workflow: podcast
+              captureMode: av
+              title: Episode 42 - AI in Content Creation
+              participants:
+                - id: host1
+                  name: Alex
+      responses:
+        "200":
+          description: Session started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  sessionId:
+                    type: string
+                  startedAt:
+                    type: number
+                  ws:
+                    type: string
+                    description: WebSocket URL for event streaming
+        "409":
+          description: Session already active
+
+  /session/stop:
+    post:
+      tags: [Legacy]
+      summary: Stop the active session
+      operationId: stopSession
+      security: []
+      responses:
+        "200":
+          description: Session stopped with duration
+        "404":
+          description: No active session
+
+  /session/status:
+    get:
+      tags: [Legacy]
+      summary: Get active session status
+      operationId: getSessionStatus
+      security: []
+      responses:
+        "200":
+          description: Current session state
+
+  /session/force-stop:
+    get:
+      tags: [Legacy]
+      summary: Force clear session state (GET)
+      operationId: forceStopSessionGet
+      security: []
+      responses:
+        "200":
+          description: Session cleared
+    post:
+      tags: [Legacy]
+      summary: Force clear session state (POST)
+      operationId: forceStopSessionPost
+      security: []
+      responses:
+        "200":
+          description: Session state cleared
+
+  /clip:
+    post:
+      tags: [Legacy]
+      summary: Create a clip from replay buffer
+      operationId: createClipLegacy
+      security: []
+      responses:
+        "200":
+          description: Clip created with artifact ID and paths
+        "404":
+          description: No active session
+
+  /clip/start:
+    post:
+      tags: [Legacy]
+      summary: Mark clip start time
+      operationId: startClip
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                t:
+                  type: number
+                  description: Optional timestamp override
+      responses:
+        "200":
+          description: Clip start marked
+        "404":
+          description: No active session
+
+  /clip/end:
+    post:
+      tags: [Legacy]
+      summary: End clip and save
+      operationId: endClip
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                t:
+                  type: number
+      responses:
+        "200":
+          description: Clip created
+
+  /screenshot:
+    post:
+      tags: [Legacy]
+      summary: Capture OBS source screenshot
+      operationId: captureScreenshot
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourceName]
+              properties:
+                sourceName:
+                  type: string
+      responses:
+        "200":
+          description: Screenshot captured
+        "409":
+          description: No active session
+
+  /frame:
+    post:
+      tags: [Legacy]
+      summary: Capture OBS source frame (alias for /screenshot)
+      operationId: captureFrame
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourceName]
+              properties:
+                sourceName:
+                  type: string
+      responses:
+        "200":
+          description: Frame captured

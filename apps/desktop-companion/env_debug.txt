@@ -1,0 +1,23 @@
+# ===================
+# Server Configuration
+# ===================
+NODE_ENV=development
+HTTP_PORT=3123
+WS_PORT=3124
+APP_URL=http://localhost:3000
+CORS_ORIGINS=http://localhost:3000,http://localhost:3002
+
+# ===================
+# Authentication Configuration
+# ===================
+JWT_SECRET=dummy_secret_for_development_purposes_only_32_chars
+JWT_REFRESH_SECRET=dummy_refresh_secret_for_development_purposes_only_32_chars
+TOKEN_ENCRYPTION_KEY=dummy_encryption_key_32_chars_long
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/livestream_copilot?schema=public
+
+# ===================
+# OBS Configuration
+# ===================
+OBS_WS_URL=ws://127.0.0.1:4455
+OBS_WS_PASSWORD=
+REPLAY_BUFFER_SECONDS=300

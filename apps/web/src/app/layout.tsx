@@ -1,3 +1,4 @@
+import type * as React from "react";
 import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/lib/contexts/AuthContext";

@@ -82,6 +82,19 @@ function categoryToPlatform(category: string): Output["platform"] {
   return "general";
 }
 
+function metaToPlatform(meta: OutputInfo["meta"]): Output["platform"] | null {
+  if (!meta || typeof meta !== "object" || Array.isArray(meta)) {
+    return null;
+  }
+
+  const platform = (meta as Record<string, unknown>).platform;
+  if (typeof platform !== "string") {
+    return null;
+  }
+
+  return categoryToPlatform(platform);
+}
+
 /**
  * Format date for display
  */
@@ -99,9 +112,11 @@ function formatDate(isoDate: string): string {
  * Transform API output to frontend format
  */
 function transformOutput(apiOutput: OutputInfo): Output {
+  const platform = metaToPlatform(apiOutput.meta) ?? categoryToPlatform(apiOutput.category);
+
   return {
     ...apiOutput,
-    platform: categoryToPlatform(apiOutput.category),
+    platform,
     formattedDate: formatDate(apiOutput.createdAt),
   };
 }

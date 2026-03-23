@@ -21,6 +21,7 @@ import { CameraView, CameraType } from "expo-camera";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "../../App";
 import { useCaptureStore, type CaptureMode } from "../stores/captureStore";
+import { useAuthStore } from "../stores/authStore";
 import { useCaptureRecording } from "../services/useCaptureRecording";
 import {
   uploadRecording,
@@ -57,6 +58,8 @@ export default function CaptureScreen({ route, navigation }: Props) {
     setQuality,
   } = useCaptureStore();
 
+  const { accessToken } = useAuthStore();
+
   const {
     cameraRef,
     hasPermissions,
@@ -81,7 +84,7 @@ export default function CaptureScreen({ route, navigation }: Props) {
   useEffect(() => {
     const unsubscribe = setupNetworkListener(
       baseUrl,
-      undefined, // TODO: Add auth token when auth is implemented
+      accessToken || undefined,
       (result) => {
         if (result.succeeded > 0) {
           Alert.alert(
@@ -93,7 +96,7 @@ export default function CaptureScreen({ route, navigation }: Props) {
     );
 
     return unsubscribe;
-  }, [baseUrl]);
+  }, [baseUrl, accessToken]);
 
   // Handle recording completion (upload or save locally)
   const handleRecordingComplete = async (videoUri: string) => {
@@ -110,7 +113,7 @@ export default function CaptureScreen({ route, navigation }: Props) {
           videoUri,
           sessionId,
           baseUrl,
-          undefined, // TODO: Add auth token when auth is implemented
+          accessToken || undefined,
           mode,
           (progress: UploadProgress) => {
             setUploadProgress(progress.percent);

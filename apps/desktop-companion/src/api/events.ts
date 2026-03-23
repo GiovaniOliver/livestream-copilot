@@ -15,6 +15,7 @@ import {
   listEvents,
   getEventById,
   createEvent,
+  deleteEvent,
   countEvents,
   type EventFilters,
 } from "../db/services/event.service.js";
@@ -131,19 +132,51 @@ function transformMomentEvent(event: {
     type?: string;
     label?: string;
     description?: string;
+    notes?: string;
     timestamp?: number;
+    t?: number;
     clipId?: string;
   };
+
+  const timestamp =
+    payload.timestamp ??
+    payload.t ??
+    Math.floor(Number(event.ts) / 1000);
 
   return {
     id: event.id,
     sessionId: event.sessionId,
     type: payload.momentType || payload.type || "marker",
     label: payload.label || "Moment",
-    description: payload.description,
-    timestamp: payload.timestamp ?? Math.floor(Number(event.ts) / 1000),
+    description: payload.description ?? payload.notes,
+    timestamp,
     clipId: payload.clipId,
     createdAt: event.createdAt.toISOString(),
+  };
+}
+
+function buildMomentPayload({
+  type,
+  label,
+  description,
+  timestamp,
+  clipId,
+}: {
+  type: string;
+  label: string;
+  description?: string;
+  timestamp: number;
+  clipId?: string;
+}) {
+  return {
+    momentType: type,
+    type,
+    label,
+    description,
+    notes: description,
+    timestamp,
+    t: timestamp,
+    clipId,
   };
 }
 
@@ -289,13 +322,7 @@ async function createMomentHandler(req: Request, res: Response): Promise<void> {
       sessionId,
       type: "MOMENT_MARKER",
       ts: BigInt(Date.now()),
-      payload: {
-        momentType: type,
-        label,
-        description,
-        timestamp,
-        clipId,
-      },
+      payload: buildMomentPayload({ type, label, description, timestamp, clipId }),
     });
 
     const moment = transformMomentEvent(event);
@@ -427,13 +454,7 @@ async function createSessionMomentHandler(req: Request, res: Response): Promise<
       sessionId,
       type: "MOMENT_MARKER",
       ts: BigInt(Date.now()),
-      payload: {
-        momentType: type,
-        label,
-        description,
-        timestamp,
-        clipId,
-      },
+      payload: buildMomentPayload({ type, label, description, timestamp, clipId }),
     });
 
     const moment = transformMomentEvent(event);
@@ -442,6 +463,70 @@ async function createSessionMomentHandler(req: Request, res: Response): Promise<
   } catch (error) {
     apiLogger.error({ err: error }, "[api/events] Error creating session moment");
     sendError(res, 500, "INTERNAL_ERROR", "Failed to create moment.");
+  }
+}
+
+/**
+ * DELETE /api/events/moments/:momentId
+ * Delete a moment marker event.
+ */
+async function deleteMomentHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const { momentId } = req.params;
+
+    const existing = await getEventById(momentId);
+    if (!existing) {
+      sendError(res, 404, "NOT_FOUND", "Moment not found.");
+      return;
+    }
+
+    const payload = existing.payload as { type?: string } | null;
+    const eventType = (existing as any).type;
+    if (eventType !== "MOMENT_MARKER") {
+      sendError(res, 400, "INVALID_TYPE", "Event is not a moment marker.");
+      return;
+    }
+
+    await deleteEvent(momentId);
+
+    sendSuccess(res, { message: "Moment deleted successfully." });
+  } catch (error) {
+    apiLogger.error({ err: error }, "[api/events] Error deleting moment");
+    sendError(res, 500, "INTERNAL_ERROR", "Failed to delete moment.");
+  }
+}
+
+/**
+ * DELETE /api/sessions/:sessionId/events/moments/:momentId
+ * Delete a moment marker event for a specific session.
+ */
+async function deleteSessionMomentHandler(req: Request, res: Response): Promise<void> {
+  try {
+    const { sessionId, momentId } = req.params;
+
+    const session = await getSessionById(sessionId);
+    if (!session) {
+      sendError(res, 404, "NOT_FOUND", "Session not found.");
+      return;
+    }
+
+    const existing = await getEventById(momentId);
+    if (!existing) {
+      sendError(res, 404, "NOT_FOUND", "Moment not found.");
+      return;
+    }
+
+    if (existing.sessionId !== sessionId) {
+      sendError(res, 403, "FORBIDDEN", "Moment does not belong to this session.");
+      return;
+    }
+
+    await deleteEvent(momentId);
+
+    sendSuccess(res, { message: "Moment deleted successfully." });
+  } catch (error) {
+    apiLogger.error({ err: error }, "[api/events] Error deleting session moment");
+    sendError(res, 500, "INTERNAL_ERROR", "Failed to delete moment.");
   }
 }
 
@@ -459,6 +544,7 @@ export function createEventsRouter(): Router {
 
   // Write endpoints require authentication
   router.post("/moments", authenticateToken, createMomentHandler);
+  router.delete("/moments/:momentId", authenticateToken, deleteMomentHandler);
 
   return router;
 }
@@ -472,6 +558,7 @@ export function createSessionEventsRouter(): Router {
 
   // Write endpoints require authentication
   router.post("/moments", authenticateToken, createSessionMomentHandler);
+  router.delete("/moments/:momentId", authenticateToken, deleteSessionMomentHandler);
 
   return router;
 }

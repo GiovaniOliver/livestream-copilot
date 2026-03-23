@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { use } from "react";
 import { Sidebar } from "@/components/dashboard";
 

@@ -46,6 +46,9 @@ export class AudioTriggerService {
   private sttProvider: STTProvider | null = null;
   private wss: WebSocketServer;
   private callbacks: AudioTriggerCallback[] = [];
+  private readonly boundHandleSTTEvent = (event: STTEvent) => {
+    this.handleSTTEvent(event);
+  };
   private lastTriggerTime: Map<string, number> = new Map();
   private cooldownMs: number = 30000;
   private enabled: boolean = false;
@@ -63,6 +66,10 @@ export class AudioTriggerService {
     workflow: string,
     sttProvider: STTProvider
   ): Promise<void> {
+    if (this.sttProvider) {
+      this.sttProvider.off(this.boundHandleSTTEvent);
+    }
+
     this.sessionId = sessionId;
     this.workflow = workflow;
     this.sttProvider = sttProvider;
@@ -76,7 +83,8 @@ export class AudioTriggerService {
     }
 
     // Subscribe to transcript events
-    sttProvider.on(this.handleSTTEvent.bind(this));
+    this.sttProvider.off(this.boundHandleSTTEvent);
+    this.sttProvider.on(this.boundHandleSTTEvent);
 
     logger.info(`[audio-trigger] Started monitoring ${this.triggers.length} phrases for workflow "${workflow}"`);
   }
@@ -85,6 +93,11 @@ export class AudioTriggerService {
    * Stop monitoring
    */
   stop(): void {
+    if (this.sttProvider) {
+      this.sttProvider.off(this.boundHandleSTTEvent);
+      this.sttProvider = null;
+    }
+
     // STT provider will be stopped elsewhere, just clean up state
     this.sessionId = null;
     this.workflow = null;

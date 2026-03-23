@@ -6,9 +6,7 @@
  */
 
 import { createClient, LiveTranscriptionEvents, type DeepgramClient, type LiveClient } from "@deepgram/sdk";
-import { WebSocketServer } from "ws";
-import { v4 as uuidv4 } from "uuid";
-import type { EventEnvelope } from "@livestream-copilot/shared";
+import type { WebSocketServer } from "ws";
 import { config } from "../config/index.js";
 import { sttLogger } from '../logger/index.js';
 import type {
@@ -20,6 +18,7 @@ import type {
   TranscriptionSegment,
   DeepgramConfig,
 } from "./types.js";
+import { alignSegmentToSessionTimeline } from "./timing.js";
 
 // Default Deepgram configuration
 const DEFAULT_MODEL = "nova-2";
@@ -43,7 +42,6 @@ export class DeepgramSTTProvider implements STTProvider {
   private deepgramClient: DeepgramClient | null = null;
   private liveClient: LiveClient | null = null;
   private callbacks: Set<STTEventCallback> = new Set();
-  private wss: WebSocketServer;
   private startConfig: STTStartConfig | null = null;
   private deepgramConfig: DeepgramConfig;
   private reconnectAttempts = 0;
@@ -51,9 +49,9 @@ export class DeepgramSTTProvider implements STTProvider {
   private keepAliveInterval: NodeJS.Timeout | null = null;
   private sessionId: string | null = null;
   private sessionStartedAt: number = 0;
+  private transcriptionStartedAt: number = 0;
 
-  constructor(wss: WebSocketServer, deepgramConfig?: Partial<DeepgramConfig>) {
-    this.wss = wss;
+  constructor(deepgramConfig?: Partial<DeepgramConfig>) {
     this.deepgramConfig = {
       apiKey: config.DEEPGRAM_API_KEY || "",
       model: DEFAULT_MODEL,
@@ -98,6 +96,7 @@ export class DeepgramSTTProvider implements STTProvider {
     this.startConfig = startConfig;
     this.sessionId = startConfig.sessionId;
     this.sessionStartedAt = startConfig.sessionStartedAt;
+    this.transcriptionStartedAt = Date.now();
     this.reconnectAttempts = 0;
 
     await this.connect();
@@ -263,9 +262,18 @@ export class DeepgramSTTProvider implements STTProvider {
       const isFinal = data.is_final === true;
       const words = alternative.words || [];
 
-      // Calculate timing relative to session start
-      const startTime = words.length > 0 ? words[0].start : data.start || 0;
-      const endTime = words.length > 0 ? words[words.length - 1].end : (data.start || 0) + (data.duration || 0);
+      // Deepgram timestamps are relative to when transcription began, not when
+      // the product session began. Shift them onto the session timeline.
+      const rawStartTime = words.length > 0 ? words[0].start : data.start || 0;
+      const rawEndTime = words.length > 0
+        ? words[words.length - 1].end
+        : (data.start || 0) + (data.duration || 0);
+      const { t0, t1 } = alignSegmentToSessionTimeline(
+        rawStartTime,
+        rawEndTime,
+        this.sessionStartedAt,
+        this.transcriptionStartedAt
+      );
 
       // Extract speaker from diarization
       let speakerId: string | null = null;
@@ -276,8 +284,8 @@ export class DeepgramSTTProvider implements STTProvider {
       const segment: TranscriptionSegment = {
         speakerId,
         text: transcript,
-        t0: startTime,
-        t1: endTime,
+        t0,
+        t1,
         confidence: alternative.confidence || 0,
         isFinal,
         words: words.map((w: any) => ({
@@ -296,43 +304,9 @@ export class DeepgramSTTProvider implements STTProvider {
         segment,
       });
 
-      // Only emit final transcripts to WebSocket clients
-      if (isFinal && this.sessionId) {
-        this.emitTranscriptEvent(segment);
-      }
-
     } catch (error) {
       sttLogger.error({ err: error }, "[stt:deepgram] Error processing transcript");
     }
-  }
-
-  /**
-   * Emit TRANSCRIPT_SEGMENT event to WebSocket clients
-   */
-  private emitTranscriptEvent(segment: TranscriptionSegment): void {
-    if (!this.sessionId) return;
-
-    const event: EventEnvelope = {
-      id: uuidv4(),
-      sessionId: this.sessionId,
-      ts: Date.now(),
-      type: "TRANSCRIPT_SEGMENT",
-      payload: {
-        speakerId: segment.speakerId,
-        text: segment.text,
-        t0: segment.t0,
-        t1: segment.t1,
-      },
-    };
-
-    const message = JSON.stringify(event);
-    this.wss.clients.forEach((client) => {
-      if (client.readyState === 1) {
-        client.send(message);
-      }
-    });
-
-    sttLogger.info(`[stt:deepgram] Emitted TRANSCRIPT_SEGMENT: "${segment.text.slice(0, 50)}..."`);
   }
 
   /**
@@ -497,8 +471,8 @@ export class DeepgramSTTProvider implements STTProvider {
  * Create a Deepgram STT provider instance
  */
 export function createDeepgramProvider(
-  wss: WebSocketServer,
+  _wss: WebSocketServer,
   deepgramConfig?: Partial<DeepgramConfig>
 ): DeepgramSTTProvider {
-  return new DeepgramSTTProvider(wss, deepgramConfig);
+  return new DeepgramSTTProvider(deepgramConfig);
 }

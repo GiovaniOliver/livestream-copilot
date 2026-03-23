@@ -430,6 +430,15 @@ export const createMomentResponseSchema = apiResponseSchema(
   })
 );
 
+/**
+ * Delete moment response
+ */
+export const deleteMomentResponseSchema = apiResponseSchema(
+  z.object({
+    message: z.string(),
+  })
+);
+
 // ============================================================================
 // Output Schemas
 // ============================================================================

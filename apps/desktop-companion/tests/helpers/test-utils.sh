@@ -15,9 +15,27 @@ export COLOR_CYAN='\033[0;36m'
 export COLOR_MAGENTA='\033[0;35m'
 export COLOR_RESET='\033[0m'
 
+# Resolve app-local defaults from apps/desktop-companion/.env when present.
+TEST_UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$(cd "$TEST_UTILS_DIR/../.." && pwd)"
+APP_ENV_FILE="${APP_DIR}/.env"
+
+read_app_env() {
+  local key=$1
+
+  if [ ! -f "$APP_ENV_FILE" ]; then
+    return 0
+  fi
+
+  grep -E "^${key}=" "$APP_ENV_FILE" | tail -n 1 | cut -d'=' -f2- | tr -d '\r'
+}
+
+DEFAULT_HTTP_PORT="$(read_app_env "HTTP_PORT")"
+DEFAULT_WS_PORT="$(read_app_env "WS_PORT")"
+
 # Test configuration
-export BASE_URL="${BASE_URL:-http://localhost:3123}"
-export WS_URL="${WS_URL:-ws://localhost:3124}"
+export BASE_URL="${BASE_URL:-http://localhost:${DEFAULT_HTTP_PORT:-3125}}"
+export WS_URL="${WS_URL:-ws://localhost:${DEFAULT_WS_PORT:-3126}}"
 export TEST_TIMEOUT="${TEST_TIMEOUT:-30}"
 export RETRY_COUNT="${RETRY_COUNT:-3}"
 export RETRY_DELAY="${RETRY_DELAY:-2}"
@@ -220,7 +238,7 @@ http_post_raw() {
 
 check_json_ok() {
   local response=$1
-  local ok=$(echo "$response" | jq -r '.ok // "null"')
+  local ok=$(echo "$response" | jq -r 'if .ok != null then .ok elif .success != null then .success else "null" end')
 
   if [ "$ok" = "true" ]; then
     return 0
@@ -234,7 +252,12 @@ json_field() {
   local field=$2
   local default=${3:-"null"}
 
-  echo "$response" | jq -r ".${field} // \"${default}\""
+  echo "$response" | jq -r --arg field "$field" --arg default "$default" '
+    if has($field) then .[$field]
+    elif (has("data") and (.data | type == "object") and (.data | has($field))) then .data[$field]
+    else $default
+    end // $default
+  '
 }
 
 json_exists() {

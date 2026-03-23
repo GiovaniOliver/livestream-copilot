@@ -1,0 +1,43 @@
+model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+personality = "pragmatic"
+[features]
+experimental_use_rmcp_client = true
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["chrome-devtools-mcp@latest"]
+
+[notice]
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+
+[notice.model_migrations]
+"gpt-5.1-codex-mini" = "gpt-5.2-codex"
+"gpt-5.2-codex" = "gpt-5.3-codex"
+
+[projects.'\\?\C:\Users\OliverProductions\Desktop\🛠️ DEVELOPMENT\Side-Old-Archived Projects\J5-Personal-Assistant']
+trust_level = "trusted"
+
+[projects.'\\?\C:\Users\OliverProductions\Desktop\1.SMG-BUSINESS\1b.)SMG-Side-Brands Dev']
+trust_level = "trusted"
+
+[projects.'\\?\C:\Users\OliverProductions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands Dev\socialtizemg_main']
+trust_level = "trusted"
+
+[projects.'\\?\C:\Users\OliverProductions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands Dev\OurPeopleUniversity']
+trust_level = "trusted"
+
+[projects.'C:\Users\OliverProductions\Desktop\1.SMG-BUSINESS']
+trust_level = "trusted"
+
+[projects.'\\?\C:\Users\OliverProductions\Desktop\2.DEVELOPMENT Work\Side-Old-Archived Projects\J5-Personal-Assistant']
+trust_level = "trusted"
+
+[projects.'C:\Users\OliverProductions\Desktop\1.SMG-BUSINESS\0b.)SMG-Main Brands Dev\A2.) EventraAI']
+trust_level = "trusted"
+
+[projects.'C:\Users\OliverProductions']
+trust_level = "trusted"
+
+[windows]
+sandbox = "elevated"

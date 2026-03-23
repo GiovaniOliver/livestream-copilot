@@ -133,7 +133,7 @@ function handleValidationError(res: Response, error: ZodError): void {
 // =============================================================================
 
 /**
- * POST /api/export/post
+ * POST /api/v1/export/post
  * Export a social media post
  */
 async function exportPostHandler(req: Request, res: Response): Promise<void> {
@@ -177,7 +177,7 @@ async function exportPostHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
- * POST /api/export/clip
+ * POST /api/v1/export/clip
  * Export a video clip
  */
 async function exportClipHandler(req: Request, res: Response): Promise<void> {
@@ -221,7 +221,7 @@ async function exportClipHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
- * POST /api/export/batch
+ * POST /api/v1/export/batch
  * Batch export multiple items
  */
 async function exportBatchHandler(req: Request, res: Response): Promise<void> {
@@ -265,7 +265,7 @@ async function exportBatchHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
- * GET /api/export/:id/status
+ * GET /api/v1/export/:id/status
  * Get export job status
  */
 async function getExportStatusHandler(req: Request, res: Response): Promise<void> {
@@ -299,6 +299,12 @@ async function getExportStatusHandler(req: Request, res: Response): Promise<void
       progress,
       createdAt: exportJob.createdAt,
       completedAt: exportJob.completedAt,
+      downloadUrl:
+        exportJob.status === ExportStatus.COMPLETED && exportJob.filePath
+          ? `/api/v1/export/${exportJob.id}/download`
+          : undefined,
+      filename: exportJob.filePath ? path.basename(exportJob.filePath) : undefined,
+      fileSize: exportJob.fileSize ? Number(exportJob.fileSize) : undefined,
       errorMessage: exportJob.errorMessage,
       metadata: exportJob.metadata,
     });
@@ -309,7 +315,7 @@ async function getExportStatusHandler(req: Request, res: Response): Promise<void
 }
 
 /**
- * GET /api/export/:id/download
+ * GET /api/v1/export/:id/download
  * Download export file
  */
 async function downloadExportHandler(req: Request, res: Response): Promise<void> {
@@ -386,7 +392,7 @@ async function downloadExportHandler(req: Request, res: Response): Promise<void>
 }
 
 /**
- * GET /api/export/history
+ * GET /api/v1/export/history
  * Get export history for current user
  */
 async function getExportHistoryHandler(req: Request, res: Response): Promise<void> {
@@ -411,7 +417,7 @@ async function getExportHistoryHandler(req: Request, res: Response): Promise<voi
 }
 
 /**
- * GET /api/export/stats
+ * GET /api/v1/export/stats
  * Get export statistics for current user
  */
 async function getExportStatsHandler(req: Request, res: Response): Promise<void> {
@@ -428,7 +434,7 @@ async function getExportStatsHandler(req: Request, res: Response): Promise<void>
 }
 
 /**
- * DELETE /api/export/:id
+ * DELETE /api/v1/export/:id
  * Delete an export
  */
 async function deleteExportHandler(req: Request, res: Response): Promise<void> {
@@ -458,7 +464,7 @@ async function deleteExportHandler(req: Request, res: Response): Promise<void> {
 }
 
 /**
- * POST /api/export/preview
+ * POST /api/v1/export/preview
  * Preview formatted post for multiple platforms without saving
  */
 async function previewPostHandler(req: Request, res: Response): Promise<void> {
@@ -524,10 +530,10 @@ export function createExportRouter(): Router {
 
 /**
  * Pre-configured export router.
- * Mount at /api/export in your Express app.
+ * Mount at /api/v1/export in your Express app.
  *
  * @example
  * import { exportRouter } from './export/routes';
- * app.use('/api/export', exportRouter);
+ * app.use('/api/v1/export', exportRouter);
  */
 export const exportRouter = createExportRouter();

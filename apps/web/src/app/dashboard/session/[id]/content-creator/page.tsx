@@ -15,11 +15,21 @@ import { ClipQueueDashboard } from "@/components/clip-queue";
 import { StreamDebugPanel } from "@/components/debug/StreamDebugPanel";
 import { type Session } from "@/lib/stores/sessions";
 import { useSession } from "@/hooks/useSessions";
-import { useClips } from "@/hooks/useClips";
+import { useClips, type Clip as SessionClip } from "@/hooks/useClips";
 import { useOutputs, type Output } from "@/hooks/useOutputs";
+import { useExport } from "@/hooks/useExport";
+import { ExportModal } from "@/components/export";
+import type { ExportContent } from "@/components/export/types";
+import { useAuth } from "@/lib/contexts/AuthContext";
+import { getClipMediaUrl, getClipThumbnailUrl } from "@/lib/api/clips";
 import { getHealth } from "@/lib/api/health";
+import { publishPost as publishOutputPost } from "@/lib/api/posts";
+import {
+  getSocialConnections,
+  type SocialConnectionInfo,
+} from "@/lib/api/social";
+import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
-import type { OutputStatus } from "@/lib/api/outputs";
 import { logger } from "@/lib/logger";
 
 // ============================================================
@@ -359,6 +369,16 @@ const MOMENT_TYPE_CONFIG = {
   clip: { name: "Clip", color: "#00D4C7" },
 } as const;
 
+const SOCIAL_OUTPUT_CATEGORY = "SOCIAL_POST";
+
+const SUPPORTING_OUTPUT_CONFIG = {
+  CLIP_TITLE: { label: "Clip Title", color: "#00D4C7", Icon: SparklesIcon },
+  CHAPTER_MARKER: { label: "Chapter Marker", color: "#FBBF24", Icon: BookmarkIcon },
+  QUOTE: { label: "Quote", color: "#8B5CF6", Icon: DocumentIcon },
+} as const;
+
+type SupportingOutputCategory = keyof typeof SUPPORTING_OUTPUT_CONFIG;
+
 // ============================================================
 // Page Props
 // ============================================================
@@ -392,6 +412,46 @@ function formatReplayTimestamp(ts?: number | null): string {
   return new Date(ts).toLocaleTimeString();
 }
 
+function normalizeOutputCategory(category: string): string {
+  return category.trim().toUpperCase().replace(/[\s-]+/g, "_");
+}
+
+function isSocialPostOutput(output: Output): boolean {
+  return normalizeOutputCategory(output.category) === SOCIAL_OUTPUT_CATEGORY;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getPublishedPostUrl(output: Output): string | null {
+  if (!isRecord(output.meta) || !isRecord(output.meta.publish)) {
+    return null;
+  }
+
+  const platformUrl = output.meta.publish.platformUrl;
+  return typeof platformUrl === "string" ? platformUrl : null;
+}
+
+function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiError && isRecord(error.body) && isRecord(error.body.error)) {
+    const message = error.body.error.message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+
+  return error instanceof Error ? error.message : fallback;
+}
+
+function getSupportingOutputCategory(output: Output): SupportingOutputCategory | null {
+  const normalizedCategory = normalizeOutputCategory(output.category);
+  if (normalizedCategory in SUPPORTING_OUTPUT_CONFIG) {
+    return normalizedCategory as SupportingOutputCategory;
+  }
+  return null;
+}
+
 // ============================================================
 // Post Card Component with Edit/Copy/Regenerate functionality
 // ============================================================
@@ -401,9 +461,22 @@ interface PostCardProps {
   onApprove: (id: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onUpdate: (id: string, updates: { title?: string; text?: string }) => Promise<void>;
+  onExport: (output: Output) => void;
+  onPublish: (output: Output) => void;
+  publishEnabled: boolean;
+  publishDisabledReason?: string;
 }
 
-function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
+function PostCard({
+  output,
+  onApprove,
+  onDelete,
+  onUpdate,
+  onExport,
+  onPublish,
+  publishEnabled,
+  publishDisabledReason,
+}: PostCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(output.title || "");
   const [editText, setEditText] = useState(output.text);
@@ -416,6 +489,7 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
   const [regenerateInstructions, setRegenerateInstructions] = useState("");
 
   const platformConfig = PLATFORM_CONFIG[output.platform];
+  const publishedPostUrl = getPublishedPostUrl(output);
 
   // Reset edit state when output changes
   useEffect(() => {
@@ -765,6 +839,15 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
             )}
           </button>
 
+          <button
+            type="button"
+            onClick={() => onExport(output)}
+            className="rounded p-1 text-teal transition-colors hover:bg-teal/10"
+            title="Export"
+          >
+            <DownloadIcon className="h-4 w-4" />
+          </button>
+
           {/* Approve button (only for drafts) */}
           {output.status === "draft" && (
             <button
@@ -775,6 +858,35 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
             >
               <CheckIcon className="h-4 w-4" />
             </button>
+          )}
+
+          {output.status === "approved" && (
+            <button
+              type="button"
+              onClick={() => onPublish(output)}
+              disabled={!publishEnabled}
+              className={cn(
+                "rounded p-1 transition-colors",
+                publishEnabled
+                  ? "text-warning hover:bg-warning/10"
+                  : "cursor-not-allowed text-text-dim opacity-50"
+              )}
+              title={publishEnabled ? "Publish" : publishDisabledReason || "Publish unavailable"}
+            >
+              <PlayIcon className="h-4 w-4" />
+            </button>
+          )}
+
+          {output.status === "published" && publishedPostUrl && (
+            <a
+              href={publishedPostUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded p-1 text-success transition-colors hover:bg-success/10"
+              title="Open published post"
+            >
+              <PlayIcon className="h-4 w-4" />
+            </a>
           )}
 
           {/* Delete button with confirmation */}
@@ -819,11 +931,95 @@ function PostCard({ output, onApprove, onDelete, onUpdate }: PostCardProps) {
   );
 }
 
+interface SupportingOutputCardProps {
+  output: Output;
+}
+
+function SupportingOutputCard({ output }: SupportingOutputCardProps) {
+  const category = getSupportingOutputCategory(output);
+  const config = category ? SUPPORTING_OUTPUT_CONFIG[category] : null;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      const textToCopy = output.title
+        ? `${output.title}\n\n${output.text}`
+        : output.text;
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      logger.error("Failed to copy supporting output:", err);
+    }
+  }, [output.text, output.title]);
+
+  if (!config) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-xl border border-stroke bg-surface p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
+              style={{
+                backgroundColor: `${config.color}20`,
+                color: config.color,
+              }}
+            >
+              <config.Icon className="h-3.5 w-3.5" />
+              {config.label}
+            </span>
+            <Badge variant="default" className="capitalize">
+              {output.status}
+            </Badge>
+          </div>
+          <h4 className="truncate font-semibold text-text">
+            {output.title || config.label}
+          </h4>
+          <p className="mt-1 text-xs text-text-dim">{output.formattedDate}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-2 hover:text-text"
+          title={copied ? "Copied" : "Copy output"}
+        >
+          <ClipboardIcon className="h-4 w-4" />
+        </button>
+      </div>
+
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-text-muted">
+        {output.text}
+      </p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-text-dim">
+        {output.refs.length > 0 && (
+          <span className="rounded bg-bg-2 px-2 py-1">
+            {output.refs.length} reference{output.refs.length === 1 ? "" : "s"}
+          </span>
+        )}
+        {output.meta && Object.keys(output.meta).length > 0 && (
+          <span className="rounded bg-bg-2 px-2 py-1">Metadata attached</span>
+        )}
+        {copied && (
+          <span className="rounded bg-success/10 px-2 py-1 text-success">
+            Copied
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ============================================================
 // Content Creator Dashboard Page
 // ============================================================
 
 export default function ContentCreatorPage({ params }: ContentCreatorPageProps) {
+  const { accessToken } = useAuth();
   const [sessionId, setSessionId] = useState<string>("");
   const [session, setSession] = useState<Session | null>(null);
 
@@ -850,6 +1046,13 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
 
   // Clip queue sidebar state
   const [isClipQueueCollapsed, setIsClipQueueCollapsed] = useState(false);
+  const [socialConnections, setSocialConnections] = useState<SocialConnectionInfo[]>([]);
+  const [isConnectionsLoading, setIsConnectionsLoading] = useState(false);
+  const [connectionsError, setConnectionsError] = useState<string | null>(null);
+  const [publishTarget, setPublishTarget] = useState<Output | null>(null);
+  const [selectedConnectionId, setSelectedConnectionId] = useState("");
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // Live stream status hook
   const { status: videoStatus } = useLiveStream();
@@ -886,10 +1089,53 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
     updateOutput,
     updateStatus: updateOutputStatus,
     deleteOutput,
-    draftCount,
-    approvedCount,
-    platformCounts,
   } = useOutputs(sessionId, { limit: 50, autoRefresh: true });
+  const {
+    isModalOpen: isExportModalOpen,
+    currentContent: exportContent,
+    openExport,
+    closeExport,
+    handleExport,
+    generateHashtagSuggestions,
+  } = useExport();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSocialConnections() {
+      if (!accessToken) {
+        setSocialConnections([]);
+        setConnectionsError(null);
+        setIsConnectionsLoading(false);
+        return;
+      }
+
+      setIsConnectionsLoading(true);
+      try {
+        const connections = await getSocialConnections(accessToken);
+        if (!cancelled) {
+          setSocialConnections(connections);
+          setConnectionsError(null);
+        }
+      } catch (error) {
+        logger.error("Failed to load social connections:", error);
+        if (!cancelled) {
+          setSocialConnections([]);
+          setConnectionsError(getApiErrorMessage(error, "Failed to load social connections"));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsConnectionsLoading(false);
+        }
+      }
+    }
+
+    void loadSocialConnections();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   // Update live duration every second for live sessions
   useEffect(() => {
@@ -928,17 +1174,122 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
     return () => clearInterval(interval);
   }, [checkObsStatus]);
 
-  // Filter outputs by platform
+  const socialOutputs = useMemo(
+    () => outputs.filter((output) => isSocialPostOutput(output)),
+    [outputs]
+  );
+
+  const supportedSocialConnections = useMemo(
+    () =>
+      socialConnections.filter(
+        (connection) => connection.isActive && connection.platform !== "general"
+      ),
+    [socialConnections]
+  );
+
+  const getPublishConnectionsForOutput = useCallback(
+    (output: Output) =>
+      supportedSocialConnections.filter(
+        (connection) => output.platform === "general" || connection.platform === output.platform
+      ),
+    [supportedSocialConnections]
+  );
+
+  const supportingOutputs = useMemo(
+    () => outputs.filter((output) => getSupportingOutputCategory(output) !== null),
+    [outputs]
+  );
+
   const filteredOutputs =
     activePlatform === "all"
-      ? outputs
-      : outputs.filter((o) => o.platform === activePlatform);
+      ? socialOutputs
+      : socialOutputs.filter((output) => output.platform === activePlatform);
 
-  // Calculate all platform counts including "all"
+  const socialPlatformCounts = useMemo(
+    () =>
+      socialOutputs.reduce<Record<"x" | "linkedin" | "instagram" | "youtube" | "general", number>>(
+        (acc, output) => {
+          acc[output.platform] += 1;
+          return acc;
+        },
+        { x: 0, linkedin: 0, instagram: 0, youtube: 0, general: 0 }
+      ),
+    [socialOutputs]
+  );
+
   const allPlatformCounts = {
-    all: outputs.length,
-    ...platformCounts,
+    all: socialOutputs.length,
+    ...socialPlatformCounts,
   };
+
+  const approvedPostCount = useMemo(
+    () => socialOutputs.filter((output) => output.status === "approved").length,
+    [socialOutputs]
+  );
+
+  const supportingOutputCounts = useMemo(
+    () =>
+      supportingOutputs.reduce<Record<SupportingOutputCategory, number>>(
+        (acc, output) => {
+          const category = getSupportingOutputCategory(output);
+          if (category) {
+            acc[category] += 1;
+          }
+          return acc;
+        },
+        {
+          CLIP_TITLE: 0,
+          CHAPTER_MARKER: 0,
+          QUOTE: 0,
+        }
+      ),
+    [supportingOutputs]
+  );
+
+  const handleCopyClipPath = useCallback(async (clipPath: string) => {
+    try {
+      await navigator.clipboard.writeText(clipPath);
+    } catch (err) {
+      logger.error("Failed to copy clip path:", err);
+    }
+  }, []);
+
+  const handleExportClip = useCallback(
+    (clip: SessionClip) => {
+      const content: ExportContent = {
+        id: clip.artifactId,
+        type: "clip",
+        title: `Clip at ${clip.timestamp}`,
+        caption: session?.name ? `Highlight from ${session.name}` : `Highlight from ${clip.timestamp}`,
+        videoUrl: getClipMediaUrl(clip.artifactId),
+        thumbnailUrl: getClipThumbnailUrl(clip.thumbnailId || clip.artifactId),
+        duration: clip.duration,
+        sessionId: clip.sessionId,
+        clipId: clip.artifactId,
+        createdAt: new Date(clip.createdAt),
+      };
+
+      openExport(content);
+    },
+    [openExport, session]
+  );
+
+  const handleExportOutput = useCallback(
+    (output: Output) => {
+      const platformName = PLATFORM_CONFIG[output.platform].name;
+      const content: ExportContent = {
+        id: output.id,
+        type: "post",
+        title: output.title || `${platformName} Draft`,
+        caption: output.text,
+        sessionId: output.sessionId,
+        createdAt: new Date(output.createdAt),
+      };
+
+      openExport(content);
+    },
+    [openExport]
+  );
 
   // Handle approving an output
   const handleApprove = useCallback(
@@ -976,6 +1327,93 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
     },
     [updateOutput]
   );
+
+  const handleOpenPublish = useCallback(
+    (output: Output) => {
+      const candidateConnections = getPublishConnectionsForOutput(output);
+      setPublishTarget(output);
+      setSelectedConnectionId(candidateConnections[0]?.id ?? "");
+      setPublishError(null);
+    },
+    [getPublishConnectionsForOutput]
+  );
+
+  const handleClosePublish = useCallback(() => {
+    if (isPublishing) return;
+    setPublishTarget(null);
+    setSelectedConnectionId("");
+    setPublishError(null);
+  }, [isPublishing]);
+
+  const handleConfirmPublish = useCallback(async () => {
+    if (!publishTarget || !selectedConnectionId) {
+      setPublishError("Select a connected account before publishing.");
+      return;
+    }
+
+    if (!accessToken) {
+      setPublishError("Your session expired. Sign in again before publishing.");
+      return;
+    }
+
+    const selectedConnection = getPublishConnectionsForOutput(publishTarget).find(
+      (connection) => connection.id === selectedConnectionId
+    );
+
+    if (!selectedConnection) {
+      setPublishError("The selected social account is no longer available for this post.");
+      return;
+    }
+
+    setIsPublishing(true);
+    setPublishError(null);
+
+    try {
+      await publishOutputPost(
+        publishTarget.id,
+        {
+          connectionId: selectedConnection.id,
+          platform: selectedConnection.platform,
+        },
+        accessToken
+      );
+      await refreshOutputs();
+      setPublishTarget(null);
+      setSelectedConnectionId("");
+    } catch (error) {
+      logger.error("Failed to publish post:", error);
+      setPublishError(getApiErrorMessage(error, "Failed to publish post"));
+    } finally {
+      setIsPublishing(false);
+    }
+  }, [
+    accessToken,
+    getPublishConnectionsForOutput,
+    publishTarget,
+    refreshOutputs,
+    selectedConnectionId,
+  ]);
+
+  const publishConnectionsForTarget = useMemo(
+    () => (publishTarget ? getPublishConnectionsForOutput(publishTarget) : []),
+    [getPublishConnectionsForOutput, publishTarget]
+  );
+
+  const publishDisabledReason = useMemo(() => {
+    if (!accessToken) {
+      return "Sign in again to publish reviewed posts.";
+    }
+    if (isConnectionsLoading) {
+      return "Loading connected social accounts...";
+    }
+    if (connectionsError) {
+      return "Social account status is unavailable right now.";
+    }
+    if (supportedSocialConnections.length === 0) {
+      return "Connect an X, LinkedIn, Instagram, or YouTube account to publish.";
+    }
+    return undefined;
+  }, [accessToken, connectionsError, isConnectionsLoading, supportedSocialConnections.length]);
 
   // Get display duration - use live calculation for live sessions, stored value otherwise
   const displayDuration = useMemo(() => {
@@ -1015,13 +1453,13 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
               }
         }
         isStreaming={videoStatus?.isStreaming}
-        title="Content Creator"
-        subtitle="Clip queue, post drafts by platform, and moment rail for fast publishing"
+        title="Producer Desk"
+        subtitle="Content Creator dashboard for the streamer workflow: live preview, completed clips, post drafts, moment rail, and supporting outputs."
       />
 
       <div className="flex-1 p-6">
         {/* Stats Row */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {/* Clips Detected */}
           <Card>
             <CardContent className="flex items-center gap-4 py-4">
@@ -1046,7 +1484,22 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
               <div>
                 <p className="text-sm text-text-muted">Post Drafts</p>
                 <p className="text-2xl font-bold text-text">
-                  {isOutputsLoading ? "--" : outputs.length}
+                  {isOutputsLoading ? "--" : socialOutputs.length}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Supporting Outputs */}
+          <Card>
+            <CardContent className="flex items-center gap-4 py-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal/10">
+                <SparklesIcon className="h-5 w-5 text-teal" />
+              </div>
+              <div>
+                <p className="text-sm text-text-muted">Supporting Outputs</p>
+                <p className="text-2xl font-bold text-text">
+                  {isOutputsLoading ? "--" : supportingOutputs.length}
                 </p>
               </div>
             </CardContent>
@@ -1061,7 +1514,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
               <div>
                 <p className="text-sm text-text-muted">Approved</p>
                 <p className="text-2xl font-bold text-text">
-                  {isOutputsLoading ? "--" : approvedCount}
+                  {isOutputsLoading ? "--" : approvedPostCount}
                 </p>
               </div>
             </CardContent>
@@ -1211,24 +1664,38 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
                             {clip.t0.toFixed(1)}s - {clip.t1.toFixed(1)}s
                           </span>
                         </div>
+                        <p className="mb-2 truncate rounded bg-bg-2 px-2 py-1 font-mono text-[11px] text-text-dim">
+                          {clip.path}
+                        </p>
                         <div className="flex items-center justify-between text-xs text-text-muted">
                           <span>
                             {new Date(clip.createdAt).toLocaleTimeString()}
                           </span>
                           <div className="flex gap-2">
-                            <button
-                              type="button"
+                            <a
+                              href={getClipMediaUrl(clip.artifactId)}
+                              target="_blank"
+                              rel="noreferrer"
                               className="flex items-center gap-1 text-teal transition-colors hover:text-teal-400"
                             >
                               <PlayIcon className="h-3 w-3" />
-                              Preview
-                            </button>
+                              Open Clip
+                            </a>
                             <button
                               type="button"
-                              className="flex items-center gap-1 text-purple transition-colors hover:text-purple-400"
+                              onClick={() => handleExportClip(clip)}
+                              className="flex items-center gap-1 text-teal transition-colors hover:text-teal-400"
                             >
                               <DownloadIcon className="h-3 w-3" />
                               Export
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyClipPath(clip.path)}
+                              className="flex items-center gap-1 text-purple transition-colors hover:text-purple-400"
+                            >
+                              <ClipboardIcon className="h-3 w-3" />
+                              Copy Path
                             </button>
                           </div>
                         </div>
@@ -1241,26 +1708,72 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
           </div>
         </div>
 
-        {/* Timeline Section */}
+        {/* Supporting Output Section */}
         <Card variant="elevated" className="mt-6">
           <CardHeader>
-            <CardTitle>Stream Timeline</CardTitle>
-            <CardDescription>
-              Visual overview of highlights and engagement throughout the stream
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* Timeline Placeholder */}
-            <div className="h-24 rounded-xl bg-bg-2">
-              <div className="flex h-full flex-col items-center justify-center">
-                <p className="text-sm text-text-muted">
-                  Timeline visualization will appear here
-                </p>
-                <p className="mt-1 text-xs text-text-dim">
-                  Showing moments and engagement data in real-time
-                </p>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <CardTitle>Supporting Outputs</CardTitle>
+                <CardDescription>
+                  Clip titles, chapter markers, and quotes persisted alongside social drafts for the MVP demo loop.
+                </CardDescription>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(Object.entries(SUPPORTING_OUTPUT_CONFIG) as Array<
+                  [SupportingOutputCategory, (typeof SUPPORTING_OUTPUT_CONFIG)[SupportingOutputCategory]]
+                >).map(([category, config]) => (
+                  <span
+                    key={category}
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+                    style={{
+                      backgroundColor: `${config.color}20`,
+                      color: config.color,
+                    }}
+                  >
+                    <config.Icon className="h-3.5 w-3.5" />
+                    {config.label} ({supportingOutputCounts[category]})
+                  </span>
+                ))}
               </div>
             </div>
+          </CardHeader>
+          <CardContent>
+            {isOutputsLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <LoadingSpinner className="mb-3 h-8 w-8 text-teal" />
+                <p className="text-sm text-text-muted">Loading supporting outputs...</p>
+              </div>
+            ) : outputsError ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-error/10">
+                  <DocumentIcon className="h-6 w-6 text-error" />
+                </div>
+                <p className="text-sm text-error">{outputsError}</p>
+                <button
+                  type="button"
+                  onClick={() => refreshOutputs()}
+                  className="mt-3 text-xs text-teal hover:underline"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : supportingOutputs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface">
+                  <SparklesIcon className="h-6 w-6 text-text-dim" />
+                </div>
+                <p className="text-sm text-text-muted">No supporting outputs yet</p>
+                <p className="mt-1 text-xs text-text-dim">
+                  The streamer agent will surface clip titles, quotes, and chapter markers here as outputs are persisted.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                {supportingOutputs.map((output) => (
+                  <SupportingOutputCard key={output.id} output={output} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -1288,6 +1801,29 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
             </div>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 rounded-xl border border-stroke bg-bg-2 px-4 py-3">
+              {connectionsError ? (
+                <p className="text-xs text-error">
+                  Social publish status is unavailable: {connectionsError}
+                </p>
+              ) : isConnectionsLoading ? (
+                <p className="text-xs text-text-muted">
+                  Loading connected social accounts for publish...
+                </p>
+              ) : supportedSocialConnections.length === 0 ? (
+                <p className="text-xs text-text-muted">
+                  Publish is disabled until you connect an X, LinkedIn, Instagram, or YouTube
+                  account. Export and approval remain available.
+                </p>
+              ) : (
+                <p className="text-xs text-text-muted">
+                  {supportedSocialConnections.length} active social{" "}
+                  {supportedSocialConnections.length === 1 ? "account is" : "accounts are"} ready
+                  for reviewed post publishing from Producer Desk.
+                </p>
+              )}
+            </div>
+
             {/* Platform Tabs */}
             <div className="mb-4 flex gap-1 overflow-x-auto border-b border-stroke pb-3">
               <button
@@ -1307,7 +1843,7 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
               {(Object.keys(PLATFORM_CONFIG) as Array<keyof typeof PLATFORM_CONFIG>).map(
                 (platform) => {
                   const config = PLATFORM_CONFIG[platform];
-                  const count = platformCounts[platform] || 0;
+                  const count = socialPlatformCounts[platform] || 0;
 
                   return (
                     <button
@@ -1379,6 +1915,15 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
                     onApprove={handleApprove}
                     onDelete={handleDelete}
                     onUpdate={handleUpdate}
+                    onExport={handleExportOutput}
+                    onPublish={handleOpenPublish}
+                    publishEnabled={
+                      !publishDisabledReason && getPublishConnectionsForOutput(output).length > 0
+                    }
+                    publishDisabledReason={
+                      publishDisabledReason ||
+                      "No compatible connected account is available for this post."
+                    }
                   />
                 ))}
               </div>
@@ -1474,6 +2019,106 @@ export default function ContentCreatorPage({ params }: ContentCreatorPageProps) 
             )}
           </CardContent>
         </Card>
+
+        <ExportModal
+          isOpen={isExportModalOpen}
+          onClose={closeExport}
+          content={exportContent}
+          onExport={handleExport}
+          hashtagSuggestions={exportContent ? generateHashtagSuggestions(exportContent) : []}
+        />
+
+        {publishTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+            <div className="w-full max-w-lg rounded-2xl border border-stroke bg-bg-1 p-6 shadow-2xl">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-text">Publish Reviewed Post</h3>
+                <p className="mt-1 text-sm text-text-muted">
+                  Choose a connected social account for this approved draft.
+                </p>
+              </div>
+
+              <div className="mb-4 rounded-xl border border-stroke bg-surface p-4">
+                <p className="text-xs uppercase tracking-wide text-text-dim">Draft Preview</p>
+                {publishTarget.title && (
+                  <h4 className="mt-2 text-sm font-medium text-text">{publishTarget.title}</h4>
+                )}
+                <p className="mt-2 text-sm text-text line-clamp-4">{publishTarget.text}</p>
+              </div>
+
+              {publishError && (
+                <div className="mb-4 rounded-xl border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
+                  {publishError}
+                </div>
+              )}
+
+              {publishConnectionsForTarget.length === 0 ? (
+                <div className="rounded-xl border border-stroke bg-surface px-4 py-3 text-sm text-text-muted">
+                  No compatible connected account is available for this draft yet.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {publishConnectionsForTarget.map((connection) => (
+                    <label
+                      key={connection.id}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors",
+                        selectedConnectionId === connection.id
+                          ? "border-purple bg-purple/10"
+                          : "border-stroke bg-surface hover:bg-surface-hover"
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="publish-connection"
+                        value={connection.id}
+                        checked={selectedConnectionId === connection.id}
+                        onChange={() => setSelectedConnectionId(connection.id)}
+                        className="mt-1"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-text">{connection.displayName}</p>
+                        <p className="text-xs text-text-muted">
+                          {connection.platformLabel}
+                          {connection.platformUsername ? ` · @${connection.platformUsername}` : ""}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={handleClosePublish}
+                  disabled={isPublishing}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-surface disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleConfirmPublish()}
+                  disabled={isPublishing || publishConnectionsForTarget.length === 0 || !selectedConnectionId}
+                  className="flex items-center gap-2 rounded-lg bg-warning px-4 py-2 text-sm font-medium text-bg-0 transition-colors hover:bg-warning/90 disabled:opacity-50"
+                >
+                  {isPublishing ? (
+                    <>
+                      <LoadingSpinner className="h-4 w-4" />
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <PlayIcon className="h-4 w-4" />
+                      Publish
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       </div>
 

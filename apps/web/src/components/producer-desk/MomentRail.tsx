@@ -1,5 +1,6 @@
 "use client";
 
+import type * as React from "react";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, Button } from "@/components/ui";
 
