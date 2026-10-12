@@ -4,6 +4,10 @@
 ## P0
 - [ ] Remove apps/desktop-companion/env_debug.txt from git and rotate the JWT_SECRET, JWT_REFRESH_SECRET, TOKEN_ENCRYPTION_KEY and DATABASE_URL credentials it exposes (added 2026-10-07) #security
 
+## P1 — Open PRs
+- [ ] Review PR #10 "Fix OBS clip persistence and disable Turbopack in dev" (open since 2026-02-08; may be superseded by later main commits) — merge or close (added 2026-10-12)
+- [ ] Triage the open Dependabot PRs #1, #2, #3, #4, #13, #17, #21 (GitHub Actions and npm bumps, open since 2026-01..04) — merge, batch or close (added 2026-10-12) #deps
+
 ## P1
 - [ ] Untrack Paperclip/Codex runtime state (.paperclip/codex-home incl. auth.json, *.sqlite, tmp/) and .claude/settings.local.json, and add them to .gitignore (added 2026-10-07) #cleanup
 - [ ] Untrack generated artifacts from the 2026-03-23 checkpoint (apps/desktop-companion/exports/clips/*, test-output.txt, root backend-err.txt/backend-out.txt/test-output.txt) (added 2026-10-07) #cleanup
